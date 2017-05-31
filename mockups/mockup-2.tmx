@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="12" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="16x16_retrostyle_GUI_Denzi101012-1" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_retrostyle_GUI_Denzi101012-1.png" trans="476c6c" width="448" height="208"/>
+ </tileset>
+ <tileset firstgid="365" name="16x16_ultim6_character_Denzi050731" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_character_Denzi050731.PNG" trans="476c6c" width="416" height="576"/>
+ </tileset>
+ <tileset firstgid="1301" name="16x16_ultim6_item_Denzi060817-2" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_item_Denzi060817-2.PNG" trans="476c6c" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="1557" name="16x16_ultim6_monster_Denzi050817-1" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_monster_Denzi050817-1.PNG" trans="476c6c" width="400" height="400"/>
+ </tileset>
+ <tileset firstgid="2182" name="16x16_ultim6_wind_map_Denzi060606-5" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_wind_map_Denzi060606-5.gif" trans="476c6c" width="528" height="720"/>
+ </tileset>
+ <layer name="Terrain" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJydkUESgjAMRbsQpt2wkJtxBPFcQrkIihfRohfoCUhGM2ZKQyuLt8hM5v3MT1Mp1ezkrZW6Bux1IaVZ+zpG/6f/AftPYIjciUyB95KZNwo+4qbje2Fejs8CTvCFeVs+++3C6XQu3UncMzKpb6lrziny50noO+VEVwucI05+I/0WM7b6PpoPqZ7JMQMvwVWDxzOnz/AdYK8Q8mvzcyE4L7aTkuE=
+  </data>
+ </layer>
+ <layer name="Vegetation" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAMnOCk0AA0cJLK5sEAujtf08geXO5/RYZ9hNwIsoscc4c7aAWGyTIqhwu1zaMWAADQzwnT
+  </data>
+ </layer>
+ <layer name="Buildings" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUrOBgYGgH4h4g7oWyQZgUcIWLgeEqF4R9gkS92MBXoFnfoOZpc2JXAwDNRAhH
+  </data>
+ </layer>
+ <layer name="Objects" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBhZoImLgaEZiJ24qGvuM07qmjcKBhc4TkZ64eHCzX9BhnnaWPQAAA1wBHk=
+  </data>
+ </layer>
+ <layer name="People" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAOOMjOwHCInUqGAcEtoFm3qWjecAFz2ahv5mJG0tQLEREvU3G48zEN3E9r4DSI0yEAx7gGgg==
+  </data>
+ </layer>
+ <layer name="UI" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFowAVHB9oB4wCogEAUIMAyA==
+  </data>
+ </layer>
+ <layer name="Objects2" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgF1AKqrAwMEqzUMauDimaNROA2yMKujYtyM9ah+UkKyAcAo3UCnw==
+  </data>
+ </layer>
+</map>
