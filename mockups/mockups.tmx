@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="12" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="16x16_gui_Denzi070917-2" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_gui_Denzi070917-2.PNG" trans="476c6c" width="256" height="416"/>
+ </tileset>
+ <tileset firstgid="417" name="16x16_monochrome_mixed_Denzi140330-12" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_monochrome_mixed_Denzi140330-12.png" trans="476c6c" width="768" height="576"/>
+ </tileset>
+ <tileset firstgid="2145" name="16x16_retrostyle_GUI_Denzi101012-1" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_retrostyle_GUI_Denzi101012-1.png" trans="476c6c" width="448" height="208"/>
+ </tileset>
+ <tileset firstgid="2509" name="16x16_skill_icons_gui" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_skill_icons_gui.PNG" trans="476c6c" width="336" height="272"/>
+ </tileset>
+ <tileset firstgid="2866" name="16x16_ultim6_character_Denzi050731" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_character_Denzi050731.PNG" trans="476c6c" width="416" height="576"/>
+ </tileset>
+ <tileset firstgid="3802" name="16x16_ultim6_GUI_item010618-1" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_GUI_item010618-1.PNG" trans="476c6c" width="528" height="448"/>
+ </tileset>
+ <tileset firstgid="4726" name="16x16_ultim6_item_Denzi060817-2" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_item_Denzi060817-2.PNG" trans="476c6c" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="4982" name="16x16_ultim6_monster_Denzi050817-1" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_monster_Denzi050817-1.PNG" trans="476c6c" width="400" height="400"/>
+ </tileset>
+ <tileset firstgid="5607" name="16x16_ultim6_wind_map_Denzi060606-5" tilewidth="16" tileheight="16">
+  <image source="16x16_oblique/16x16_ultim6_wind_map_Denzi060606-5.gif" trans="476c6c" width="528" height="720"/>
+ </tileset>
+ <layer name="Terrain" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJyVkssNwCAMQ7lzh6nYfwdoO0NbCUvGSvgcnoAKvcYhLYXQPmpfsWdiDqHk8axUcYDb8J2gLvWVXhvX4PHfg+vqsE+z7NTGNcI5688qJ+6z03N52bln3ne858qr7+n1FdQ0zgr/Q13Ipq6TmeC+c69m9UU6ex5r1qxMRbDmCzybc6VZLQ94ATyGxd0=
+  </data>
+ </layer>
+ <layer name="Vegetation" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYEAAOXEGBnlxBqoBe6BZDgTMEwLKC1PRTmOgWSZUNI/egFZxIIlk5gsxCH4phl1PhiQDQ6YkbjMtgWZZQc3jEIeY8wKHWSDQCTSrC495yOC5GMTMoQhq8bi7DeivdjxhhA5qgGbVi2M3E2TWaiBuBWIAM1sR5w==
+  </data>
+ </layer>
+ <layer name="Buildings" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYICAk+IMcCAmxsDwVRSBxYH8R2IMJAFk88yAeo8C8TEoDeIzi+PWiw10opl3DMm8v6KkmQUCq7C4D4SPALEciX4FgeVA81KBOE0cYd4RKAbxHwOxKol+hgFztPiwAPJZxCFmUgOwkOAuAwns4qSmDxgIBJr3AGj/QzLDBgMAzWMEYiYc7iQVKALNUQJiZSqZR20AAHqtIWI=
+  </data>
+ </layer>
+ <layer name="Objects" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYKA9yBJnYMgG4k1AvFkcv9oYAvLo4AqJ6nGBIiqZAwM5QPPKhahr5igYHuA3FdMFABijBpc=
+  </data>
+ </layer>
+ <layer name="People" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBg44CxKW/MDRRgYgkRQxWJEsKslBmQB9WZToH+wggxu2pjLykOevmBgGIdAw/muMOXuyAGalTsM4w0EAOojBdU=
+  </data>
+ </layer>
+ <layer name="UI" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgF+MBsjoF2wSgYBbgBAK+nAKQ=
+  </data>
+ </layer>
+ <layer name="Objects2" width="20" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYGBgmCvEAAbTgfRMKJsaAJtZAsKUmTmXiu6jhXkwMIlG5o4C/GDDCAt3AGthBZY=
+  </data>
+ </layer>
+</map>
