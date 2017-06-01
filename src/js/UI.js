@@ -15,9 +15,11 @@ const UI = {
 			Loader.load(this.game);
 		},
 		init: function(){
-			this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+			//this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 			this.game.renderer.renderSession.roundPixels = true;  
 			Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
+			this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
+			this.game.scale.setUserScale(2, 2);
 			this.cursors = this.game.input.keyboard.createCursorKeys();
 			this.nextMove = 0;
 		},
@@ -58,7 +60,7 @@ const UI = {
 		map.createLayer('Objects');
 		terrainLayer.resizeWorld();
 
-		this.playerSprite = this.game.add.sprite(192, 144, 'player', 2);
+		this.playerSprite = this.game.add.sprite(192, 192, 'player', 1);
 		this.playerSprite.animations.add('walk_s', [0,1,2,1], 4);
 		this.playerSprite.animations.add('walk_n', [3,4,5,4], 4);
 		this.playerSprite.animations.add('walk_e', [6,7,8,7], 4);
