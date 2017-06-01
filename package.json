@@ -1,0 +1,28 @@
+{
+  "name": "OpenArthurianX6",
+  "version": "1.0.0",
+  "description": "A classic cRPG game engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "phaser": "^2.6.2"
+  },
+
+  "browserify-shim": {
+    "phaser": "global:Phaser",
+    "pixi": "global:PIXI"
+  },
+
+  "browserify": {
+    "transform": [ "browserify-shim" ]
+  },
+
+  "devDependencies": {
+    "browserify": "^11.0.0",
+    "browserify-shim": "^3.8.10"
+  }
+}
