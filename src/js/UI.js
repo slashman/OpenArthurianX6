@@ -67,7 +67,7 @@ const UI = {
 		this.playerSprite.animations.add('walk_w', [9,10,11,10], 4);
 		this.game.camera.follow(this.playerSprite);
 		this.game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
-		this.afterInit();
+		this.afterInit(this.game);
 	},
 	move: function(varx, vary){
 		var now = new Date().getTime();

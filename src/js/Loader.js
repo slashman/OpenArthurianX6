@@ -11,6 +11,7 @@ const Loader = {
 		game.load.image('terrain', 'assets/terrain.png');
 
 		game.load.spritesheet('player', 'assets/player.png', 16, 16);
+		game.load.spritesheet('mobs', 'assets/mobs.png', 16, 16);
 	}
 }
 
