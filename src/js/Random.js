@@ -1,0 +1,8 @@
+module.exports = {
+	chance: function(c) {
+		return Math.random() * 100 <= c;
+	},
+	num: function(low, hi){
+		return Math.floor(Math.random() * (hi - low + 1))+low;
+	}
+}

@@ -9,20 +9,33 @@ const NPCsData = require('./data/NPCs');
 const AppearancesData = require('./data/Appearances');
 
 const NPCFactory = require('./NPCFactory');
+const PlayerFactory = require('./PlayerFactory');
 const AppearanceFactory = require('./AppearanceFactory');
+
+const Timer = require('./Timer');
 
 const OAX6 = {
 	run: function(){
 		console.log("Running OAX6");
 		NPCFactory.init(NPCsData);
 		AppearanceFactory.init(AppearancesData);
-		UI.init(this.loadLevel.bind(this));
+		UI.launch(this.startGame.bind(this));
+	},
+	startGame: function(game){
+		Timer.init(game);
+		const firstLevel = this.loadLevel(game);
+		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 12, 0);
+		player.act();
 	},
 	loadLevel: function(game){
-		LevelLoader.loadLevel(game);
+		return LevelLoader.loadLevel(game);
 	}
 };
 
-window.OAX6 = OAX6;
+window.OAX6 = {
+	runner: OAX6,
+	UI: UI,
+	Timer: Timer
+};
 
 module.exports = OAX6;
