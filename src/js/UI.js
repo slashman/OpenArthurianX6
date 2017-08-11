@@ -42,9 +42,10 @@ const UI = {
 			varx = 1;
 		}
 		if (varx != 0 || vary != 0){
-			this.player.moveTo(varx, vary);
-			this.actionEnabled = false;
-			OAX6.Timer.set(this.WALK_DELAY+20, this.enableAction, this)
+			if (this.player.moveTo(varx, vary)) {
+				this.actionEnabled = false;
+				OAX6.Timer.set(this.WALK_DELAY+20, this.enableAction, this)
+			}
 		}
 	},
 	enableAction: function(){
@@ -56,16 +57,6 @@ const UI = {
 		const DESIRED_WALK_DELAY = 400;
 		this.WALK_FRAME_RATE = Math.ceil(1000 / (DESIRED_WALK_DELAY / WALK_FRAMES));
 		this.WALK_DELAY = Math.ceil((1000 / this.WALK_FRAME_RATE) * WALK_FRAMES);
-		var map = this.game.add.tilemap('covetous3'); //TODO: Read from Scenario data
-		map.addTilesetImage('terrain', 'terrain');
-		map.addTilesetImage('items', 'items');
-		map.addTilesetImage('monsters', 'monsters');
-		var terrainLayer = map.createLayer('Terrain');
-		map.createLayer('Vegetation');
-		map.createLayer('Buildings');
-		map.createLayer('Objects');
-		terrainLayer.resizeWorld();
-		this.game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
 		this.afterInit(this.game);
 	},
 	selectDir: function(varx, vary){

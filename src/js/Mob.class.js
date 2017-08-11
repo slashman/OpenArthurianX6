@@ -28,8 +28,7 @@ Mob.prototype = {
 			if (dx == 0 && dy == 0){
 				dx = 1;
 			}
-			if (this.level.canWalkTo(this, dx, dy)){
-				this.moveTo(dx, dy);
+			if (this.moveTo(dx, dy)) {
 				return 400;
 			}
 			return 0;
@@ -45,12 +44,16 @@ Mob.prototype = {
 	},
 	moveTo: function(dx, dy){
 		// Position changes before the tween to "reserve" the spot
-		this.x += dx;
-		this.y += dy;
-		OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
-		var dir = OAX6.UI.selectDir(dx, dy);
-		this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
+		if (!this.level.isSolid(this.x + dx, this.y + dy)) {
+			this.x += dx;
+			this.y += dy;
+			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
+			var dir = OAX6.UI.selectDir(dx, dy);
+			this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
+			return true;
+		}
 
+		return false;
 	},
 	climb: function(dz){
 

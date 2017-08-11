@@ -2,14 +2,18 @@ const Bus = require('./Bus');
 
 function Level(){
 	this.mobs = [];	
+	this.solidMask = null;
 	this.currentTurnCounter = 0;
 	Bus.listen('nextActor', this.actNext, this);
 }
 
 Level.prototype = {
-	canWalkTo: function(mob, dx, dy){
-		//TODO: Check collision vs other mobs and vs solid mask
-		return true;
+	isSolid: function(x, y){
+		// TODO: Check collision against other mobs
+		return this.solidMask[x][y];
+	},
+	setSolidMask: function(solidMask) {
+		this.solidMask = solidMask;
 	},
 	addMob: function(mob){
 		this.mobs.push(mob);
