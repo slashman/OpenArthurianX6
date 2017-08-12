@@ -11,7 +11,33 @@ const NPCs = [
 	},
 	{
 		id: 'shamuru',
-		appearance: 'skeleton'
+		appearance: 'skeleton',
+		dialog: [
+			{
+				key: "greeting",
+				dialog: "Hello, Avatar! I was [expecting] you"
+			},
+			{
+				key: "name",
+				dialog: "My name is Kram, lord of [Kramlandia]"
+			},
+			{
+				key: "expecting",
+				dialog: "Yes, I knew you'd come."
+			},
+			{
+				key: "job",
+				dialog: "I create worlds"
+			},
+			{
+				key: "kramlandia",
+				dialog: "A fair nation, full of bandits and thieves"	
+			},
+			{
+				key: "bye",
+				dialog: "Hasta la vista, baby"
+			},
+		]
 	}
 ]
 

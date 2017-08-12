@@ -18,6 +18,7 @@ const NPCFactory = {
 		npc.sprite.animations.add('walk_n', appearance.u, 4);
 		npc.sprite.animations.add('walk_e', appearance.r, 4);
 		npc.sprite.animations.add('walk_w', appearance.l, 4);
+		npc.dialog = definition.dialog;
 		return npc;
 	}
 }

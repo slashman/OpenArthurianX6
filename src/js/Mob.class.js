@@ -1,3 +1,4 @@
+const Bus = require('./Bus');
 const Random = require('./Random');
 const Timer = require('./Timer');
 
@@ -43,7 +44,10 @@ Mob.prototype = {
 			Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
 	},
 	moveTo: function(dx, dy){
-		if (!this.level.isSolid(this.x + dx, this.y + dy)) {
+		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		if (mob){
+			Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
+		} else if (!this.level.isSolid(this.x + dx, this.y + dy)) {
 			// Position changes before the tween to "reserve" the spot
 			this.x += dx;
 			this.y += dy;

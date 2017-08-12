@@ -12,13 +12,14 @@ Level.prototype = {
 		if (this.solidMask[x][y]) {
 			return true;
 		}
-
+		return false;
+	},
+	getMobAt: function(x, y){
 		for (var i=0,mob;mob=this.mobs[i];i++) {
 			if (mob.x == x && mob.y == y) {
-				return true;
+				return this.mobs[i];
 			}
 		}
-
 		return false;
 	},
 	setSolidMask: function(solidMask) {
