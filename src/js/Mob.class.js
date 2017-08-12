@@ -43,13 +43,16 @@ Mob.prototype = {
 			Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
 	},
 	moveTo: function(dx, dy){
-		// Position changes before the tween to "reserve" the spot
 		if (!this.level.isSolid(this.x + dx, this.y + dy)) {
+			// Position changes before the tween to "reserve" the spot
 			this.x += dx;
 			this.y += dy;
-			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
+
 			var dir = OAX6.UI.selectDir(dx, dy);
 			this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
+
+			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
+
 			return true;
 		}
 

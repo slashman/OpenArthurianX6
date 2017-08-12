@@ -9,8 +9,17 @@ function Level(){
 
 Level.prototype = {
 	isSolid: function(x, y){
-		// TODO: Check collision against other mobs
-		return this.solidMask[x][y];
+		if (this.solidMask[x][y]) {
+			return true;
+		}
+
+		for (var i=0,mob;mob=this.mobs[i];i++) {
+			if (mob.x == x && mob.y == y) {
+				return true;
+			}
+		}
+
+		return false;
 	},
 	setSolidMask: function(solidMask) {
 		this.solidMask = solidMask;
