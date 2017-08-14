@@ -1,3 +1,4 @@
 assembly/
 build/
 node_modules/
+src/js/ScenarioInfo.js
