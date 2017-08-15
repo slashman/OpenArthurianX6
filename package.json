@@ -24,6 +24,7 @@
     "browserify": "^11.0.0",
     "browserify-shim": "^3.8.10",
     "watchify": "^3.9.0",
+    "create-symlink": "^1.0.0",
     "gulp": "^3.9.1"
   }
 }
