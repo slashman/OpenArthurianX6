@@ -14,3 +14,6 @@ browserify assembly/OAX6.js -o build/oax6.js
 cp src/html/* build
 cp assets/* build/assets
 cp scenarios/wod6/maps/*.json build/scenario/maps
+
+# Clean up
+rm -rf assembly

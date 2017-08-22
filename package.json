@@ -11,18 +11,20 @@
   "dependencies": {
     "phaser": "^2.6.2"
   },
-
   "browserify-shim": {
     "phaser": "global:Phaser",
     "pixi": "global:PIXI"
   },
-
   "browserify": {
-    "transform": [ "browserify-shim" ]
+    "transform": [
+      "browserify-shim"
+    ]
   },
-
   "devDependencies": {
     "browserify": "^11.0.0",
-    "browserify-shim": "^3.8.10"
+    "browserify-shim": "^3.8.10",
+    "watchify": "^3.9.0",
+    "create-symlink": "^1.0.0",
+    "gulp": "^3.9.1"
   }
 }
