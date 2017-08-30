@@ -25,9 +25,11 @@ function bundle(b) {
 gulp.task('build', function() {
     createScenarioSymlink()
     .then(function() {
-        var b = browserify();
+        var b = browserify({
+            entries: ['../../src/js/OAX6.js'],
+            debug: true
+        });
 
-        b.add('../../src/js/OAX6.js');
         bundle(b);
     })
     .catch(function(error) {
@@ -42,7 +44,8 @@ gulp.task('watch', function() {
             entries: ['../../src/js/OAX6.js'],
             cache: {},
             packageCache: {},
-            plugin: [watchify]
+            plugin: [watchify],
+            debug: true
         });
 
         b.on('update', function(){ bundle(b); });
