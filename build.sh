@@ -1,7 +1,7 @@
 # Assembly
 rm -rf assembly
 mkdir assembly
-cp -r src/js/* assembly
+cp -r src/js/* assembly -L
 cp scenarios/wod6/Info.js assembly/ScenarioInfo.js 
 
 # Package
