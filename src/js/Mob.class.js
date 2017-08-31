@@ -14,6 +14,9 @@ function Mob(level, x, y, z){
 	this.x = x;
 	this.y = y;
 	this.z = z;
+
+	this.actionEnabled = true;
+	this.canStartDialog = false;
 }
 
 Mob.prototype = {
@@ -23,6 +26,8 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
+		if (!this.actionEnabled) { return; }
+
 		if (Random.chance(50)){
 			var dx = Random.num(-1,1);
 			var dy = Random.num(-1,1);
@@ -46,7 +51,9 @@ Mob.prototype = {
 	moveTo: function(dx, dy){
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
-			Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
+			if (this.canStartDialog && mob.dialog){
+				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
+			}
 		} else if (!this.level.isSolid(this.x + dx, this.y + dy)) {
 			// Position changes before the tween to "reserve" the spot
 			this.x += dx;

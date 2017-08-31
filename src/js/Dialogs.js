@@ -40,9 +40,19 @@ module.exports = {
 		]
 	 }
 	 */
-	startDialog: function(dialog){
-		console.log(dialog);
+	startDialog: function(chat){
+		var mob = chat.mob,
+			dialog = chat.dialog;
+
 		OAX6.UI.actionEnabled = false;
+		mob.actionEnabled = false;
+
+		var text = "Hello, this is a quick test";
+		var style = { font: "24px Verdana", fill: "#ffffff", align: "left"};
+
+
+		console.log(dialog);
+
 		//TODO: Show a window with the NPC name or appearance and portrait
 		//TODO: Show the greeting dialog
 		//TODO: Show the name, job, bye options
