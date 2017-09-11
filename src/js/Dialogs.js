@@ -1,5 +1,6 @@
 const Bus = require('./Bus');
 const Timer = require('./Timer');
+const PlayerStateMachine = require('./PlayerStateMachine');
 
 module.exports = {
 	init: function(game){
@@ -8,13 +9,15 @@ module.exports = {
 		this.maxWidth = 236;
 		this.maxLines = 4;
 		this.fontSize = 12;
+		this.inputPrefix = "YOU SAY: ";
 		this.chatLog = [];
+		this.chat = null;
 
 		this.background = game.add.image(64, 176, "dialogBack");
 
 		this.measureTool = game.add.bitmapText(0, 0, 'pixeled', '', this.fontSize);
 		this.name = game.add.bitmapText(68, 180, 'pixeled', '', this.fontSize);
-		this.playerInput = game.add.bitmapText(68, 274, 'pixeled', 'YOU SAY: _', this.fontSize);
+		this.playerInput = game.add.bitmapText(68, 274, 'pixeled', this.inputPrefix + '_', this.fontSize);
 		this.dialogLines = [];
 		
 		//TODO: Create a scene scheme and order the ui and the game there
@@ -33,9 +36,11 @@ module.exports = {
 		this.dialogUI.fixedToCamera = true;
 		this.dialogUI.visible = false;
 
-		Bus.listen('startDialog', this.startDialog, this);
-
 		this.blinkingCursor();
+
+		Bus.listen('startDialog', this.startDialog, this);
+		Bus.listen('updateDialogInput', this.updateDialogInput, this);
+		Bus.listen('sendInput', this.sendInput, this);
 	},
 	getKeywords: function(string) {
 		var keywords = [],
@@ -180,7 +185,9 @@ module.exports = {
 		var mob = chat.mob,
 			dialog = chat.dialog;
 
-		OAX6.UI.actionEnabled = false;
+		this.chat = chat;
+
+		PlayerStateMachine.switchState(PlayerStateMachine.DIALOG);
 		mob.actionEnabled = false;
 
 		this.name.text = mob.definitionId;
@@ -195,6 +202,19 @@ module.exports = {
 		//TODO: Show the name, job, bye options
 		//TODO: Add options based on shown keywords
 		//TODO: End dialog after the "bye" keyword chosen
-	}
+	},
+	updateDialogInput: function(line) {
+		this.playerInput.text = this.inputPrefix + line + "_";
+		this.blinkOut = true;
+	},
+	sendInput: function(line) {
+		var dialog = this.chat.dialog[line.toLowerCase()];
 
+		if (!dialog) {
+			dialog = this.chat.dialog.unknown;
+		}
+
+		this.addDialog({dialog: "> " + line});
+		this.addDialog(dialog);
+	}
 }

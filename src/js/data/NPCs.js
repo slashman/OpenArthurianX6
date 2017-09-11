@@ -37,6 +37,10 @@ const NPCs = [
 				key: "bye",
 				dialog: "Hasta la vista, baby"
 			},
+			{
+				key: "unknown",
+				dialog: "I can't help you with that"
+			}
 		]
 	}
 ]
