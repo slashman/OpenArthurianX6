@@ -98,6 +98,8 @@ module.exports = {
 			lines.push(line);
 		}
 
+		measureTool.text = "";
+
 		return lines;
 	},
 	addDialog: function(dialog) {
