@@ -5,11 +5,20 @@ module.exports = {
 		this.game = game;
 		this.blinkOut = true;
 
-		game.add.image(64, 224, "dialogBack");
+		this.background = game.add.image(64, 176, "dialogBack");
 
-		this.name = game.add.bitmapText(68, 228, 'pixeled', 'Spooky skeleton', 12);
-		this.playerInput = game.add.bitmapText(68, 322, 'pixeled', 'YOU SAY: _', 12);
+		this.name = game.add.bitmapText(68, 180, 'pixeled', 'Spooky skeleton', 12);
+		this.playerInput = game.add.bitmapText(68, 274, 'pixeled', 'YOU SAY: _', 12);
 		this.dialog = this.addDialog({dialog: "Hello, Avatar! I was [expecting] you, what a [pleasant] coincidence that you're standing here next to me :) As you probably know by now I am the ruler of this game and you are at my disposal :D"}); 
+
+		//TODO: Create a scene scheme and order the ui and the game there
+		this.dialogUI = game.add.group();
+		this.dialogUI.add(this.background);
+		this.dialogUI.add(this.name);
+		this.dialogUI.add(this.playerInput);
+		this.dialogUI.add(this.dialog);
+
+		this.dialogUI.fixedToCamera = true;
 
 		Bus.listen('startDialog', this.startDialog, this);
 
@@ -57,8 +66,7 @@ module.exports = {
 		// Remove [] out of keywords
 		msg = msg.replace(/[\[\]]/g, "");
 
-		var dialog = this.game.add.bitmapText(80, 214, 'pixeled', msg, 12);
-		dialog.fixedToCamera = true;
+		var dialog = this.game.add.bitmapText(80, 208, 'pixeled', msg, 12);
 		dialog.maxWidth = 240;
 
 		this.tintWords(dialog, keywords, 0xffff00);
