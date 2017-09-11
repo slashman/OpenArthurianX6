@@ -1,24 +1,37 @@
 const Bus = require('./Bus');
+const Timer = require('./Timer');
 
 module.exports = {
 	init: function(game){
 		this.game = game;
 		this.blinkOut = true;
+		this.maxWidth = 236;
+		this.maxLines = 4;
+		this.fontSize = 12;
+		this.chatLog = [];
 
 		this.background = game.add.image(64, 176, "dialogBack");
 
-		this.name = game.add.bitmapText(68, 180, 'pixeled', 'Spooky skeleton', 12);
-		this.playerInput = game.add.bitmapText(68, 274, 'pixeled', 'YOU SAY: _', 12);
-		this.dialog = this.addDialog({dialog: "Hello, Avatar! I was [expecting] you, what a [pleasant] coincidence that you're standing here next to me :) As you probably know by now I am the ruler of this game and you are at my disposal :D"}); 
-
+		this.measureTool = game.add.bitmapText(0, 0, 'pixeled', '', this.fontSize);
+		this.name = game.add.bitmapText(68, 180, 'pixeled', '', this.fontSize);
+		this.playerInput = game.add.bitmapText(68, 274, 'pixeled', 'YOU SAY: _', this.fontSize);
+		this.dialogLines = [];
+		
 		//TODO: Create a scene scheme and order the ui and the game there
 		this.dialogUI = game.add.group();
 		this.dialogUI.add(this.background);
 		this.dialogUI.add(this.name);
 		this.dialogUI.add(this.playerInput);
-		this.dialogUI.add(this.dialog);
+		
+		for (var i=0;i<this.maxLines;i++) {
+			var line = game.add.bitmapText(84, 208 + this.fontSize * i, 'pixeled', '', this.fontSize);
+
+			this.dialogUI.add(line);
+			this.dialogLines.push(line);
+		}
 
 		this.dialogUI.fixedToCamera = true;
+		this.dialogUI.visible = false;
 
 		Bus.listen('startDialog', this.startDialog, this);
 
@@ -38,8 +51,8 @@ module.exports = {
 
 		return keywords;
 	},
-	tintWords: function(text, words, color) {
-		var msg = text.text;
+	tintWords: function(bitmapText, words, color) {
+		var msg = bitmapText.text;
 
 		for (var k=0,word;word=words[k];k++) {
 			var reg = new RegExp("(?!" + word + ").", "g"),
@@ -52,26 +65,67 @@ module.exports = {
 					index2 = index1 + wordLength;
 
 				for (var j=0;j<wordLength;j++) {
-					text.getChildAt(index1 + j).tint = color;
+					bitmapText.getChildAt(index1 + j).tint = color;
 				}
 
 				lastIndex = index1 + 1;
 			}
 		}
 	},
+	splitInLines: function(text) {
+		var lines = [],
+			line = "",
+			measureTool = this.measureTool,
+			words = text.split(/\s/g);
+
+		measureTool.text = "";
+		for (var i=0,word;word=words[i];i++) {
+			if (line.length != 0) { measureTool.text += " "; }
+
+			measureTool.text += word;
+
+			if (measureTool.textWidth >= this.maxWidth) {
+				lines.push(line);
+				line = "";
+				measureTool.text = "";
+				i--;
+			}
+
+			line = measureTool.text;
+		}
+
+		if (line != "") {
+			lines.push(line);
+		}
+
+		return lines;
+	},
 	addDialog: function(dialog) {
 		var msg = dialog.dialog,
 			keywords = this.getKeywords(msg);
 			
-		// Remove [] out of keywords
-		msg = msg.replace(/[\[\]]/g, "");
+		// Remove [] out of keywords and split in lines
+		lines = this.splitInLines(msg.replace(/[\[\]]/g, ""));
 
-		var dialog = this.game.add.bitmapText(80, 208, 'pixeled', msg, 12);
-		dialog.maxWidth = 240;
+		for (var i=0,line;line=lines[i];i++) {
+			var dialogLine = this.dialogLines[this.chatLog.length];
 
-		this.tintWords(dialog, keywords, 0xffff00);
+			if (!dialogLine) {
+				for (var j=1;j<this.maxLines;j++) {
+					this.dialogLines[j].y -= this.fontSize;
+				}
 
-		return dialog;
+				dialogLine = this.dialogLines[0];
+				dialogLine.y += (this.maxLines - 1) * this.fontSize;
+
+				this.dialogLines.push(this.dialogLines.shift());
+			}
+
+			dialogLine.text = line;
+			this.chatLog.push(line);
+
+			this.tintWords(dialogLine, keywords, 0xffff00);
+		}
 	},
 	blinkingCursor: function() {
 		if (this.blinkOut) {
@@ -82,7 +136,7 @@ module.exports = {
 
 		this.blinkOut = !this.blinkOut;
 
-		this.game.time.events.add(Phaser.Timer.SECOND * 0.3, this.blinkingCursor, this);
+		Timer.set(Phaser.Timer.SECOND * 0.3, this.blinkingCursor, this);
 	},
 	/*
 	 * Sample structure of dialog object
@@ -127,9 +181,12 @@ module.exports = {
 		OAX6.UI.actionEnabled = false;
 		mob.actionEnabled = false;
 
-		this.dialog.text = dialog.greeting.dialog;
-		
-		console.log(dialog);
+		this.name.text = mob.definitionId;
+		this.addDialog(dialog.greeting);
+
+		this.dialogUI.visible = true;
+
+		console.log(mob);
 
 		//TODO: Show a window with the NPC name or appearance and portrait
 		//TODO: Show the greeting dialog

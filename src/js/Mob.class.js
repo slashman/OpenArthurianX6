@@ -26,8 +26,6 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		if (!this.actionEnabled) { return; }
-
 		if (Random.chance(50)){
 			var dx = Random.num(-1,1);
 			var dy = Random.num(-1,1);
@@ -44,6 +42,7 @@ Mob.prototype = {
 		}
 	},
 	activate: function() {
+		if (!this.actionEnabled) { return; }
 		var actionTime = this.act();
 		if (actionTime != -1)
 			Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
