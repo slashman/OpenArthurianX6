@@ -69,9 +69,11 @@ const PlayerStateMachine = {
             }
 
             if ((keyCode >= Phaser.KeyCode.A && keyCode <= Phaser.KeyCode.Z) || (keyCode >= Phaser.KeyCode.ZERO && keyCode <= Phaser.KeyCode.NINE) || keyCode == Phaser.KeyCode.SPACEBAR) {
-                var keyChar = String.fromCharCode(keyCode);
-                this.inputDialog += (key.shiftKey)? keyChar : keyChar.toLowerCase();
-                Bus.emit('updateDialogInput', this.inputDialog);
+                if (this.inputDialog.length < 20) { // Not measured anywhere but why would you put more than 20 characters
+                    var keyChar = String.fromCharCode(keyCode);
+                    this.inputDialog += (key.shiftKey)? keyChar : keyChar.toLowerCase();
+                    Bus.emit('updateDialogInput', this.inputDialog);
+                }
             } else if (keyCode == Phaser.KeyCode.BACKSPACE) {
                 this.inputDialog = this.inputDialog.substring(0, this.inputDialog.length - 1);
                 Bus.emit('updateDialogInput', this.inputDialog);
