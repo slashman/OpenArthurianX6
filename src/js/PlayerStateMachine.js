@@ -51,6 +51,10 @@ const PlayerStateMachine = {
         this.inputDialogCallback = callback.bind(context);
     },
 
+    clearInputDialogCallback: function() {
+        this.inputDialogCallback = null;
+    },
+
     updateDialogAction: function() {
         var key = this.game.input.keyboard.lastKey;
         if (key.isDown && key.repeats == 1) {
@@ -59,7 +63,6 @@ const PlayerStateMachine = {
             if (this.inputDialogCallback != null) {
                 if (keyCode == Phaser.KeyCode.ENTER) {
                     this.inputDialogCallback();
-                    this.inputDialogCallback = null;
                 }
 
                 return;

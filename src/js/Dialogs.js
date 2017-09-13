@@ -12,6 +12,7 @@ module.exports = {
 		this.inputPrefix = "YOU SAY: ";
 		this.chatLog = [];
 		this.chat = null;
+		this.backlogLines = null;
 
 		this.background = game.add.image(64, 176, "dialogBack");
 
@@ -107,14 +108,25 @@ module.exports = {
 
 		return lines;
 	},
-	addDialog: function(dialog) {
+	addDialog: function(dialog, isShowMore) {
 		var msg = dialog.dialog,
 			keywords = this.getKeywords(msg);
 			
-		// Remove [] out of keywords and split in lines
-		lines = this.splitInLines(msg.replace(/[\[\]]/g, ""));
+		// Split in lines
+		lines = this.splitInLines(msg);
+		
+		var showMoreMaxLines = (isShowMore)? 5 : 4,
+			showMoreSpliceAt = (isShowMore)? 3 : 2,
+			showMore = false;
+		if (lines.length >= showMoreMaxLines) {
+			this.backlogLines = lines.splice(showMoreSpliceAt).join(" ");
+			showMore = true;
+			PlayerStateMachine.setInputDialogCallback(this.showMoreLines, this);
+		}
 
 		for (var i=0,line;line=lines[i];i++) {
+			// Remove [] out of keywords
+			line = line.replace(/[\[\]]/g, "");
 			var dialogLine = this.dialogLines[this.chatLog.length];
 
 			if (!dialogLine) {
@@ -131,7 +143,12 @@ module.exports = {
 			dialogLine.text = line;
 			this.chatLog.push(line);
 
-			this.tintWords(dialogLine, keywords, 0xffff00);
+			var color = 0xffff00;
+			this.tintWords(dialogLine, keywords, color);
+		}
+
+		if (showMore) {
+			this.addDialog({ dialog: "[SHOW MORE]" }, false);
 		}
 	},
 	blinkingCursor: function() {
@@ -191,7 +208,7 @@ module.exports = {
 		mob.actionEnabled = false;
 
 		this.name.text = mob.definitionId;
-		this.addDialog(dialog.greeting);
+		this.addDialog(dialog.greeting, false);
 
 		this.dialogUI.visible = true;
 
@@ -200,6 +217,8 @@ module.exports = {
 	},
 	endDialog: function() {
 		PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+		PlayerStateMachine.clearInputDialogCallback();
+
 		this.chat.mob.actionEnabled = true;
 
 		this.name.text = "";
@@ -226,11 +245,19 @@ module.exports = {
 			dialog = this.chat.dialog.unknown;
 		}
 
-		this.addDialog({dialog: "> " + line});
-		this.addDialog(dialog);
+		this.addDialog({dialog: "> " + line}, false);
+		this.addDialog(dialog, false);
 
 		if (line.toLowerCase() == "bye") {
 			PlayerStateMachine.setInputDialogCallback(this.endDialog, this);
 		}
+	},
+	showMoreLines: function() {
+		var line = this.backlogLines;
+		this.backlogLines = null;
+
+		PlayerStateMachine.clearInputDialogCallback();
+
+		this.addDialog({ dialog: line }, true);
 	}
 }
