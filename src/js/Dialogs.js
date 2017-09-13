@@ -195,13 +195,25 @@ module.exports = {
 
 		this.dialogUI.visible = true;
 
-		console.log(mob);
-
 		//TODO: Show a window with the NPC name or appearance and portrait
-		//TODO: Show the greeting dialog
 		//TODO: Show the name, job, bye options
-		//TODO: Add options based on shown keywords
-		//TODO: End dialog after the "bye" keyword chosen
+	},
+	endDialog: function() {
+		PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+		this.chat.mob.actionEnabled = true;
+
+		this.name.text = "";
+
+		this.playerInput.text = this.inputPrefix + "_";
+		this.blinkOut = true;
+
+		for (var i=0;i<this.maxLines;i++) {
+			this.dialogLines[i].text = "";
+		}
+
+		this.chat = null;
+		this.chatLog = [];
+		this.dialogUI.visible = false;
 	},
 	updateDialogInput: function(line) {
 		this.playerInput.text = this.inputPrefix + line + "_";
@@ -216,5 +228,9 @@ module.exports = {
 
 		this.addDialog({dialog: "> " + line});
 		this.addDialog(dialog);
+
+		if (line.toLowerCase() == "bye") {
+			PlayerStateMachine.setInputDialogCallback(this.endDialog, this);
+		}
 	}
 }

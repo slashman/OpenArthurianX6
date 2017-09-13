@@ -14,6 +14,7 @@ const PlayerStateMachine = {
 
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
+        this.inputDialogCallback = null; // Call a function when pressing enter instead of allowing normal input
     },
 
     checkMovement: function() {
@@ -46,10 +47,24 @@ const PlayerStateMachine = {
         this.state = stateId;
     },
 
+    setInputDialogCallback: function(callback, context) {
+        this.inputDialogCallback = callback.bind(context);
+    },
+
     updateDialogAction: function() {
         var key = this.game.input.keyboard.lastKey;
         if (key.isDown && key.repeats == 1) {
             var keyCode = key.keyCode;
+
+            if (this.inputDialogCallback != null) {
+                if (keyCode == Phaser.KeyCode.ENTER) {
+                    this.inputDialogCallback();
+                    this.inputDialogCallback = null;
+                }
+
+                return;
+            }
+
             if ((keyCode >= Phaser.KeyCode.A && keyCode <= Phaser.KeyCode.Z) || (keyCode >= Phaser.KeyCode.ZERO && keyCode <= Phaser.KeyCode.NINE) || keyCode == Phaser.KeyCode.SPACEBAR) {
                 var keyChar = String.fromCharCode(keyCode);
                 this.inputDialog += (key.shiftKey)? keyChar : keyChar.toLowerCase();
