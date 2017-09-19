@@ -2,6 +2,8 @@ const Phaser = require('phaser');
 
 const Loader = require('./Loader');
 
+const PlayerStateMachine = require('./PlayerStateMachine');
+
 const TILE_WIDTH = 16;
 const TILE_HEIGHT = 16;
 
@@ -19,37 +21,13 @@ const UI = {
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
 		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
 		this.game.scale.setUserScale(2, 2);
-		this.cursors = this.game.input.keyboard.createCursorKeys();
 		this.nextMove = 0;
 	},
 	create: function(){
 		this.start();
 	},
 	update: function(){
-		if (!this.actionEnabled){
-			return;
-		}
-		var varx = 0;
-		var vary = 0;
-		if(this.cursors.up.isDown) {
-			vary = -1;
-		} else if(this.cursors.down.isDown) {
-			vary = 1;
-		}
-		if(this.cursors.left.isDown) {
-			varx = -1;
-		} else if(this.cursors.right.isDown) {
-			varx = 1;
-		}
-		if (varx != 0 || vary != 0){
-			if (this.player.moveTo(varx, vary)) {
-				this.actionEnabled = false;
-				OAX6.Timer.set(this.WALK_DELAY+20, this.enableAction, this)
-			}
-		}
-	},
-	enableAction: function(){
-		this.actionEnabled = true;
+		PlayerStateMachine.update();
 	},
 	start: function(){
 		this.scrollingEnabled = true;

@@ -12,6 +12,8 @@ const NPCFactory = require('./NPCFactory');
 const PlayerFactory = require('./PlayerFactory');
 const AppearanceFactory = require('./AppearanceFactory');
 
+const PlayerStateMachine = require('./PlayerStateMachine');
+
 const Timer = require('./Timer');
 
 const Dialogs = require('./Dialogs');
@@ -25,10 +27,13 @@ const OAX6 = {
 	},
 	startGame: function(game){
 		Timer.init(game);
-		Dialogs.init(game);
+		PlayerStateMachine.init(game);
+		
 		const firstLevel = this.loadLevel(game);
 		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 12, 0);
 		player.act();
+
+		Dialogs.init(game);
 	},
 	loadLevel: function(game){
 		return LevelLoader.loadLevel(game);

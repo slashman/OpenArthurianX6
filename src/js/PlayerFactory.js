@@ -5,6 +5,7 @@ const PlayerFactory = {
 	buildPlayer: function(UI, game, level, x, y, z){
 		const player = new Mob(level, x, y, z);
 		player.act = UI.playerAct.bind(UI);
+		player.canStartDialog = true;
 		UI.player = player;
 		const appearance = AppearanceFactory.getAppearance('demon');
 		player.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1]);
