@@ -205,7 +205,7 @@ module.exports = {
 		this.chat = chat;
 
 		PlayerStateMachine.switchState(PlayerStateMachine.DIALOG);
-		mob.actionEnabled = false;
+		mob.isTalking = true;
 
 		this.name.text = mob.definitionId;
 		this.addDialog(dialog.greeting, false);
@@ -219,7 +219,8 @@ module.exports = {
 		PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
 		PlayerStateMachine.clearInputDialogCallback();
 
-		this.chat.mob.actionEnabled = true;
+		this.chat.mob.isTalking = false;
+		this.chat.mob.activate(); 
 
 		this.name.text = "";
 

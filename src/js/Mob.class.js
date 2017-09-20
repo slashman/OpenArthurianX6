@@ -14,9 +14,8 @@ function Mob(level, x, y, z){
 	this.x = x;
 	this.y = y;
 	this.z = z;
-
-	this.actionEnabled = true;
-	this.canStartDialog = false;
+	this.isTalking = false;
+	this.canStartDialog = false; // Only player "mob" can start dialog
 }
 
 Mob.prototype = {
@@ -26,23 +25,29 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		if (Random.chance(50)){
-			var dx = Random.num(-1,1);
-			var dy = Random.num(-1,1);
-			if (dx == 0 && dy == 0){
-				dx = 1;
-			}
-			if (this.moveTo(dx, dy)) {
-				return 400;
-			}
-			return 0;
+		if (this === OAX6.UI.player){
+
 		} else {
-			// Do nothing
-			return 0;
+			if (Random.chance(50)){
+				var dx = Random.num(-1,1);
+				var dy = Random.num(-1,1);
+				if (dx == 0 && dy == 0){
+					dx = 1;
+				}
+				if (this.moveTo(dx, dy)) {
+					return 400;
+				}
+				return 0;
+			} else {
+				// Do nothing
+				return 0;
+			}
 		}
 	},
 	activate: function() {
-		if (!this.actionEnabled) { return; }
+		if (this.isTalking) {
+			return;
+		}
 		var actionTime = this.act();
 		if (actionTime != -1)
 			Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
