@@ -24,6 +24,10 @@ const UI = {
 		this.nextMove = 0;
 	},
 	create: function(){
+		this.mapLayer = this.game.add.group();
+		this.UILayer = this.game.add.group();
+		this.UILayer.fixedToCamera = true;
+		this.modeLabel = this.game.add.bitmapText(20, 20, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.start();
 	},
 	update: function(){

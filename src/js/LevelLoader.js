@@ -17,10 +17,10 @@ const LevelLoader = {
 		map.addTilesetImage('terrain', 'terrain');
 		map.addTilesetImage('items', 'items');
 		map.addTilesetImage('monsters', 'monsters');
-		var terrainLayer = map.createLayer('Terrain');
-		map.createLayer('Vegetation');
-		map.createLayer('Buildings');
-		map.createLayer('Objects');
+		var terrainLayer = map.createLayer('Terrain', false, false, OAX6.UI.mapLayer);
+		map.createLayer('Vegetation', false, false, OAX6.UI.mapLayer);
+		map.createLayer('Buildings', false, false, OAX6.UI.mapLayer);
+		map.createLayer('Objects', false, false, OAX6.UI.mapLayer);
 		terrainLayer.resizeWorld();
 		game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
 

@@ -115,6 +115,7 @@ const PlayerStateMachine = {
     },
 
     startCombat: function(){
+    	OAX6.UI.modeLabel.text = "Combat";
         this.actionEnabled = false;
         this.switchState(PlayerStateMachine.COMBAT_SYNC);
         // When the state is switched, all mobs will try to make their last move,
