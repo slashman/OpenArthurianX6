@@ -1,6 +1,8 @@
 const Bus = require('./Bus');
 const Random = require('./Random');
 const Timer = require('./Timer');
+const PlayerStateMachine = require('./PlayerStateMachine');
+const log = require('./Debug').log;
 
 /**
  * Represents a being living inside a world
@@ -26,7 +28,11 @@ Mob.prototype = {
 	 */
 	act: function(){
 		if (this === OAX6.UI.player){
-
+			// Enable action
+			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+				PlayerStateMachine.actionEnabled = true;
+			}
+			return 0;
 		} else {
 			if (Random.chance(50)){
 				var dx = Random.num(-1,1);
@@ -35,7 +41,7 @@ Mob.prototype = {
 					dx = 1;
 				}
 				if (this.moveTo(dx, dy)) {
-					return 400;
+					return OAX6.UI.WALK_DELAY;
 				}
 				return 0;
 			} else {
@@ -45,12 +51,23 @@ Mob.prototype = {
 		}
 	},
 	activate: function() {
-		if (this.isTalking) {
+		if (this.isTalking || PlayerStateMachine.state === PlayerStateMachine.COMBAT) {
+			//TODO: May be check state === DIALOG instead of this.isTalking?
+			return;
+		}
+		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
+			PlayerStateMachine.checkCombatReady();
 			return;
 		}
 		var actionTime = this.act();
-		if (actionTime != -1)
-			Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
+		Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
+		this.executingAction = true;
+		Timer.set(actionTime, ()=>{
+			this.executingAction = false;
+			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
+				PlayerStateMachine.checkCombatReady();
+			};
+		});
 	},
 	moveTo: function(dx, dy){
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);

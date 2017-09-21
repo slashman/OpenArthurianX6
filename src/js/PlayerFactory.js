@@ -4,7 +4,6 @@ const AppearanceFactory = require('./AppearanceFactory');
 const PlayerFactory = {
 	buildPlayer: function(UI, game, level, x, y, z){
 		const player = new Mob(level, x, y, z);
-		player.act = UI.playerAct.bind(UI);
 		player.canStartDialog = true;
 		UI.player = player;
 		const appearance = AppearanceFactory.getAppearance('demon');

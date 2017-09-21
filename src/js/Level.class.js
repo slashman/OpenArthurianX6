@@ -1,10 +1,11 @@
 const Bus = require('./Bus');
+const log = require('./Debug').log;
+const Timer = require('./Timer');
 
 function Level(){
 	this.mobs = [];	
 	this.solidMask = null;
 	this.currentTurnCounter = 0;
-	Bus.listen('nextActor', this.actNext, this);
 }
 
 Level.prototype = {
@@ -31,12 +32,22 @@ Level.prototype = {
 	},
 	// This is used when in TBS mode. This is WIP, not tested.
 	actNext: function(){
+		log("actNext",this.currentTurnCounter);
 		const nextActor = this.mobs[this.currentTurnCounter++];
 		if (this.currentTurnCounter === this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
 		const actionTime = nextActor.act();
-		Bus.emit('nextActor', actionTime); // Signals the caller to call again
+		if (nextActor !== OAX6.UI.player){
+			Timer.set(actionTime, ()=>this.actNext(), this);
+		} else {
+			// Player will take its time, then call actNext himself
+			// via the PlayerStateMachine
+			log ("Player's turn");
+		}
+	},
+	isMobActive: function(){
+		return this.mobs.find(m=>m.executingAction==true);
 	}
 }
 

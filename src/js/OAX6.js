@@ -31,8 +31,7 @@ const OAX6 = {
 		
 		const firstLevel = this.loadLevel(game);
 		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 12, 0);
-		player.act();
-
+		firstLevel.addMob(player);
 		Dialogs.init(game);
 	},
 	loadLevel: function(game){

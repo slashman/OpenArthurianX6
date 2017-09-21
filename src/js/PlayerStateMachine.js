@@ -1,9 +1,12 @@
 const Bus = require('./Bus');
+const log = require('./Debug').log;
 
 const PlayerStateMachine = {
     NOTHING     : 0,
     WORLD       : 1,
     DIALOG      : 2,
+    COMBAT      : 3,
+    COMBAT_SYNC : 4,
 
     init: function(game) {
         this.game = game;
@@ -16,7 +19,9 @@ const PlayerStateMachine = {
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
         this.inputDialogCallback = null; // Call a function when pressing enter instead of allowing normal input
     },
-
+    /*
+     * This is used by both WORLD and COMBAT modes
+     */
     checkMovement: function() {
         var varx = 0;
 		var vary = 0;
@@ -33,7 +38,14 @@ const PlayerStateMachine = {
 		if (varx != 0 || vary != 0){
 			if (OAX6.UI.player.moveTo(varx, vary)) {
 				this.actionEnabled = false;
-				OAX6.Timer.set(OAX6.UI.WALK_DELAY+20, this.enableAction, this)
+				switch (this.state) {
+					case PlayerStateMachine.WORLD:
+        				OAX6.Timer.set(OAX6.UI.WALK_DELAY+20, this.enableAction, this)
+                        break;
+                    case PlayerStateMachine.COMBAT:
+                    	OAX6.Timer.set(OAX6.UI.WALK_DELAY+20, ()=> OAX6.UI.player.level.actNext());
+                        break;
+                }
 			}
 		}
     },
@@ -87,7 +99,43 @@ const PlayerStateMachine = {
     },
 
     updateWorldAction: function() {
+        var key = this.game.input.keyboard.lastKey;
+        if (key && key.isDown && key.repeats == 1) {
+            var keyCode = key.keyCode;
+            if (keyCode === Phaser.KeyCode.C){
+                this.startCombat();
+            }
+            return;
+        }
         this.checkMovement();
+    },
+
+    updateCombatAction: function(){
+        this.checkMovement();
+    },
+
+    startCombat: function(){
+        this.actionEnabled = false;
+        this.switchState(PlayerStateMachine.COMBAT_SYNC);
+        // When the state is switched, all mobs will try to make their last move,
+        // Calling "checkCombatReady" after acting
+    },
+
+    checkCombatReady: function(){
+        // Sync all enemies, make sure they are ready for TBS.
+        if (this.state === PlayerStateMachine.COMBAT){
+        	return;
+        }
+        if (!OAX6.UI.player.level.isMobActive()){
+            this._combatStarted();
+        }
+    },
+
+    _combatStarted: function(){
+        // Eventually, the player's "act" function will be called,
+        // And action will be enabled.
+        this.switchState(PlayerStateMachine.COMBAT);
+        OAX6.UI.player.level.actNext();
     },
 
     update: function() {
@@ -100,6 +148,9 @@ const PlayerStateMachine = {
 
             case PlayerStateMachine.DIALOG:
                 this.updateDialogAction();
+                break;
+			case PlayerStateMachine.COMBAT:
+                this.updateCombatAction();
                 break;
         }
     }

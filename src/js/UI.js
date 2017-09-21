@@ -48,21 +48,6 @@ const UI = {
 			return 'n';
 		}
 	},
-	// This is for the TBS System. (Not implemented yet)
-	playerAct: function(){
-		this.actionEnabled = true;
-		/*const queuedCommand = this.queuedCommand;
-		if (!queuedCommand){
-			this.waitMode = true;
-			return -1;
-		}
-		this.waitMode = false;
-		if (queuedCommand === 'walk'){
-			
-			return this.WALK_DELAY;
-		}
-		return 0;*/
-	},
 	tween: function(sprite){
 		return this.game.add.tween(sprite);
 	}
