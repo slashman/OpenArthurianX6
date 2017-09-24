@@ -6,11 +6,13 @@ const UI = require('./UI');
 const LevelLoader = require('./LevelLoader');
 
 const NPCsData = require('./data/NPCs');
+const ItemsData = require('./data/Items');
 const AppearancesData = require('./data/Appearances');
 
 const NPCFactory = require('./NPCFactory');
 const PlayerFactory = require('./PlayerFactory');
 const AppearanceFactory = require('./AppearanceFactory');
+const ItemFactory = require('./ItemFactory');
 
 const PlayerStateMachine = require('./PlayerStateMachine');
 
@@ -23,6 +25,7 @@ const OAX6 = {
 		console.log("Running OAX6");
 		NPCFactory.init(NPCsData);
 		AppearanceFactory.init(AppearancesData);
+		ItemFactory.init(ItemsData);
 		UI.launch(this.startGame.bind(this));
 	},
 	startGame: function(game){

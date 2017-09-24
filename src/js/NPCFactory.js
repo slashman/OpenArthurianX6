@@ -1,6 +1,8 @@
 const Mob = require('./Mob.class');
 const AppearanceFactory = require('./AppearanceFactory');
+const ItemFactory = require('./ItemFactory');
 
+//TODO: Rename to MobFactory
 const NPCFactory = {
 	init: function(npcData){
 		this.npcMap = [];
@@ -30,6 +32,7 @@ const NPCFactory = {
 		npc.sprite.animations.add('walk_e', appearance.r, 4);
 		npc.sprite.animations.add('walk_w', appearance.l, 4);
 		npc.dialog = this.parseDialog(definition.dialog);
+		npc.weapon = ItemFactory.getRandomWeapon();
 		return npc;
 	}
 }
