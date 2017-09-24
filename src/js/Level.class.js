@@ -37,13 +37,22 @@ Level.prototype = {
 		if (this.currentTurnCounter === this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
-		const actionTime = nextActor.act();
+		OAX6.UI.locateMarker(nextActor);
+		OAX6.UI.showMessage(nextActor.getBattleDescription()+":");
 		if (nextActor !== OAX6.UI.player){
-			Timer.set(actionTime+2000, ()=>this.actNext(), this);
+			OAX6.UI.locateMarker(nextActor);
+			Timer.delay(1000)
+			.then(()=>{
+				OAX6.UI.hideMarker();
+				return nextActor.act();
+			})
+			.then((actionTime)=>{
+				Timer.set(actionTime+500, ()=>this.actNext(), this);
+			})
 		} else {
+			nextActor.act();
 			// Player will take its time, then call actNext himself
 			// via the PlayerStateMachine
-			OAX6.UI.showMessage(OAX6.UI.player.getBattleDescription()+":");
 		}
 	},
 	isMobActive: function(){

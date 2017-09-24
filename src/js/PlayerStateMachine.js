@@ -37,6 +37,7 @@ const PlayerStateMachine = {
 		}
 		if (varx != 0 || vary != 0){
 			if (OAX6.UI.player.moveTo(varx, vary)) {
+				OAX6.UI.hideMarker();
 				this.actionEnabled = false;
 				switch (this.state) {
 					case PlayerStateMachine.WORLD:

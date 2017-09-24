@@ -29,6 +29,9 @@ const UI = {
 		this.UILayer.fixedToCamera = true;
 		this.modeLabel = this.game.add.bitmapText(20, 20, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
+		this.marker = this.game.add.sprite(0, 0, 'ui', 1);
+		this.marker.animations.add('blink', [0,1], 8);
+		this.marker.visible = false;
 		this.start();
 	},
 	update: function(){
@@ -59,6 +62,15 @@ const UI = {
 	showMessage: function(message){
 		console.log(message);
 		this.tempCombatLabel.text = message;
+	},
+	locateMarker: function(mob){
+		this.marker.x = mob.sprite.x;
+		this.marker.y = mob.sprite.y;
+		this.marker.animations.play('blink', 8, true);
+		this.marker.visible = true;
+	},
+	hideMarker: function(){
+		this.marker.visible = false;	
 	}
 }
 
