@@ -43,7 +43,7 @@ const PlayerStateMachine = {
         				OAX6.Timer.set(OAX6.UI.WALK_DELAY+20, this.enableAction, this)
                         break;
                     case PlayerStateMachine.COMBAT:
-                    	OAX6.Timer.set(OAX6.UI.WALK_DELAY+20, ()=> OAX6.UI.player.level.actNext());
+                    	OAX6.Timer.set(OAX6.UI.WALK_DELAY+20+1000, ()=> OAX6.UI.player.level.actNext());
                         break;
                 }
 			}

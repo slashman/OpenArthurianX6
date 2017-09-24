@@ -39,11 +39,11 @@ Level.prototype = {
 		}
 		const actionTime = nextActor.act();
 		if (nextActor !== OAX6.UI.player){
-			Timer.set(actionTime, ()=>this.actNext(), this);
+			Timer.set(actionTime+2000, ()=>this.actNext(), this);
 		} else {
 			// Player will take its time, then call actNext himself
 			// via the PlayerStateMachine
-			log ("Player's turn");
+			OAX6.UI.showMessage(OAX6.UI.player.getBattleDescription()+":");
 		}
 	},
 	isMobActive: function(){

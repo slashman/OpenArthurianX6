@@ -22,6 +22,7 @@ const NPCFactory = {
 		let npc = new Mob(level, x, y, z);
 		npc.definitionId = id;
 		let definition = this.npcMap[id];
+		npc.definition = definition;
 		let appearance = AppearanceFactory.getAppearance(definition.appearance);
 		npc.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1]);
 		npc.sprite.animations.add('walk_s', appearance.d, 4);

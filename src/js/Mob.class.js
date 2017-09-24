@@ -46,6 +46,7 @@ Mob.prototype = {
 				return 0;
 			} else {
 				// Do nothing
+				this.reportAction("Stand by");
 				return 0;
 			}
 		}
@@ -82,16 +83,29 @@ Mob.prototype = {
 
 			var dir = OAX6.UI.selectDir(dx, dy);
 			this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
+			this.reportAction("Move");
 
 			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
 
 			return true;
 		}
-
+		this.reportAction("Move - Blocked");
 		return false;
 	},
 	climb: function(dz){
 
+	},
+	reportAction: function(action){
+		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
+		}
+	},
+	getBattleDescription: function(){
+		let desc = this.definition.name;
+		if (this.weapon){
+			desc += " armed with "+this.weapon.name;
+		}
+		return desc;
 	}
 }
 

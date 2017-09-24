@@ -28,6 +28,7 @@ const UI = {
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
 		this.modeLabel = this.game.add.bitmapText(20, 20, 'pixeled', 'Exploration', 12, this.UILayer);
+		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
 		this.start();
 	},
 	update: function(){
@@ -54,6 +55,10 @@ const UI = {
 	},
 	tween: function(sprite){
 		return this.game.add.tween(sprite);
+	},
+	showMessage: function(message){
+		console.log(message);
+		this.tempCombatLabel.text = message;
 	}
 }
 
