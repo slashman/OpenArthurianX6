@@ -32,7 +32,7 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 				PlayerStateMachine.actionEnabled = true;
 			}
-			return 0;
+			return Promise.resolve();
 		} else {
 			if (Random.chance(50)){
 				var dx = Random.num(-1,1);
@@ -40,14 +40,11 @@ Mob.prototype = {
 				if (dx == 0 && dy == 0){
 					dx = 1;
 				}
-				if (this.moveTo(dx, dy)) {
-					return OAX6.UI.WALK_DELAY;
-				}
-				return 0;
+				return this.moveTo(dx, dy);
 			} else {
 				// Do nothing
 				this.reportAction("Stand by");
-				return 0;
+				return Promise.resolve();
 			}
 		}
 	},
@@ -60,15 +57,14 @@ Mob.prototype = {
 			PlayerStateMachine.checkCombatReady();
 			return;
 		}
-		var actionTime = this.act();
-		Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
 		this.executingAction = true;
-		Timer.set(actionTime, ()=>{
+		this.act().then(()=>{
 			this.executingAction = false;
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
 			};
-		});
+			return Timer.delay(Random.num(500, 3000));
+		}).then(()=>{this.activate();});
 	},
 	moveTo: function(dx, dy){
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
@@ -76,6 +72,7 @@ Mob.prototype = {
 			if (this.canStartDialog && mob.dialog){
 				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
 			}
+			// What should we return here? :|
 		} else if (!this.level.isSolid(this.x + dx, this.y + dy)) {
 			// Position changes before the tween to "reserve" the spot
 			this.x += dx;
@@ -86,11 +83,10 @@ Mob.prototype = {
 			this.reportAction("Move");
 
 			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
-
-			return OAX6.UI.WALK_DELAY;
+			return Timer.delay(OAX6.UI.WALK_DELAY);
 		}
 		this.reportAction("Move - Blocked");
-		return false;
+		return Promise.resolve();
 	},
 	climb: function(dz){
 

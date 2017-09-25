@@ -19,9 +19,6 @@ const PlayerStateMachine = {
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
         this.inputDialogCallback = null; // Call a function when pressing enter instead of allowing normal input
     },
-    /*
-     * This is used by both WORLD and COMBAT modes
-     */
     checkMovement: function() {
         var varx = 0;
 		var vary = 0;
@@ -36,6 +33,8 @@ const PlayerStateMachine = {
 			varx = 1;
 		}
 		if (varx != 0 || vary != 0){
+			OAX6.UI.hideMarker(); 
+			this.actionEnabled = false;
 			return OAX6.UI.player.moveTo(varx, vary);
 		} else {
 			return false;
@@ -101,28 +100,28 @@ const PlayerStateMachine = {
     },
 
     updateWorldAction: function() {
-    	let actionTime = false;
-    	const keyCode = this._inkey();
-	    if (keyCode) {
-	    	if (keyCode === Phaser.KeyCode.C){
-	            this.startCombat();
-	            return; // Special command
+    	Promise.resolve()
+    	.then(()=>{
+			const keyCode = this._inkey();
+	    	if (keyCode) {
+	    		if (keyCode === Phaser.KeyCode.C){
+	            	return this.startCombat();
+				}
 			}
-		}
-		actionTime = this.checkMovement();
-	    
-    	if (actionTime !== false) {
-			OAX6.UI.hideMarker();
-			this.actionEnabled = false;
+			return this.checkMovement();
+		}).then((acted)=>{ 
+			if (acted === false){
+				return;
+			}
 			switch (this.state) {
 				case PlayerStateMachine.WORLD:
-    				OAX6.Timer.set(actionTime+20, this.enableAction, this)
+    				this.enableAction()
                     break;
                 case PlayerStateMachine.COMBAT:
-                	OAX6.Timer.set(actionTime+20+1000, ()=> OAX6.UI.player.level.actNext());
+                	OAX6.UI.player.level.actNext();
                     break;
             }
-		}
+		});
     },
 
     startCombat: function(){

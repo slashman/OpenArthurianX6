@@ -1,6 +1,7 @@
 const Bus = require('./Bus');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
+const PlayerStateMachine = require('./PlayerStateMachine');
 
 function Level(){
 	this.mobs = [];	
@@ -46,9 +47,8 @@ Level.prototype = {
 				OAX6.UI.hideMarker();
 				return nextActor.act();
 			})
-			.then((actionTime)=>{
-				Timer.set(actionTime+500, ()=>this.actNext(), this);
-			})
+			.then(()=>Timer.delay(500))
+			.then(()=>this.actNext());
 		} else {
 			nextActor.act();
 			// Player will take its time, then call actNext himself
