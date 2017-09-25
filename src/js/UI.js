@@ -27,11 +27,14 @@ const UI = {
 		this.mapLayer = this.game.add.group();
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
+		this.floatingUILayer = this.game.add.group();
 		this.modeLabel = this.game.add.bitmapText(20, 20, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
-		this.marker = this.game.add.sprite(0, 0, 'ui', 1);
+		this.marker = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.marker.animations.add('blink', [0,1], 8);
 		this.marker.visible = false;
+		this.floatingIcon = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
+		this.floatingIcon.visible = false;
 		this.start();
 	},
 	update: function(){
@@ -71,6 +74,15 @@ const UI = {
 	},
 	hideMarker: function(){
 		this.marker.visible = false;	
+	},
+	showIcon: function(index, x, y){
+		this.floatingIcon.x = x;
+		this.floatingIcon.y = y;
+		this.floatingIcon.frame = index;
+		this.floatingIcon.visible = true;
+	},
+	hideIcon: function(){
+		this.floatingIcon.visible = false;
 	}
 }
 

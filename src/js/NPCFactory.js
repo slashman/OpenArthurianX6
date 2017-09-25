@@ -26,7 +26,7 @@ const NPCFactory = {
 		let definition = this.npcMap[id];
 		npc.definition = definition;
 		let appearance = AppearanceFactory.getAppearance(definition.appearance);
-		npc.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1]);
+		npc.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1], OAX6.UI.mapLayer);
 		npc.sprite.animations.add('walk_s', appearance.d, 4);
 		npc.sprite.animations.add('walk_n', appearance.u, 4);
 		npc.sprite.animations.add('walk_e', appearance.r, 4);

@@ -88,6 +88,30 @@ Mob.prototype = {
 		this.reportAction("Move - Blocked");
 		return Promise.resolve();
 	},
+	attackOnDirection: function(dx, dy){
+		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		if (mob){
+			// Attack!
+			OAX6.UI.showIcon(2, mob.sprite.x, mob.sprite.y);
+			return Timer.delay(500)
+			.then(()=>{
+				OAX6.UI.hideIcon();
+				this.attack(mob);
+			});
+		} else if (this.level.isSolid(this.x + dx, this.y + dy)) {
+			// TODO: Attack the map
+			this.reportAction("Attack - No one there!");
+			return Timer.delay(500);
+		} else {
+			this.reportAction("Attack - No one there!");
+			return Timer.delay(500);
+		}
+	},
+	attack: function(mob){
+		let combinedDamage = mob.damage + (mob.weapon ? mob.weapon.damage : 0);
+		let combinedDefense = mob.defense + (mob.armor ? mob.armor.defense : 0);
+		
+	},
 	climb: function(dz){
 
 	},

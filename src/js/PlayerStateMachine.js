@@ -1,5 +1,7 @@
 const Bus = require('./Bus');
 const log = require('./Debug').log;
+const Timer = require('./Timer');
+const Geo = require('./Geo');
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -18,6 +20,28 @@ const PlayerStateMachine = {
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
         this.inputDialogCallback = null; // Call a function when pressing enter instead of allowing normal input
+        this.directionCallback = null;
+        this.cursors.up.onDown.add(this.listenDirections, this);
+        this.cursors.down.onDown.add(this.listenDirections, this);
+        this.cursors.left.onDown.add(this.listenDirections, this);
+        this.cursors.right.onDown.add(this.listenDirections, this);
+    },
+    listenDirections: function(){
+    	if (this.directionCallback){
+    		var varx = 0;
+			var vary = 0;
+			if(this.cursors.up.isDown) {
+				vary = -1;
+			} else if(this.cursors.down.isDown) {
+				vary = 1;
+			}
+			if(this.cursors.left.isDown) {
+				varx = -1;
+			} else if(this.cursors.right.isDown) {
+				varx = 1;
+			}
+    		this.directionCallback({x: varx, y: vary});
+    	}
     },
     checkMovement: function() {
         var varx = 0;
@@ -59,6 +83,14 @@ const PlayerStateMachine = {
         this.inputDialogCallback = null;
     },
 
+    setDirectionCallback: function(cb){
+    	this.directionCallback = cb;
+    },
+
+    clearDirectionCallback: function(cb){
+    	this.directionCallback = null;
+    },
+
     _inkey: function(){
 		var key = this.game.input.keyboard.lastKey;
         if (key && key.isDown && key.repeats == 1) {
@@ -74,6 +106,7 @@ const PlayerStateMachine = {
             var keyCode = key.keyCode;
 
             if (this.inputDialogCallback != null) {
+            	// TODO: Maybe refactor to not do this on the update cycle, instead have a key listener
                 if (keyCode == Phaser.KeyCode.ENTER) {
                     this.inputDialogCallback();
                 }
@@ -98,7 +131,20 @@ const PlayerStateMachine = {
             }
         }
     },
-
+    attackCommand: function(){
+    	// Select a direction
+    	return new Promise((resolve)=>{
+    		this.actionEnabled = false;
+    		OAX6.UI.player.reportAction("Attack - Where?");
+			this.setDirectionCallback((dir) => {
+				OAX6.UI.player.reportAction("Attack - "+Geo.getDirectionName(dir));
+				this.clearDirectionCallback();
+				Timer.delay(500).then(()=>resolve(dir));
+			});
+		}).then(dir=>{
+			return OAX6.UI.player.attackOnDirection(dir.x, dir.y);
+		});
+    },
     updateWorldAction: function() {
     	Promise.resolve()
     	.then(()=>{
@@ -106,6 +152,8 @@ const PlayerStateMachine = {
 	    	if (keyCode) {
 	    		if (keyCode === Phaser.KeyCode.C){
 	            	return this.startCombat();
+				} else if (keyCode === Phaser.KeyCode.A){
+	            	return this.attackCommand();
 				}
 			}
 			return this.checkMovement();
