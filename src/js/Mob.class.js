@@ -87,7 +87,7 @@ Mob.prototype = {
 
 			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
 
-			return true;
+			return OAX6.UI.WALK_DELAY;
 		}
 		this.reportAction("Move - Blocked");
 		return false;

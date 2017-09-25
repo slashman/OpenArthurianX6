@@ -36,19 +36,11 @@ const PlayerStateMachine = {
 			varx = 1;
 		}
 		if (varx != 0 || vary != 0){
-			if (OAX6.UI.player.moveTo(varx, vary)) {
-				OAX6.UI.hideMarker();
-				this.actionEnabled = false;
-				switch (this.state) {
-					case PlayerStateMachine.WORLD:
-        				OAX6.Timer.set(OAX6.UI.WALK_DELAY+20, this.enableAction, this)
-                        break;
-                    case PlayerStateMachine.COMBAT:
-                    	OAX6.Timer.set(OAX6.UI.WALK_DELAY+20+1000, ()=> OAX6.UI.player.level.actNext());
-                        break;
-                }
-			}
+			return OAX6.UI.player.moveTo(varx, vary);
+		} else {
+			return false;
 		}
+
     },
 
     enableAction: function() {
@@ -66,6 +58,15 @@ const PlayerStateMachine = {
 
     clearInputDialogCallback: function() {
         this.inputDialogCallback = null;
+    },
+
+    _inkey: function(){
+		var key = this.game.input.keyboard.lastKey;
+        if (key && key.isDown && key.repeats == 1) {
+            return key.keyCode;
+        } else {
+        	return false;
+        }
     },
 
     updateDialogAction: function() {
@@ -100,19 +101,28 @@ const PlayerStateMachine = {
     },
 
     updateWorldAction: function() {
-        var key = this.game.input.keyboard.lastKey;
-        if (key && key.isDown && key.repeats == 1) {
-            var keyCode = key.keyCode;
-            if (keyCode === Phaser.KeyCode.C){
-                this.startCombat();
+    	let actionTime = false;
+    	const keyCode = this._inkey();
+	    if (keyCode) {
+	    	if (keyCode === Phaser.KeyCode.C){
+	            this.startCombat();
+	            return; // Special command
+			}
+		}
+		actionTime = this.checkMovement();
+	    
+    	if (actionTime !== false) {
+			OAX6.UI.hideMarker();
+			this.actionEnabled = false;
+			switch (this.state) {
+				case PlayerStateMachine.WORLD:
+    				OAX6.Timer.set(actionTime+20, this.enableAction, this)
+                    break;
+                case PlayerStateMachine.COMBAT:
+                	OAX6.Timer.set(actionTime+20+1000, ()=> OAX6.UI.player.level.actNext());
+                    break;
             }
-            return;
-        }
-        this.checkMovement();
-    },
-
-    updateCombatAction: function(){
-        this.checkMovement();
+		}
     },
 
     startCombat: function(){
@@ -121,6 +131,7 @@ const PlayerStateMachine = {
         this.switchState(PlayerStateMachine.COMBAT_SYNC);
         // When the state is switched, all mobs will try to make their last move,
         // Calling "checkCombatReady" after acting
+        return 0;
     },
 
     checkCombatReady: function(){
@@ -145,14 +156,12 @@ const PlayerStateMachine = {
 
         switch (this.state) {
             case PlayerStateMachine.WORLD:
+            case PlayerStateMachine.COMBAT:
                 this.updateWorldAction();
                 break;
 
             case PlayerStateMachine.DIALOG:
                 this.updateDialogAction();
-                break;
-			case PlayerStateMachine.COMBAT:
-                this.updateCombatAction();
                 break;
         }
     }
