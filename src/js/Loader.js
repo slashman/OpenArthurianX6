@@ -10,6 +10,7 @@ const Loader = {
 		game.load.image('monsters', 'assets/monsters.png');
 		game.load.image('terrain', 'assets/terrain.png');
 		game.load.image('dialogBack', 'assets/dialogBack.png')
+		game.load.image('uiVariants', 'assets/uiVariants_8x8.png')
 
 		game.load.spritesheet('player', 'assets/player.png', 16, 16);
 		game.load.spritesheet('mobs', 'assets/mobs.png', 16, 16);
