@@ -1,4 +1,5 @@
 const Random = require('./Random');
+const Stat = require('./Stat.class');
 
 const ItemFactory = {
 	init: function(itemData){
@@ -9,8 +10,14 @@ const ItemFactory = {
 		return this.appearancesMap[id];
 	},
 	getRandomWeapon: function(){
-		return Random.from(this.itemData);
+		const def = Random.from(this.itemData);
+		const weapon = {
+			defId: def.id,
+			name: def.name,
+			damage: new Stat(def.damage)
+		};
+		return weapon;
 	}
-}
+};
 
 module.exports = ItemFactory;

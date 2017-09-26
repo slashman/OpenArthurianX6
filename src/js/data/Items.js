@@ -3,15 +3,18 @@
 const Items = [
 	{
 		id: 'sword',
-		name: 'Sword'
+		name: 'Sword',
+		damage: 3
 	},
 	{
 		id: 'spear',
-		name: 'Spear'
+		name: 'Spear',
+		damage: 4
 	},
 	{
 		id: 'maingauche',
-		name: 'Main Gauche'
+		name: 'Main Gauche',
+		damage: 5
 	}
 ]
 

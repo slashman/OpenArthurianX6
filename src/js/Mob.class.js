@@ -3,6 +3,7 @@ const Random = require('./Random');
 const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const log = require('./Debug').log;
+const Stat = require('./Stat.class');
 
 /**
  * Represents a being living inside a world
@@ -11,7 +12,7 @@ const log = require('./Debug').log;
 
 function Mob(level, x, y, z){
 	this.sprite = null;
-	this.definitionId = null;
+	this.definition = null;
 	this.level = level;
 	this.x = x;
 	this.y = y;
@@ -96,7 +97,7 @@ Mob.prototype = {
 			return Timer.delay(500)
 			.then(()=>{
 				OAX6.UI.hideIcon();
-				this.attack(mob);
+				return this.attack(mob);
 			});
 		} else if (this.level.isSolid(this.x + dx, this.y + dy)) {
 			// TODO: Attack the map
@@ -108,9 +109,26 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
-		let combinedDamage = mob.damage + (mob.weapon ? mob.weapon.damage : 0);
-		let combinedDefense = mob.defense + (mob.armor ? mob.armor.defense : 0);
-		
+		const combinedDamage = mob.damage.current + (mob.weapon ? mob.weapon.damage.current : 0);
+		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
+		let damage = combinedDamage - combinedDefense;
+		if (damage < 0)
+			damage = 0;
+		if (damage === 0){
+			this.reportOutcome(mob.getDescription()+" shrugs off the attack!");
+			return Timer.delay(500)
+		}
+		let proportion = damage / mob.hp.max;
+		if (proportion > 1){
+			proportion = 1;
+		}
+		proportion = Math.floor(proportion * 100 / 25);
+		this.reportOutcome(mob.getDescription()+" is "+ATTACK_DESCRIPTIONS[proportion]+"wounded.");
+		mob._damage(damage);
+		return Timer.delay(1500)
+	},
+	_damage: function(damage){
+		this.hp.reduce(damage);
 	},
 	climb: function(dz){
 
@@ -120,13 +138,31 @@ Mob.prototype = {
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
 		}
 	},
+	reportOutcome: function(outcome){
+		OAX6.UI.showMessage(outcome);
+	},
 	getBattleDescription: function(){
-		let desc = this.definition.name;
+		let desc = this.name;
 		if (this.weapon){
 			desc += " armed with "+this.weapon.name;
 		}
 		return desc;
+	},
+	getDescription: function(){
+		if (this.name){
+			return this.name;
+		} else {
+			return 'The'+ this.definition.name
+		}
 	}
 }
 
 module.exports = Mob;
+
+const ATTACK_DESCRIPTIONS = [
+	"barely ",
+	"lightly ",
+	"",
+	"critically ",
+	"critically "
+];

@@ -1,8 +1,6 @@
-const Mob = require('./Mob.class');
-const AppearanceFactory = require('./AppearanceFactory');
 const ItemFactory = require('./ItemFactory');
+const MobFactory = require('./MobFactory');
 
-//TODO: Rename to MobFactory
 const NPCFactory = {
 	init: function(npcData){
 		this.npcMap = [];
@@ -14,6 +12,7 @@ const NPCFactory = {
 		if (!dialog) { return null; }
 
 		var ret = {};
+		//TODO: Fix jshint
 		for (var i=0,option;option=dialog[i];i++) {
 			ret[option.key] = option;
 		}
@@ -21,20 +20,14 @@ const NPCFactory = {
 		return ret;
 	},
 	buildNPC: function(game, id, level, x, y, z){
-		let npc = new Mob(level, x, y, z);
-		npc.definitionId = id;
-		let definition = this.npcMap[id];
-		npc.definition = definition;
-		let appearance = AppearanceFactory.getAppearance(definition.appearance);
-		npc.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1], OAX6.UI.mapLayer);
-		npc.sprite.animations.add('walk_s', appearance.d, 4);
-		npc.sprite.animations.add('walk_n', appearance.u, 4);
-		npc.sprite.animations.add('walk_e', appearance.r, 4);
-		npc.sprite.animations.add('walk_w', appearance.l, 4);
+		const definition = this.npcMap[id];
+		const npc = MobFactory.buildMob(game, definition.type, level, x, y, z);
+		npc.npcDefinition = definition;
 		npc.dialog = this.parseDialog(definition.dialog);
 		npc.weapon = ItemFactory.getRandomWeapon();
+		npc.name = definition.name;
 		return npc;
 	}
-}
+};
 
 module.exports = NPCFactory;
