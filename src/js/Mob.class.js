@@ -47,11 +47,22 @@ Mob.prototype = {
 		if (actionTime != -1)
 			Timer.set(actionTime + Random.num(500, 3000), this.activate, this);
 	},
+	lookAt: function(dx, dy) {
+		var dir = OAX6.UI.selectDir(dx, dy);
+		this.sprite.animations.play('walk_'+dir, 0);
+
+		// TODO: Do something about this since the first frame is midwalk... 
+		this.sprite.frame += 1;
+	},
 	moveTo: function(dx, dy){
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
 			if (this.canStartDialog && mob.dialog){
 				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
+				
+				// Look at each other while talking
+				this.lookAt(dx, dy);
+				mob.lookAt(-dx, -dy);
 			}
 		} else if (!this.level.isSolid(this.x + dx, this.y + dy)) {
 			// Position changes before the tween to "reserve" the spot

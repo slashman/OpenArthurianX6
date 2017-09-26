@@ -80,7 +80,7 @@ module.exports = {
 			}
 		}
 	},
-	splitInLines: function(text) {
+	splitInLines: function(text, isShowMore) {
 		var lines = [],
 			line = "",
 			measureTool = this.measureTool,
@@ -92,7 +92,9 @@ module.exports = {
 
 			measureTool.text += word;
 
-			var maxWidth = this.maxWidth - ((lines.length == this.maxLines - 2)? 15 : 0);
+			var lastLine = this.maxLines - ((isShowMore)? 1 : 2),
+				maxWidth = this.maxWidth - ((lines.length == lastLine)? 15 : 0);
+
 			if (measureTool.textWidth >= maxWidth) {
 				lines.push(line);
 				line = "";
@@ -117,8 +119,7 @@ module.exports = {
 			keywords = this.getKeywords(msg);
 			
 		// Split in lines
-		lines = this.splitInLines(msg);
-		console.log(lines);
+		lines = this.splitInLines(msg, isShowMore);
 		
 		var showMoreMaxLines = this.maxLines + ((isShowMore)? 1 : 0),
 			showMoreSpliceAt = this.maxLines - ((isShowMore)? 0 : 1),
