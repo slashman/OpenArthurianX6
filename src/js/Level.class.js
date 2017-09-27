@@ -1,10 +1,12 @@
 const Bus = require('./Bus');
+const log = require('./Debug').log;
+const Timer = require('./Timer');
+const PlayerStateMachine = require('./PlayerStateMachine');
 
 function Level(){
 	this.mobs = [];	
 	this.solidMask = null;
 	this.currentTurnCounter = 0;
-	Bus.listen('nextActor', this.actNext, this);
 }
 
 Level.prototype = {
@@ -29,14 +31,37 @@ Level.prototype = {
 		this.mobs.push(mob);
 		mob.activate();
 	},
-	// This is used when in TBS mode. This is WIP, not tested.
+	removeMob: function(mob){
+		this.mobs.splice(this.mobs.indexOf(mob), 1);
+	},
 	actNext: function(){
+		log("actNext",this.currentTurnCounter);
 		const nextActor = this.mobs[this.currentTurnCounter++];
 		if (this.currentTurnCounter === this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
-		const actionTime = nextActor.act();
-		Bus.emit('nextActor', actionTime); // Signals the caller to call again
+		OAX6.UI.locateMarker(nextActor);
+		OAX6.UI.showMessage(nextActor.getBattleDescription()+":");
+		if (nextActor !== OAX6.UI.player){
+			OAX6.UI.locateMarker(nextActor);
+			Timer.delay(1000)
+			.then(()=>{
+				OAX6.UI.hideMarker();
+				return nextActor.act();
+			})
+			.then(()=>Timer.delay(500))
+			.then(()=>this.actNext());
+		} else {
+			nextActor.act();
+			// Player will take its time, then call actNext himself
+			// via the PlayerStateMachine
+		}
+	},
+	isMobActive: function(){
+		return this.mobs.find(m=>m.executingAction==true);
+	},
+	addItem: function(item, x, y){
+		OAX6.UI.addItemSprite(item, x, y);
 	}
 }
 

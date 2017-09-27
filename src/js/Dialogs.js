@@ -37,7 +37,7 @@ module.exports = {
 		this.dialogUI.fixedToCamera = true;
 		this.dialogUI.visible = false;
 
-		this.blinkingCursor();
+		this.blinkingCursor(); //TODO: Change this to animate a sprite alternating with blank, instead of using timer
 
 		Bus.listen('startDialog', this.startDialog, this);
 		Bus.listen('updateDialogInput', this.updateDialogInput, this);
@@ -205,9 +205,9 @@ module.exports = {
 		this.chat = chat;
 
 		PlayerStateMachine.switchState(PlayerStateMachine.DIALOG);
-		mob.actionEnabled = false;
+		mob.isTalking = true;
 
-		this.name.text = mob.definitionId;
+		this.name.text = mob.npcDefinition.name;
 		this.addDialog(dialog.greeting, false);
 
 		this.dialogUI.visible = true;
@@ -219,7 +219,8 @@ module.exports = {
 		PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
 		PlayerStateMachine.clearInputDialogCallback();
 
-		this.chat.mob.actionEnabled = true;
+		this.chat.mob.isTalking = false;
+		this.chat.mob.activate(); 
 
 		this.name.text = "";
 

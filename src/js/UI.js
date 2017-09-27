@@ -24,6 +24,19 @@ const UI = {
 		this.nextMove = 0;
 	},
 	create: function(){
+		this.mapLayer = this.game.add.group();
+		this.floorLayer = this.game.add.group();
+		this.mobsLayer = this.game.add.group();
+		this.UILayer = this.game.add.group();
+		this.UILayer.fixedToCamera = true;
+		this.floatingUILayer = this.game.add.group();
+		this.modeLabel = this.game.add.bitmapText(20, 20, 'pixeled', 'Exploration', 12, this.UILayer);
+		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
+		this.marker = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
+		this.marker.animations.add('blink', [0,1], 8);
+		this.marker.visible = false;
+		this.floatingIcon = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
+		this.floatingIcon.visible = false;
 		this.start();
 	},
 	update: function(){
@@ -48,23 +61,38 @@ const UI = {
 			return 'n';
 		}
 	},
-	// This is for the TBS System. (Not implemented yet)
-	playerAct: function(){
-		this.actionEnabled = true;
-		/*const queuedCommand = this.queuedCommand;
-		if (!queuedCommand){
-			this.waitMode = true;
-			return -1;
-		}
-		this.waitMode = false;
-		if (queuedCommand === 'walk'){
-			
-			return this.WALK_DELAY;
-		}
-		return 0;*/
-	},
 	tween: function(sprite){
 		return this.game.add.tween(sprite);
+	},
+	showMessage: function(message){
+		console.log(message);
+		this.tempCombatLabel.text = message;
+	},
+	locateMarker: function(mob){
+		this.marker.x = mob.sprite.x;
+		this.marker.y = mob.sprite.y;
+		this.marker.animations.play('blink', 8, true);
+		this.marker.visible = true;
+	},
+	hideMarker: function(){
+		this.marker.visible = false;	
+	},
+	showIcon: function(index, x, y){
+		this.floatingIcon.x = x;
+		this.floatingIcon.y = y;
+		this.floatingIcon.frame = index;
+		this.floatingIcon.visible = true;
+	},
+	hideIcon: function(){
+		this.floatingIcon.visible = false;
+	},
+	addItemSprite: function(item, x, y){
+		item.sprite.x = x * TILE_WIDTH;
+		item.sprite.y = y * TILE_HEIGHT;
+		this.floorLayer.add(item.sprite);
+		item.sprite.visible = true;
+		console.log("item",item.sprite.x);
+		console.log("item",x);
 	}
 }
 

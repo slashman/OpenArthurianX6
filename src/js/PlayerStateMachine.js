@@ -1,9 +1,14 @@
 const Bus = require('./Bus');
+const log = require('./Debug').log;
+const Timer = require('./Timer');
+const Geo = require('./Geo');
 
 const PlayerStateMachine = {
     NOTHING     : 0,
     WORLD       : 1,
     DIALOG      : 2,
+    COMBAT      : 3,
+    COMBAT_SYNC : 4,
 
     init: function(game) {
         this.game = game;
@@ -15,8 +20,29 @@ const PlayerStateMachine = {
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
         this.inputDialogCallback = null; // Call a function when pressing enter instead of allowing normal input
+        this.directionCallback = null;
+        this.cursors.up.onDown.add(this.listenDirections, this);
+        this.cursors.down.onDown.add(this.listenDirections, this);
+        this.cursors.left.onDown.add(this.listenDirections, this);
+        this.cursors.right.onDown.add(this.listenDirections, this);
     },
-
+    listenDirections: function(){
+    	if (this.directionCallback){
+    		var varx = 0;
+			var vary = 0;
+			if(this.cursors.up.isDown) {
+				vary = -1;
+			} else if(this.cursors.down.isDown) {
+				vary = 1;
+			}
+			if(this.cursors.left.isDown) {
+				varx = -1;
+			} else if(this.cursors.right.isDown) {
+				varx = 1;
+			}
+    		this.directionCallback({x: varx, y: vary});
+    	}
+    },
     checkMovement: function() {
         var varx = 0;
 		var vary = 0;
@@ -31,11 +57,13 @@ const PlayerStateMachine = {
 			varx = 1;
 		}
 		if (varx != 0 || vary != 0){
-			if (OAX6.UI.player.moveTo(varx, vary)) {
-				this.actionEnabled = false;
-				OAX6.Timer.set(OAX6.UI.WALK_DELAY+20, this.enableAction, this)
-			}
+			OAX6.UI.hideMarker(); 
+			this.actionEnabled = false;
+			return OAX6.UI.player.moveTo(varx, vary);
+		} else {
+			return false;
 		}
+
     },
 
     enableAction: function() {
@@ -55,12 +83,30 @@ const PlayerStateMachine = {
         this.inputDialogCallback = null;
     },
 
+    setDirectionCallback: function(cb){
+    	this.directionCallback = cb;
+    },
+
+    clearDirectionCallback: function(cb){
+    	this.directionCallback = null;
+    },
+
+    _inkey: function(){
+		var key = this.game.input.keyboard.lastKey;
+        if (key && key.isDown && key.repeats == 1) {
+            return key.keyCode;
+        } else {
+        	return false;
+        }
+    },
+
     updateDialogAction: function() {
         var key = this.game.input.keyboard.lastKey;
         if (key.isDown && key.repeats == 1) {
             var keyCode = key.keyCode;
 
             if (this.inputDialogCallback != null) {
+            	// TODO: Maybe refactor to not do this on the update cycle, instead have a key listener
                 if (keyCode == Phaser.KeyCode.ENTER) {
                     this.inputDialogCallback();
                 }
@@ -85,9 +131,74 @@ const PlayerStateMachine = {
             }
         }
     },
-
+    attackCommand: function(){
+    	// Select a direction
+    	return new Promise((resolve)=>{
+    		this.actionEnabled = false;
+    		OAX6.UI.player.reportAction("Attack - Where?");
+    		OAX6.UI.hideMarker();
+    		OAX6.UI.showIcon(3, OAX6.UI.player.sprite.x, OAX6.UI.player.sprite.y);
+			this.setDirectionCallback((dir) => {
+				OAX6.UI.hideIcon();
+				OAX6.UI.player.reportAction("Attack - "+Geo.getDirectionName(dir));
+				this.clearDirectionCallback();
+				Timer.delay(500).then(()=>resolve(dir));
+			});
+		}).then(dir=>{
+			return OAX6.UI.player.attackOnDirection(dir.x, dir.y);
+		});
+    },
     updateWorldAction: function() {
-        this.checkMovement();
+    	Promise.resolve()
+    	.then(()=>{
+			const keyCode = this._inkey();
+	    	if (keyCode) {
+	    		if (keyCode === Phaser.KeyCode.C){
+	            	return this.startCombat();
+				} else if (keyCode === Phaser.KeyCode.A){
+	            	return this.attackCommand();
+				}
+			}
+			return this.checkMovement();
+		}).then((acted)=>{ 
+			if (acted === false){
+				return;
+			}
+			switch (this.state) {
+				case PlayerStateMachine.WORLD:
+    				this.enableAction()
+                    break;
+                case PlayerStateMachine.COMBAT:
+                	OAX6.UI.player.level.actNext();
+                    break;
+            }
+		});
+    },
+
+    startCombat: function(){
+    	OAX6.UI.modeLabel.text = "Combat";
+        this.actionEnabled = false;
+        this.switchState(PlayerStateMachine.COMBAT_SYNC);
+        // When the state is switched, all mobs will try to make their last move,
+        // Calling "checkCombatReady" after acting
+        return 0;
+    },
+
+    checkCombatReady: function(){
+        // Sync all enemies, make sure they are ready for TBS.
+        if (this.state === PlayerStateMachine.COMBAT){
+        	return;
+        }
+        if (!OAX6.UI.player.level.isMobActive()){
+            this._combatStarted();
+        }
+    },
+
+    _combatStarted: function(){
+        // Eventually, the player's "act" function will be called,
+        // And action will be enabled.
+        this.switchState(PlayerStateMachine.COMBAT);
+        OAX6.UI.player.level.actNext();
     },
 
     update: function() {
@@ -95,6 +206,7 @@ const PlayerStateMachine = {
 
         switch (this.state) {
             case PlayerStateMachine.WORLD:
+            case PlayerStateMachine.COMBAT:
                 this.updateWorldAction();
                 break;
 
