@@ -69,6 +69,15 @@ const Appearances = [
 				dead: 12+48
 			}
 		]
+	},
+	{
+		tileset: 'items',
+		items: [
+			{
+				id: 'fish',
+				i: 16+12
+			}
+		]
 	}
 ]
 

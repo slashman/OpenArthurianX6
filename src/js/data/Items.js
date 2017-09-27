@@ -2,6 +2,11 @@
 
 const Items = [
 	{
+		id: 'fish',
+		appearance: 'fish',
+		name: 'Fish'
+	},
+	{
 		id: 'sword',
 		appearance: 'sword',
 		name: 'Sword',
