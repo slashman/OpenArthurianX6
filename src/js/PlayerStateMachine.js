@@ -136,7 +136,10 @@ const PlayerStateMachine = {
     	return new Promise((resolve)=>{
     		this.actionEnabled = false;
     		OAX6.UI.player.reportAction("Attack - Where?");
+    		OAX6.UI.hideMarker();
+    		OAX6.UI.showIcon(3, OAX6.UI.player.sprite.x, OAX6.UI.player.sprite.y);
 			this.setDirectionCallback((dir) => {
+				OAX6.UI.hideIcon();
 				OAX6.UI.player.reportAction("Attack - "+Geo.getDirectionName(dir));
 				this.clearDirectionCallback();
 				Timer.delay(500).then(()=>resolve(dir));
