@@ -5,6 +5,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 
 function Level(){
 	this.mobs = [];	
+	this.items = [];
 	this.solidMask = null;
 	this.currentTurnCounter = 0;
 }
@@ -60,8 +61,21 @@ Level.prototype = {
 	isMobActive: function(){
 		return this.mobs.find(m=>m.executingAction==true);
 	},
-	addItem: function(item, x, y){
+	addItem: function(item, x, y) {
 		OAX6.UI.addItemSprite(item, x, y);
+		this.items.push(item);
+	},
+	removeItem: function(item) {
+		this.items.splice(this.items.indexOf(item), 1);
+	},
+	getItemAt: function(x, y) {
+		for (var i=0,item;item=this.items[i];i++) {
+			if (item.x == x && item.y == y) {
+				return item;
+			}
+		}
+
+		return false;
 	}
 }
 

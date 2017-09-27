@@ -86,7 +86,6 @@ const LevelLoader = {
 	loadItem: function(game, itemData, level) {
 		const item = ItemFactory.createItem(itemData.id);
 		level.addItem(item, itemData.x, itemData.y);
-		console.log(item);
 	}
 }
 

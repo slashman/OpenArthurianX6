@@ -25,5 +25,4 @@ const ItemFactory = {
 		return item;
 	}
 };
-
 module.exports = ItemFactory;

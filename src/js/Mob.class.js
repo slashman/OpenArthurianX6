@@ -20,6 +20,7 @@ function Mob(level, x, y, z){
 	this.z = z;
 	this.isTalking = false;
 	this.canStartDialog = false; // Only player "mob" can start dialog
+	this.inventory = [];
 }
 
 Mob.prototype = {
@@ -93,6 +94,17 @@ Mob.prototype = {
 		this.reportAction("Move - Blocked");
 		return Promise.resolve();
 	},
+	getOnDirection: function(dx, dy) {
+		var item = this.level.getItemAt(this.x + dx, this.y + dy);
+		if (item) {
+			OAX6.UI.removeItemSprite(item);
+			this.reportAction("Yummy!");
+			return Timer.delay(500);
+		} else {
+			this.reportAction("Get - Nothing there!");
+			return Timer.delay(500);
+		}
+	},
 	attackOnDirection: function(dx, dy){
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
@@ -150,6 +162,10 @@ Mob.prototype = {
 	reportAction: function(action){
 		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
+		} else if (OAX6.UI.player == this){ 
+			if (PlayerStateMachine.state === PlayerStateMachine.GET){
+				OAX6.UI.showMessage(action);
+			}
 		}
 	},
 	reportOutcome: function(outcome){

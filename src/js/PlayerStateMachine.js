@@ -9,6 +9,7 @@ const PlayerStateMachine = {
     DIALOG      : 2,
     COMBAT      : 3,
     COMBAT_SYNC : 4,
+    GET         : 5,
 
     init: function(game) {
         this.game = game;
@@ -16,6 +17,8 @@ const PlayerStateMachine = {
 
         this.state = PlayerStateMachine.WORLD;
         this.actionEnabled = true;
+
+        this.inventory = [];
 
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
@@ -59,7 +62,7 @@ const PlayerStateMachine = {
 		if (varx != 0 || vary != 0){
 			OAX6.UI.hideMarker(); 
 			this.actionEnabled = false;
-			return OAX6.UI.player.moveTo(varx, vary);
+			return this.player.moveTo(varx, vary);
 		} else {
 			return false;
 		}
@@ -135,18 +138,40 @@ const PlayerStateMachine = {
     	// Select a direction
     	return new Promise((resolve)=>{
     		this.actionEnabled = false;
-    		OAX6.UI.player.reportAction("Attack - Where?");
+    		this.player.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, OAX6.UI.player.sprite.x, OAX6.UI.player.sprite.y);
+    		OAX6.UI.showIcon(3, this.player.sprite.x, this.player.sprite.y);
 			this.setDirectionCallback((dir) => {
 				OAX6.UI.hideIcon();
-				OAX6.UI.player.reportAction("Attack - "+Geo.getDirectionName(dir));
+				this.player.reportAction("Attack - "+Geo.getDirectionName(dir));
 				this.clearDirectionCallback();
 				Timer.delay(500).then(()=>resolve(dir));
 			});
 		}).then(dir=>{
-			return OAX6.UI.player.attackOnDirection(dir.x, dir.y);
+			return this.player.attackOnDirection(dir.x, dir.y);
 		});
+    },
+    getCommand: function() {
+        // Select a direction
+    	return new Promise((resolve)=>{
+            this.switchState(PlayerStateMachine.GET);
+    		this.actionEnabled = false;
+    		this.player.reportAction("Get - Where?");
+    		OAX6.UI.hideMarker();
+    		OAX6.UI.showIcon(3, this.player.sprite.x, this.player.sprite.y);
+			this.setDirectionCallback((dir) => {
+				OAX6.UI.hideIcon();
+				this.player.reportAction("Get - "+Geo.getDirectionName(dir));
+				this.clearDirectionCallback();
+				Timer.delay(500).then(()=>resolve(dir));
+			});
+		}).then(dir=>{
+            return this.player.getOnDirection(dir.x, dir.y);
+		}).then(()=>{
+            this.switchState(PlayerStateMachine.WORLD);
+            this.actionEnabled = true;
+            OAX6.UI.clearMessage();
+        });
     },
     updateWorldAction: function() {
     	Promise.resolve()
@@ -157,6 +182,8 @@ const PlayerStateMachine = {
 	            	return this.startCombat();
 				} else if (keyCode === Phaser.KeyCode.A){
 	            	return this.attackCommand();
+				} else if (keyCode === Phaser.KeyCode.G){
+	            	return this.getCommand();
 				}
 			}
 			return this.checkMovement();
@@ -169,7 +196,7 @@ const PlayerStateMachine = {
     				this.enableAction()
                     break;
                 case PlayerStateMachine.COMBAT:
-                	OAX6.UI.player.level.actNext();
+                	this.player.level.actNext();
                     break;
             }
 		});
@@ -189,7 +216,7 @@ const PlayerStateMachine = {
         if (this.state === PlayerStateMachine.COMBAT){
         	return;
         }
-        if (!OAX6.UI.player.level.isMobActive()){
+        if (!this.player.level.isMobActive()){
             this._combatStarted();
         }
     },
@@ -198,7 +225,7 @@ const PlayerStateMachine = {
         // Eventually, the player's "act" function will be called,
         // And action will be enabled.
         this.switchState(PlayerStateMachine.COMBAT);
-        OAX6.UI.player.level.actNext();
+        this.player.level.actNext();
     },
 
     update: function() {
