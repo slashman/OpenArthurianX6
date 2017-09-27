@@ -97,6 +97,7 @@ Mob.prototype = {
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
 		if (item) {
+			this.inventory.push(item);
 			OAX6.UI.removeItemSprite(item);
 			this.reportAction("Yummy!");
 			return Timer.delay(500);
