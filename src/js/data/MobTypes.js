@@ -7,7 +7,8 @@ const MobTypes = [
 		name: 'Demon',
 		hp: 20,
 		damage: 3,
-		defense: 0
+		defense: 0,
+		corpse: 'demonCorpse'
 	},
 	{
 		id: 'human',
@@ -15,7 +16,8 @@ const MobTypes = [
 		name: 'Man',
 		hp: 20,
 		damage: 3,
-		defense: 0
+		defense: 0,
+		corpse: 'manCorpse'
 	},
 	{
 		id: 'rat',
@@ -23,7 +25,8 @@ const MobTypes = [
 		name: 'Rat',
 		hp: 20,
 		damage: 3,
-		defense: 0
+		defense: 0,
+		corpse: 'ratCorpse'
 	},
 	{
 		id: 'skeleton',
@@ -31,7 +34,8 @@ const MobTypes = [
 		name: 'Skeleton',
 		hp: 20,
 		damage: 3,
-		defense: 0
+		defense: 0,
+		corpse: 'bones'
 	}
 ]
 

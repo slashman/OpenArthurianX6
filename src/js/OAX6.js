@@ -34,6 +34,7 @@ const OAX6 = {
 	startGame: function(game){
 		Timer.init(game);
 		PlayerStateMachine.init(game);
+		ItemFactory.setGame(game);
 		
 		const firstLevel = this.loadLevel(game);
 		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 12, 0);

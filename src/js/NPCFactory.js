@@ -24,7 +24,8 @@ const NPCFactory = {
 		const npc = MobFactory.buildMob(game, definition.type, level, x, y, z);
 		npc.npcDefinition = definition;
 		npc.dialog = this.parseDialog(definition.dialog);
-		npc.weapon = ItemFactory.getRandomWeapon();
+		if (definition.weapon)
+			npc.weapon = ItemFactory.createItem(definition.weapon);
 		npc.name = definition.name;
 		return npc;
 	}

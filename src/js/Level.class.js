@@ -31,7 +31,9 @@ Level.prototype = {
 		this.mobs.push(mob);
 		mob.activate();
 	},
-	// This is used when in TBS mode. This is WIP, not tested.
+	removeMob: function(mob){
+		this.mobs.splice(this.mobs.indexOf(mob), 1);
+	},
 	actNext: function(){
 		log("actNext",this.currentTurnCounter);
 		const nextActor = this.mobs[this.currentTurnCounter++];
@@ -57,6 +59,9 @@ Level.prototype = {
 	},
 	isMobActive: function(){
 		return this.mobs.find(m=>m.executingAction==true);
+	},
+	addItem: function(item, x, y){
+		OAX6.UI.addItemSprite(item, x, y);
 	}
 }
 

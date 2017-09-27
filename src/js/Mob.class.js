@@ -4,6 +4,7 @@ const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const log = require('./Debug').log;
 const Stat = require('./Stat.class');
+const ItemFactory = require('./ItemFactory');
 
 /**
  * Represents a being living inside a world
@@ -50,6 +51,9 @@ Mob.prototype = {
 		}
 	},
 	activate: function() {
+		if (this.dead){
+			return;
+		}
 		if (this.isTalking || PlayerStateMachine.state === PlayerStateMachine.COMBAT) {
 			//TODO: May be check state === DIALOG instead of this.isTalking?
 			return;
@@ -109,7 +113,7 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
-		const combinedDamage = mob.damage.current + (mob.weapon ? mob.weapon.damage.current : 0);
+		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
 		let damage = combinedDamage - combinedDefense;
 		if (damage < 0)
@@ -129,6 +133,16 @@ Mob.prototype = {
 	},
 	_damage: function(damage){
 		this.hp.reduce(damage);
+		if (this.hp.empty()){
+			this.reportOutcome(this.getDescription()+" dies.");
+			this.dead = true;
+			this.sprite.destroy();
+			if (this.definition.corpse){
+				const corpse = ItemFactory.createItem(this.definition.corpse);
+				this.level.removeMob(this);
+				this.level.addItem(corpse, this.x, this.y);
+			}
+		}
 	},
 	climb: function(dz){
 

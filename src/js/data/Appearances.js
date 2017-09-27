@@ -13,6 +13,28 @@ const Appearances = [
 	},
 	{
 		tileset: 'mobs',
+		items: [
+			{
+				id: 'manCorpse',
+				i: 12
+			},
+			{
+				id: 'demonCorpse',
+				i: 12+16
+			},
+			{
+				id: 'bones',
+				i: 12+32
+			},
+			{
+				id: 'ratCorpse',
+				i: 12+48
+			},
+			{
+				id: 'spear',
+				i: 12
+			}
+		],
 		mobs: [
 			{
 				id: 'human',

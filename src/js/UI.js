@@ -25,6 +25,8 @@ const UI = {
 	},
 	create: function(){
 		this.mapLayer = this.game.add.group();
+		this.floorLayer = this.game.add.group();
+		this.mobsLayer = this.game.add.group();
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
@@ -83,6 +85,14 @@ const UI = {
 	},
 	hideIcon: function(){
 		this.floatingIcon.visible = false;
+	},
+	addItemSprite: function(item, x, y){
+		item.sprite.x = x * TILE_WIDTH;
+		item.sprite.y = y * TILE_HEIGHT;
+		this.floorLayer.add(item.sprite);
+		item.sprite.visible = true;
+		console.log("item",item.sprite.x);
+		console.log("item",x);
 	}
 }
 

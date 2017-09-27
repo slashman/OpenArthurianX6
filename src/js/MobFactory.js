@@ -14,7 +14,7 @@ const MobFactory = {
 		const definition = this.mobTypeMap[typeId];
 		mob.definition = definition;
 		const appearance = AppearanceFactory.getAppearance(definition.appearance);
-		mob.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1], OAX6.UI.mapLayer);
+		mob.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1], OAX6.UI.mobsLayer);
 		mob.sprite.animations.add('walk_s', appearance.d, 4);
 		mob.sprite.animations.add('walk_n', appearance.u, 4);
 		mob.sprite.animations.add('walk_e', appearance.r, 4);

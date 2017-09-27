@@ -3,7 +3,8 @@
 const NPCs = [
 	{
 		id: 'avatar',
-		type: 'human'
+		type: 'human',
+		weapon: 'spear'
 	},
 	{
 		id: 'iolo',
