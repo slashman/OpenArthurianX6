@@ -76,6 +76,10 @@ const Appearances = [
 			{
 				id: 'fish',
 				i: 16+12
+			},
+			{
+				id: 'lobster',
+				i: 16+14
 			}
 		]
 	}

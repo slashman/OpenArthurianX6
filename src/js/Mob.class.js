@@ -98,8 +98,8 @@ Mob.prototype = {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
 		if (item) {
 			this.inventory.push(item);
-			OAX6.UI.removeItemSprite(item);
-			this.reportAction("Yummy!");
+			this.level.removeItem(item);
+			this.reportAction("Got some " + item.name);
 			return Timer.delay(500);
 		} else {
 			this.reportAction("Get - Nothing there!");

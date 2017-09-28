@@ -67,6 +67,7 @@ Level.prototype = {
 	},
 	removeItem: function(item) {
 		this.items.splice(this.items.indexOf(item), 1);
+		OAX6.UI.removeItemSprite(item);
 	},
 	getItemAt: function(x, y) {
 		for (var i=0,item;item=this.items[i];i++) {

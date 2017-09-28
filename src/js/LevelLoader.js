@@ -40,6 +40,12 @@ const LevelLoader = {
 				amount: 1,
 				x: 10,
 				y: 14
+			},
+			{
+				id: 'lobster',
+				amount: 1,
+				x: 9,
+				y: 15
 			}
 		];
 	},
