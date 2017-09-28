@@ -6,8 +6,8 @@ module.exports = {
 	init: function(game){
 		this.game = game;
 		this.blinkOut = true;
-		this.maxWidth = 236;
-		this.maxLines = 4;
+		this.maxWidth = 265;
+		this.maxLines = 6;
 		this.fontSize = 12;
 		this.inputPrefix = "YOU SAY: ";
 		this.chatLog = [];
@@ -15,6 +15,7 @@ module.exports = {
 		this.backlogLines = null;
 
 		this.background = game.add.image(64, 176, "dialogBack");
+		this.showMore = game.add.image(64+255, 176+83, "uiVariants");
 
 		this.measureTool = game.add.bitmapText(0, 0, 'pixeled', '', this.fontSize);
 		this.name = game.add.bitmapText(68, 180, 'pixeled', '', this.fontSize);
@@ -26,9 +27,10 @@ module.exports = {
 		this.dialogUI.add(this.background);
 		this.dialogUI.add(this.name);
 		this.dialogUI.add(this.playerInput);
+		this.dialogUI.add(this.showMore);
 		
 		for (var i=0;i<this.maxLines;i++) {
-			var line = game.add.bitmapText(84, 208 + this.fontSize * i, 'pixeled', '', this.fontSize);
+			var line = game.add.bitmapText(68, 196 + this.fontSize * i, 'pixeled', '', this.fontSize);
 
 			this.dialogUI.add(line);
 			this.dialogLines.push(line);
@@ -78,7 +80,7 @@ module.exports = {
 			}
 		}
 	},
-	splitInLines: function(text) {
+	splitInLines: function(text, isShowMore) {
 		var lines = [],
 			line = "",
 			measureTool = this.measureTool,
@@ -90,11 +92,15 @@ module.exports = {
 
 			measureTool.text += word;
 
-			if (measureTool.textWidth >= this.maxWidth) {
+			var lastLine = this.maxLines - ((isShowMore)? 1 : 2),
+				maxWidth = this.maxWidth - ((lines.length == lastLine)? 15 : 0);
+
+			if (measureTool.textWidth >= maxWidth) {
 				lines.push(line);
 				line = "";
 				measureTool.text = "";
 				i--;
+				continue;
 			}
 
 			line = measureTool.text;
@@ -113,11 +119,14 @@ module.exports = {
 			keywords = this.getKeywords(msg);
 			
 		// Split in lines
-		lines = this.splitInLines(msg);
+		lines = this.splitInLines(msg, isShowMore);
 		
-		var showMoreMaxLines = (isShowMore)? 5 : 4,
-			showMoreSpliceAt = (isShowMore)? 3 : 2,
+		var showMoreMaxLines = this.maxLines + ((isShowMore)? 1 : 0),
+			showMoreSpliceAt = this.maxLines - ((isShowMore)? 0 : 1),
 			showMore = false;
+
+		this.playerInput.visible = true;
+		
 		if (lines.length >= showMoreMaxLines) {
 			this.backlogLines = lines.splice(showMoreSpliceAt).join(" ");
 			showMore = true;
@@ -148,14 +157,24 @@ module.exports = {
 		}
 
 		if (showMore) {
-			this.addDialog({ dialog: "[SHOW MORE]" }, false);
+			this.playerInput.visible = false;
 		}
 	},
 	blinkingCursor: function() {
 		if (this.blinkOut) {
 			this.playerInput.text = this.playerInput.text.substring(0, this.playerInput.text.length - 1);
+
+			// Blinking showMore
+			this.showMore.visible = false;
 		} else {
 			this.playerInput.text += "_";
+
+			// Blinking showMore
+			this.showMore.visible = true;
+		}
+
+		if (!this.backlogLines) {
+			this.showMore.visible = false;
 		}
 
 		this.blinkOut = !this.blinkOut;
@@ -233,6 +252,7 @@ module.exports = {
 
 		this.chat = null;
 		this.chatLog = [];
+		this.playerInput.visible = true;
 		this.dialogUI.visible = false;
 	},
 	updateDialogInput: function(line) {
@@ -251,6 +271,7 @@ module.exports = {
 
 		if (line.toLowerCase() == "bye") {
 			PlayerStateMachine.setInputDialogCallback(this.endDialog, this);
+			this.playerInput.visible = false;
 		}
 	},
 	showMoreLines: function() {
