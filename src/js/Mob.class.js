@@ -2,8 +2,6 @@ const Bus = require('./Bus');
 const Random = require('./Random');
 const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
-const log = require('./Debug').log;
-const Stat = require('./Stat.class');
 const ItemFactory = require('./ItemFactory');
 
 /**
@@ -36,19 +34,47 @@ Mob.prototype = {
 			}
 			return Promise.resolve();
 		} else {
-			if (Random.chance(50)){
-				var dx = Random.num(-1,1);
-				var dy = Random.num(-1,1);
-				if (dx == 0 && dy == 0){
-					dx = 1;
+			const nearbyTarget = this.getNearbyTarget();
+			if (!nearbyTarget || this.alignment == 'n'){
+				if (Random.chance(50)){
+					var dx = Random.num(-1,1);
+					var dy = Random.num(-1,1);
+					if (dx === 0 && dy === 0){
+						dx = 1;
+					}
+					return this.moveTo(dx, dy);
+				} else {
+					// Do nothing
+					this.reportAction("Stand by");
+					return Promise.resolve();
 				}
-				return this.moveTo(dx, dy);
-			} else {
-				// Do nothing
-				this.reportAction("Stand by");
-				return Promise.resolve();
+			} else if (nearbyTarget){
+				let dx = Math.sign(nearbyTarget.x - this.x);
+				let dy = Math.sign(nearbyTarget.y - this.y);
+				const mob = this.level.getMobAt(this.x + dx, this.y + dy);
+				if (mob){
+					if (mob.alignment !== this.alignment){
+						return this.attackOnDirection(dx, dy);
+					} else {
+						dx = Random.num(-1,1);
+						dy = Random.num(-1,1);
+						if (dx === 0 && dy === 0){
+							dx = 1;
+						}
+						return this.moveTo(dx, dy);
+					}
+				} else {
+					return this.moveTo(dx, dy);
+				}
 			}
 		}
+	},
+	getNearbyTarget: function(){
+		//TODO: Implement some LOS.
+		if (this.alignment === 'a')
+			return OAX6.UI.player;
+		else 
+			return false;
 	},
 	activate: function() {
 		if (this.dead){
@@ -67,7 +93,7 @@ Mob.prototype = {
 			this.executingAction = false;
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
-			};
+			}
 			return Timer.delay(Random.num(500, 3000));
 		}).then(()=>{this.activate();});
 	},
@@ -131,7 +157,7 @@ Mob.prototype = {
 			damage = 0;
 		if (damage === 0){
 			this.reportOutcome(mob.getDescription()+" shrugs off the attack!");
-			return Timer.delay(500)
+			return Timer.delay(500);
 		}
 		let proportion = damage / mob.hp.max;
 		if (proportion > 1){
@@ -140,7 +166,7 @@ Mob.prototype = {
 		proportion = Math.floor(proportion * 100 / 25);
 		this.reportOutcome(mob.getDescription()+" is "+ATTACK_DESCRIPTIONS[proportion]+"wounded.");
 		mob._damage(damage);
-		return Timer.delay(1500)
+		return Timer.delay(1500);
 	},
 	_damage: function(damage){
 		this.hp.reduce(damage);
@@ -177,10 +203,10 @@ Mob.prototype = {
 		if (this.name){
 			return this.name;
 		} else {
-			return 'The'+ this.definition.name
+			return 'The'+ this.definition.name;
 		}
 	}
-}
+};
 
 module.exports = Mob;
 
