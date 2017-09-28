@@ -2,6 +2,7 @@
   "node": true,
   "strict": "implied",
   "globals": {
-    "OAX6": true
+    "OAX6": true,
+    "Phaser": true
   }
 }
