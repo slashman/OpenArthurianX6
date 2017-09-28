@@ -26,8 +26,8 @@ const Items = [
 		capacity: 10
 	},
 	{
-		id: 'humanCorpse',
-		appearance: 'humanCorpse',
+		id: 'manCorpse',
+		appearance: 'manCorpse',
 		name: 'Man Body',
 		capacity: 10
 	},
