@@ -69,9 +69,12 @@ Mob.prototype = {
 			}
 		}
 	},
+	isHostileMob: function(){
+		return this.alignment === 'a';
+	},
 	getNearbyTarget: function(){
 		//TODO: Implement some LOS.
-		if (this.alignment === 'a')
+		if (this.isHostileMob())
 			return OAX6.UI.player;
 		else 
 			return false;
@@ -93,8 +96,8 @@ Mob.prototype = {
 			this.executingAction = false;
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
-			}
-			return Timer.delay(Random.num(500, 3000));
+			} 
+			return Timer.delay(this.isHostileMob() ? OAX6.UI.WALK_DELAY : Random.num(500, 3000));
 		}).then(()=>{this.activate();});
 	},
 	lookAt: function(dx, dy) {
@@ -150,6 +153,11 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
+		if (mob === OAX6.UI.player){
+			if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
+				PlayerStateMachine.startCombat();
+			}
+		}
 		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
 		let damage = combinedDamage - combinedDefense;
