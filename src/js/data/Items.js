@@ -17,6 +17,7 @@ const Items = [
 		id: 'magicAxe',
 		appearance: 'magicAxe',
 		name: 'Magic Axe',
+		range: 5,
 		damage: 400
 	},
 	{

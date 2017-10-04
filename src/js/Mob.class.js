@@ -3,6 +3,7 @@ const Random = require('./Random');
 const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
+const Geo = require('./Geo');
 
 /**
  * Represents a being living inside a world
@@ -133,17 +134,51 @@ Mob.prototype = {
 		this.reportAction("Move - Blocked");
 		return Promise.resolve();
 	},
+	attackToPosition: function(x, y){
+		const weapon = this.weapon;
+		const range = weapon ? (weapon.range || 1) : 1;
+		const dist = Geo.flatDist(this.x, this.y, x, y);
+		if (dist > range){
+			this.reportAction("Attack - Out of range!");
+			return Promise.resolve();
+		}
+		const isRangedAttack = dist > 1; 
+		//TODO: Handle case of diagonals (cannot use simple flatDist, diff geometry)
+		/*
+		 * TODO: Define this based on the weapon.
+		 * Some weapons should allow ranged attacks at close range, some others should prevent it
+		 * some others will allow a weaker attack that doesn't use ammo, etc
+		 * For now, we'll do a melee attack if too close
+		 */
+		if (isRangedAttack){
+			// Add a projectile sprite, tween it to destination
+			// TODO: Depending on weapon, do one of: a: Fixed image b. Rotate on direction c. Rotate continuously
+			// TODO: Doesn't look good having appearance details at this class
+			return OAX6.UI.tweenFixedProjectile(weapon.appearance.tileset, weapon.appearance.i, this.x, this.y, x, y)
+			.then(()=> this._attackPosition(x, y));
+		} else if (dist <= 1){
+			// Simple melee attack? but use the weapon's melee mode instead of ranged
+			// Or may be prevent attack from happening, depends on the weapon
+			return this.attackOnDirection(Math.sign(x-this.x), Math.sign(y-this.y));
+		} else {
+			this.reportAction("Attack - Out of range!");
+			return Promise.resolve();
+		}
+	},
 	attackOnDirection: function(dx, dy){
-		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		return this._attackPosition(this.x + dx, this.y + dy);
+	},
+	_attackPosition: function(x, y){
+		var mob = this.level.getMobAt(x, y);
 		if (mob){
 			// Attack!
-			OAX6.UI.showIcon(2, mob.sprite.x, mob.sprite.y);
+			OAX6.UI.showIcon(2, mob.x, mob.y);
 			return Timer.delay(500)
 			.then(()=>{
 				OAX6.UI.hideIcon();
 				return this.attack(mob);
 			});
-		} else if (this.level.isSolid(this.x + dx, this.y + dy)) {
+		} else if (this.level.isSolid(x, y)) {
 			// TODO: Attack the map
 			this.reportAction("Attack - No one there!");
 			return Timer.delay(500);
@@ -193,7 +228,7 @@ Mob.prototype = {
 
 	},
 	reportAction: function(action){
-		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT || this === OAX6.UI.player){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
 		}
 	},

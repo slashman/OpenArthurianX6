@@ -20,7 +20,7 @@ const Appearances = [
 			},
 			{
 				id: 'magicAxe',
-				i: 65
+				i: 49
 			}
 		]
 	},

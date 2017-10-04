@@ -1,8 +1,10 @@
 const Phaser = require('phaser');
 
 const Loader = require('./Loader');
+const Timer = require('./Timer');
 
 const PlayerStateMachine = require('./PlayerStateMachine');
+const Geo = require('./Geo');
 
 const TILE_WIDTH = 16;
 const TILE_HEIGHT = 16;
@@ -78,13 +80,32 @@ const UI = {
 		this.marker.visible = false;	
 	},
 	showIcon: function(index, x, y){
-		this.floatingIcon.x = x;
-		this.floatingIcon.y = y;
-		this.floatingIcon.frame = index;
+		this.floatingIcon.x = x * TILE_WIDTH;
+		this.floatingIcon.y = y * TILE_HEIGHT;
+		this.floatingIcon.loadTexture('ui', index);
 		this.floatingIcon.visible = true;
 	},
 	hideIcon: function(){
 		this.floatingIcon.visible = false;
+	},
+	tweenFixedProjectile: function(tileset, index, fromX, fromY, toX, toY){
+		return Promise.resolve()
+		.then(()=>{
+			this.floatingIcon.loadTexture(tileset, index);
+			fromX *= TILE_WIDTH;
+			fromY *= TILE_HEIGHT;
+			toX *= TILE_WIDTH;
+			toY *= TILE_HEIGHT;
+			this.floatingIcon.x = fromX;
+			this.floatingIcon.y = fromY;
+			const distance = Math.floor(Geo.flatDist(fromX, fromY, toX, toY)/16); //TODO: Use hDistance
+			const projectileSpeed = distance * 50; //TODO: Receive param, based for example on weapon's speed
+			this.floatingIcon.visible = true;
+			this.tween(this.floatingIcon).to({x: toX, y: toY}, projectileSpeed, Phaser.Easing.Linear.None, true);
+			return Timer.delay(projectileSpeed);
+		}).then(()=>{
+			this.floatingIcon.visible = false;
+		});
 	},
 	addItemSprite: function(item, x, y){
 		item.sprite.x = x * TILE_WIDTH;
