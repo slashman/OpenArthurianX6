@@ -4,7 +4,7 @@ const NPCs = [
 	{
 		id: 'avatar',
 		type: 'human',
-		weapon: 'spear'
+		weapon: 'magicAxe'
 	},
 	{
 		id: 'iolo',

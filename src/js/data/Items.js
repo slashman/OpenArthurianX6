@@ -14,6 +14,12 @@ const Items = [
 		damage: 400
 	},
 	{
+		id: 'magicAxe',
+		appearance: 'magicAxe',
+		name: 'Magic Axe',
+		damage: 400
+	},
+	{
 		id: 'maingauche',
 		appearance: 'maingauche',
 		name: 'Main Gauche',
