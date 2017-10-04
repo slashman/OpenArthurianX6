@@ -6,6 +6,7 @@ const PlayerFactory = {
 		mob.canStartDialog = true;
 		UI.player = mob;
 		mob.name = "Slash";
+		mob.alignment = 'b';
 		game.camera.follow(mob.sprite);
 		return mob;
 	}
