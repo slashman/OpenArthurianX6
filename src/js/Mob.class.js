@@ -209,7 +209,7 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
-		if (mob === OAX6.UI.player){
+		if (mob === OAX6.UI.player || mob.isPartyMember()){
 			if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
 				PlayerStateMachine.startCombat();
 			}
@@ -230,7 +230,7 @@ Mob.prototype = {
 		proportion = Math.floor(proportion * 100 / 25);
 		this.reportOutcome(mob.getDescription()+" is "+ATTACK_DESCRIPTIONS[proportion]+"wounded.");
 		mob._damage(damage);
-		return Timer.delay(1500);
+		return Timer.delay(100);
 	},
 	_damage: function(damage){
 		this.hp.reduce(damage);
