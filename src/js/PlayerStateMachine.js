@@ -2,6 +2,7 @@ const Bus = require('./Bus');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
 const Geo = require('./Geo');
+const Inventory = require('./Inventory');
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -10,6 +11,7 @@ const PlayerStateMachine = {
     COMBAT      : 3,
     COMBAT_SYNC : 4,
     GET         : 5,
+    INVENTORY   : 6,
 
     init: function(game) {
         this.game = game;
@@ -214,6 +216,19 @@ const PlayerStateMachine = {
 			return OAX6.UI.player.attackToPosition(position.x, position.y);
 		});
     },
+    activateInventory: function() {
+        return new Promise((resolve) => {
+            if (Inventory.isOpen()) {
+                Inventory.close();
+                PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+            } else {
+                Inventory.open();
+                PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
+            }
+
+            resolve(true);
+        })
+    },
     updateWorldAction: function() {
     	Promise.resolve()
     	.then(()=>{
@@ -223,10 +238,12 @@ const PlayerStateMachine = {
 	            	return this.startCombat();
 				} else if (keyCode === Phaser.KeyCode.A){
 	            	return this.attackCommand();
-				} else if (keyCode === Phaser.KeyCode.G){
-	            	return this.getCommand();
 				} else if (keyCode === Phaser.KeyCode.T){
 	            	return this.rangedAttackCommand();
+				} else if (keyCode === Phaser.KeyCode.G){
+	            	return this.getCommand();
+				} else if (keyCode === Phaser.KeyCode.I){
+	            	return this.activateInventory();
 				} 
 			}
 			return this.checkMovement();
@@ -271,6 +288,15 @@ const PlayerStateMachine = {
         this.player.level.actNext();
     },
 
+    updateInventory: function() {
+        var keyCode = this._inkey();
+        if (keyCode) {
+            if (keyCode === Phaser.KeyCode.I){
+                this.activateInventory();
+            } 
+        }
+    },
+
     update: function() {
         if (!this.actionEnabled) { return; }
 
@@ -282,6 +308,10 @@ const PlayerStateMachine = {
 
             case PlayerStateMachine.DIALOG:
                 this.updateDialogAction();
+                break;
+
+            case PlayerStateMachine.INVENTORY:
+                this.updateInventory();
                 break;
         }
     }
