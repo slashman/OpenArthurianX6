@@ -36,7 +36,7 @@ Mob.prototype = {
 				PlayerStateMachine.actionEnabled = true;
 			}
 			return Promise.resolve();
-		} else if (player && this.alignment === player.alignment){
+		} else if (player && PlayerStateMachine.state !== PlayerStateMachine.COMBAT && this.alignment === player.alignment){
 			let dx = Math.sign(player.x - this.x);
 			let dy = Math.sign(player.y - this.y);
 			return this.moveTo(dx, dy);
@@ -86,10 +86,13 @@ Mob.prototype = {
 	},
 	getNearbyTarget: function(){
 		//TODO: Implement some LOS.
-		if (this.isHostileMob())
-			return OAX6.UI.player;
-		else 
+		if (this.isHostileMob()){
+			return this.level.getCloserMobTo(this.x, this.y, 'b');
+		} else if (this.isPartyMember()){
+			return this.level.getCloserMobTo(this.x, this.y, 'a');
+		} else {
 			return false;
+		}
 	},
 	activate: function() {
 		if (this.dead){
@@ -150,7 +153,7 @@ Mob.prototype = {
 			.then(()=>console.log("Tween ends for "+this.getDescription()));
 		}
 		this.reportAction("Move - Blocked");
-		return Timer.next();
+		return Timer.delay(500);
 	},
 	attackToPosition: function(x, y){
 		const weapon = this.weapon;

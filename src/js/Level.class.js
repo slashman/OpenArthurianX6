@@ -1,4 +1,5 @@
 const Bus = require('./Bus');
+const Geo = require('./Geo');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
@@ -62,6 +63,14 @@ Level.prototype = {
 	},
 	isMobActive: function(){
 		return this.mobs.find(m=>m.executingAction==true);
+	},
+	getCloserMobTo: function(x, y, alignment){
+		const mobs = this.mobs.filter(m=>m.alignment === alignment);
+		if (mobs.length > 0){
+			const sorted = mobs.sort((a,b)=>Geo.flatDist(x,y,a.x,a.y)-Geo.flatDist(x,y,b.x,b.y));
+			return sorted[0];
+		}
+		return false;
 	},
 	addItem: function(item, x, y){
 		OAX6.UI.addItemSprite(item, x, y);
