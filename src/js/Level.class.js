@@ -40,6 +40,9 @@ Level.prototype = {
 		if (this.currentTurnCounter === this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
+		if (nextActor.dead){
+			return this.actNext();
+		}
 		OAX6.UI.locateMarker(nextActor);
 		OAX6.UI.showMessage(nextActor.getBattleDescription()+":");
 		if (nextActor !== OAX6.UI.player){
