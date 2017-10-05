@@ -19,6 +19,7 @@ function Mob(level, x, y, z){
 	this.z = z;
 	this.isTalking = false;
 	this.canStartDialog = false; // Only player "mob" can start dialog
+	this.party = [];
 }
 
 Mob.prototype = {
@@ -28,12 +29,17 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		if (this === OAX6.UI.player){
+		const player = OAX6.UI.player;
+		if (this === player){
 			// Enable action
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 				PlayerStateMachine.actionEnabled = true;
 			}
 			return Promise.resolve();
+		} else if (player && this.alignment === player.alignment){
+			let dx = Math.sign(player.x - this.x);
+			let dy = Math.sign(player.y - this.y);
+			return this.moveTo(dx, dy);
 		} else {
 			const nearbyTarget = this.getNearbyTarget();
 			if (!nearbyTarget || this.alignment == 'n'){
@@ -47,7 +53,7 @@ Mob.prototype = {
 				} else {
 					// Do nothing
 					this.reportAction("Stand by");
-					return Promise.resolve();
+					return Timer.delay(1000);
 				}
 			} else if (nearbyTarget){
 				let dx = Math.sign(nearbyTarget.x - this.x);
@@ -67,11 +73,16 @@ Mob.prototype = {
 				} else {
 					return this.moveTo(dx, dy);
 				}
+			} else {
+				return Timer.delay(1000);
 			}
 		}
 	},
 	isHostileMob: function(){
 		return this.alignment === 'a';
+	},
+	isPartyMember: function(){
+		return this.alignment === 'b';
 	},
 	getNearbyTarget: function(){
 		//TODO: Implement some LOS.
@@ -98,7 +109,13 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
 			} 
-			return Timer.delay(this.isHostileMob() ? OAX6.UI.WALK_DELAY : Random.num(500, 3000));
+			if (this.isHostileMob() || this.isPartyMember()){
+				// Reactivate immediately
+				return Timer.next();
+			} else {
+				return Timer.delay(Random.num(500, 3000));
+			}
+			//return Timer.delay(Random.num(500, 3000));
 		}).then(()=>{this.activate();});
 	},
 	lookAt: function(dx, dy) {
@@ -109,6 +126,7 @@ Mob.prototype = {
 		this.sprite.frame += 1;
 	},
 	moveTo: function(dx, dy){
+		console.log("is moving "+this.getDescription());
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
 			if (this.canStartDialog && mob.dialog){
@@ -128,11 +146,11 @@ Mob.prototype = {
 			this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
 			this.reportAction("Move");
 
-			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
-			return Timer.delay(OAX6.UI.WALK_DELAY);
+			return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY)
+			.then(()=>console.log("Tween ends for "+this.getDescription()));
 		}
 		this.reportAction("Move - Blocked");
-		return Promise.resolve();
+		return Timer.next();
 	},
 	attackToPosition: function(x, y){
 		const weapon = this.weapon;
@@ -248,6 +266,9 @@ Mob.prototype = {
 		} else {
 			return 'The'+ this.definition.name;
 		}
+	},
+	addMobToParty: function(mob){
+		this.party.push(mob);
 	}
 };
 

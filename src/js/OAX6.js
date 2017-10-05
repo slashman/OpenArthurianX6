@@ -37,8 +37,20 @@ const OAX6 = {
 		ItemFactory.setGame(game);
 		
 		const firstLevel = this.loadLevel(game);
-		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 12, 0);
+		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 5, 0);
+		const partyMember1 = NPCFactory.buildNPC(game, 'iolo', firstLevel, 11, 6, 0);
+		partyMember1.alignment = 'b';
+		const partyMember2 = NPCFactory.buildNPC(game, 'iolo', firstLevel, 13, 6, 0);
+		partyMember2.alignment = 'b';
+		const partyMember3 = NPCFactory.buildNPC(game, 'iolo', firstLevel, 12, 7, 0);
+		partyMember3.alignment = 'b';
+		player.addMobToParty(partyMember1);
+		player.addMobToParty(partyMember2);
+		player.addMobToParty(partyMember3);
 		firstLevel.addMob(player);
+		firstLevel.addMob(partyMember1);
+		firstLevel.addMob(partyMember2);
+		firstLevel.addMob(partyMember3);
 		Dialogs.init(game);
 	},
 	loadLevel: function(game){

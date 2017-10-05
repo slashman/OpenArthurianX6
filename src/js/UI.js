@@ -66,6 +66,14 @@ const UI = {
 	tween: function(sprite){
 		return this.game.add.tween(sprite);
 	},
+	executeTween: function(sprite, to, time){
+		return new Promise(resolve => {
+			const tween = this.tween(sprite);
+			tween.to(to, time);
+			tween.onComplete.add(resolve, this);
+			tween.start();
+		});
+	},
 	showMessage: function(message){
 		console.log(message);
 		this.tempCombatLabel.text = message;
