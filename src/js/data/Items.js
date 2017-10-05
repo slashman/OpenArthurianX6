@@ -24,6 +24,13 @@ const Items = [
 		damage: 400
 	},
 	{
+		id: 'magicAxe',
+		appearance: 'magicAxe',
+		name: 'Magic Axe',
+		range: 5,
+		damage: 400
+	},
+	{
 		id: 'maingauche',
 		appearance: 'maingauche',
 		name: 'Main Gauche',
@@ -36,8 +43,8 @@ const Items = [
 		capacity: 10
 	},
 	{
-		id: 'humanCorpse',
-		appearance: 'humanCorpse',
+		id: 'manCorpse',
+		appearance: 'manCorpse',
 		name: 'Man Body',
 		capacity: 10
 	},

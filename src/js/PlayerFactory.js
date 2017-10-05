@@ -7,6 +7,7 @@ const PlayerFactory = {
 		mob.canStartDialog = true;
 		mob.inventory = PlayerStateMachine.inventory;
 		mob.name = "Slash";
+		mob.alignment = 'b';
 		
 		UI.player = mob;
 		PlayerStateMachine.player = mob;

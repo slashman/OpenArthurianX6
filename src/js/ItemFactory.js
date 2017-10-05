@@ -22,6 +22,7 @@ const ItemFactory = {
 		}
 		item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		item.sprite.visible = false;
+		item.appearance = appearance;
 		return item;
 	}
 };

@@ -1,6 +1,3 @@
-/* jshint node: true */
-"use strict";
-
 const DIRECTION_NAMES = {
 	"0:-1": "North",
 	"0:1": "South",
@@ -9,6 +6,9 @@ const DIRECTION_NAMES = {
 };
 
 const Geo = {
+	flatDist: function(xa, ya, xb, yb){
+		return Math.abs(xb-xa)+Math.abs(yb-ya);
+	},
 	getDirectionName: function(v){
 		return DIRECTION_NAMES[v.x+":"+v.y];
 	}

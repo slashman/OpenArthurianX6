@@ -12,6 +12,19 @@ const Appearances = [
 		}]
 	},
 	{
+		tileset: 'items',
+		items: [
+			{
+				id: 'spear',
+				i: 12
+			},
+			{
+				id: 'magicAxe',
+				i: 49
+			}
+		]
+	},
+	{
 		tileset: 'mobs',
 		items: [
 			{
@@ -29,10 +42,6 @@ const Appearances = [
 			{
 				id: 'ratCorpse',
 				i: 12+48
-			},
-			{
-				id: 'spear',
-				i: 12
 			}
 		],
 		mobs: [

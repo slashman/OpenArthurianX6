@@ -24,10 +24,12 @@ const PlayerStateMachine = {
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
         this.inputDialogCallback = null; // Call a function when pressing enter instead of allowing normal input
         this.directionCallback = null;
+        this.actionCallback = null;
         this.cursors.up.onDown.add(this.listenDirections, this);
         this.cursors.down.onDown.add(this.listenDirections, this);
         this.cursors.left.onDown.add(this.listenDirections, this);
         this.cursors.right.onDown.add(this.listenDirections, this);
+        this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
     },
     listenDirections: function(){
     	if (this.directionCallback){
@@ -44,6 +46,11 @@ const PlayerStateMachine = {
 				varx = 1;
 			}
     		this.directionCallback({x: varx, y: vary});
+    	}
+    },
+	listenAction: function(){
+    	if (this.actionCallback){
+    		this.actionCallback();
     	}
     },
     checkMovement: function() {
@@ -94,6 +101,14 @@ const PlayerStateMachine = {
     	this.directionCallback = null;
     },
 
+    setActionCallback: function(cb){
+    	this.actionCallback = cb;
+    },
+
+    clearActionCallback: function(cb){
+    	this.actionCallback = null;
+    },
+
     _inkey: function(){
 		var key = this.game.input.keyboard.lastKey;
         if (key && key.isDown && key.repeats == 1) {
@@ -140,7 +155,7 @@ const PlayerStateMachine = {
     		this.actionEnabled = false;
     		this.player.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, this.player.sprite.x, this.player.sprite.y);
+    		OAX6.UI.showIcon(3, OAX6.UI.player.x, OAX6.UI.player.y);
 			this.setDirectionCallback((dir) => {
 				OAX6.UI.hideIcon();
 				this.player.reportAction("Attack - "+Geo.getDirectionName(dir));
@@ -173,6 +188,32 @@ const PlayerStateMachine = {
             OAX6.UI.clearMessage();
         });
     },
+    rangedAttackCommand: function(){
+    	return new Promise((resolve)=>{
+    		this.actionEnabled = false;
+    		OAX6.UI.player.reportAction("Attack - Where?");
+    		OAX6.UI.hideMarker();
+    		let cursor = {
+    			x: OAX6.UI.player.x,
+    			y: OAX6.UI.player.y
+    		};
+    		OAX6.UI.showIcon(4, cursor.x, cursor.y);
+			this.setDirectionCallback((dir) => {
+				cursor.x += dir.x;
+				cursor.y += dir.y;
+				//TODO: Limit based on player's range
+				OAX6.UI.showIcon(4, cursor.x, cursor.y);
+			});
+			this.setActionCallback(() => {
+				this.clearDirectionCallback();
+				this.clearActionCallback();
+				OAX6.UI.hideIcon();
+				resolve(cursor);
+			});
+		}).then(position=>{
+			return OAX6.UI.player.attackToPosition(position.x, position.y);
+		});
+    },
     updateWorldAction: function() {
     	Promise.resolve()
     	.then(()=>{
@@ -184,7 +225,9 @@ const PlayerStateMachine = {
 	            	return this.attackCommand();
 				} else if (keyCode === Phaser.KeyCode.G){
 	            	return this.getCommand();
-				}
+				} else if (keyCode === Phaser.KeyCode.T){
+	            	return this.rangedAttackCommand();
+				} 
 			}
 			return this.checkMovement();
 		}).then((acted)=>{ 

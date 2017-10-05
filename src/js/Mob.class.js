@@ -2,9 +2,8 @@ const Bus = require('./Bus');
 const Random = require('./Random');
 const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
-const log = require('./Debug').log;
-const Stat = require('./Stat.class');
 const ItemFactory = require('./ItemFactory');
+const Geo = require('./Geo');
 
 /**
  * Represents a being living inside a world
@@ -37,19 +36,50 @@ Mob.prototype = {
 			}
 			return Promise.resolve();
 		} else {
-			if (Random.chance(50)){
-				var dx = Random.num(-1,1);
-				var dy = Random.num(-1,1);
-				if (dx == 0 && dy == 0){
-					dx = 1;
+			const nearbyTarget = this.getNearbyTarget();
+			if (!nearbyTarget || this.alignment == 'n'){
+				if (Random.chance(50)){
+					var dx = Random.num(-1,1);
+					var dy = Random.num(-1,1);
+					if (dx === 0 && dy === 0){
+						dx = 1;
+					}
+					return this.moveTo(dx, dy);
+				} else {
+					// Do nothing
+					this.reportAction("Stand by");
+					return Promise.resolve();
 				}
-				return this.moveTo(dx, dy);
-			} else {
-				// Do nothing
-				this.reportAction("Stand by");
-				return Promise.resolve();
+			} else if (nearbyTarget){
+				let dx = Math.sign(nearbyTarget.x - this.x);
+				let dy = Math.sign(nearbyTarget.y - this.y);
+				const mob = this.level.getMobAt(this.x + dx, this.y + dy);
+				if (mob){
+					if (mob.alignment !== this.alignment){
+						return this.attackOnDirection(dx, dy);
+					} else {
+						dx = Random.num(-1,1);
+						dy = Random.num(-1,1);
+						if (dx === 0 && dy === 0){
+							dx = 1;
+						}
+						return this.moveTo(dx, dy);
+					}
+				} else {
+					return this.moveTo(dx, dy);
+				}
 			}
 		}
+	},
+	isHostileMob: function(){
+		return this.alignment === 'a';
+	},
+	getNearbyTarget: function(){
+		//TODO: Implement some LOS.
+		if (this.isHostileMob())
+			return OAX6.UI.player;
+		else 
+			return false;
 	},
 	activate: function() {
 		if (this.dead){
@@ -68,15 +98,26 @@ Mob.prototype = {
 			this.executingAction = false;
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
-			};
-			return Timer.delay(Random.num(500, 3000));
+			} 
+			return Timer.delay(this.isHostileMob() ? OAX6.UI.WALK_DELAY : Random.num(500, 3000));
 		}).then(()=>{this.activate();});
+	},
+	lookAt: function(dx, dy) {
+		var dir = OAX6.UI.selectDir(dx, dy);
+		this.sprite.animations.play('walk_'+dir, 0);
+
+		// TODO: Do something about this since the first frame is midwalk... 
+		this.sprite.frame += 1;
 	},
 	moveTo: function(dx, dy){
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
 			if (this.canStartDialog && mob.dialog){
 				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
+				
+				// Look at each other while talking
+				this.lookAt(dx, dy);
+				mob.lookAt(-dx, -dy);
 			}
 			// What should we return here? :|
 		} else if (!this.level.isSolid(this.x + dx, this.y + dy)) {
@@ -106,17 +147,51 @@ Mob.prototype = {
 			return Timer.delay(500);
 		}
 	},
+	attackToPosition: function(x, y){
+		const weapon = this.weapon;
+		const range = weapon ? (weapon.range || 1) : 1;
+		const dist = Geo.flatDist(this.x, this.y, x, y);
+		if (dist > range){
+			this.reportAction("Attack - Out of range!");
+			return Promise.resolve();
+		}
+		const isRangedAttack = dist > 1; 
+		//TODO: Handle case of diagonals (cannot use simple flatDist, diff geometry)
+		/*
+		 * TODO: Define this based on the weapon.
+		 * Some weapons should allow ranged attacks at close range, some others should prevent it
+		 * some others will allow a weaker attack that doesn't use ammo, etc
+		 * For now, we'll do a melee attack if too close
+		 */
+		if (isRangedAttack){
+			// Add a projectile sprite, tween it to destination
+			// TODO: Depending on weapon, do one of: a: Fixed image b. Rotate on direction c. Rotate continuously
+			// TODO: Doesn't look good having appearance details at this class
+			return OAX6.UI.tweenFixedProjectile(weapon.appearance.tileset, weapon.appearance.i, this.x, this.y, x, y)
+			.then(()=> this._attackPosition(x, y));
+		} else if (dist <= 1){
+			// Simple melee attack? but use the weapon's melee mode instead of ranged
+			// Or may be prevent attack from happening, depends on the weapon
+			return this.attackOnDirection(Math.sign(x-this.x), Math.sign(y-this.y));
+		} else {
+			this.reportAction("Attack - Out of range!");
+			return Promise.resolve();
+		}
+	},
 	attackOnDirection: function(dx, dy){
-		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		return this._attackPosition(this.x + dx, this.y + dy);
+	},
+	_attackPosition: function(x, y){
+		var mob = this.level.getMobAt(x, y);
 		if (mob){
 			// Attack!
-			OAX6.UI.showIcon(2, mob.sprite.x, mob.sprite.y);
+			OAX6.UI.showIcon(2, mob.x, mob.y);
 			return Timer.delay(500)
 			.then(()=>{
 				OAX6.UI.hideIcon();
 				return this.attack(mob);
 			});
-		} else if (this.level.isSolid(this.x + dx, this.y + dy)) {
+		} else if (this.level.isSolid(x, y)) {
 			// TODO: Attack the map
 			this.reportAction("Attack - No one there!");
 			return Timer.delay(500);
@@ -126,6 +201,11 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
+		if (mob === OAX6.UI.player){
+			if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
+				PlayerStateMachine.startCombat();
+			}
+		}
 		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
 		let damage = combinedDamage - combinedDefense;
@@ -133,7 +213,7 @@ Mob.prototype = {
 			damage = 0;
 		if (damage === 0){
 			this.reportOutcome(mob.getDescription()+" shrugs off the attack!");
-			return Timer.delay(500)
+			return Timer.delay(500);
 		}
 		let proportion = damage / mob.hp.max;
 		if (proportion > 1){
@@ -142,7 +222,7 @@ Mob.prototype = {
 		proportion = Math.floor(proportion * 100 / 25);
 		this.reportOutcome(mob.getDescription()+" is "+ATTACK_DESCRIPTIONS[proportion]+"wounded.");
 		mob._damage(damage);
-		return Timer.delay(1500)
+		return Timer.delay(1500);
 	},
 	_damage: function(damage){
 		this.hp.reduce(damage);
@@ -161,7 +241,7 @@ Mob.prototype = {
 
 	},
 	reportAction: function(action){
-		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT || this === OAX6.UI.player){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
 		} else if (OAX6.UI.player == this){ 
 			if (PlayerStateMachine.state === PlayerStateMachine.GET){
@@ -183,10 +263,10 @@ Mob.prototype = {
 		if (this.name){
 			return this.name;
 		} else {
-			return 'The'+ this.definition.name
+			return 'The'+ this.definition.name;
 		}
 	}
-}
+};
 
 module.exports = Mob;
 
