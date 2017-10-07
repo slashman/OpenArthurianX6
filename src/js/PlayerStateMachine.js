@@ -1,5 +1,4 @@
 const Bus = require('./Bus');
-const log = require('./Debug').log;
 const Timer = require('./Timer');
 const Geo = require('./Geo');
 
@@ -63,7 +62,7 @@ const PlayerStateMachine = {
 		} else if(this.cursors.right.isDown) {
 			varx = 1;
 		}
-		if (varx != 0 || vary != 0){
+		if (varx !== 0 || vary !== 0){
 			OAX6.UI.hideMarker(); 
 			this.actionEnabled = false;
 			const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
@@ -95,7 +94,7 @@ const PlayerStateMachine = {
     	this.directionCallback = cb;
     },
 
-    clearDirectionCallback: function(cb){
+    clearDirectionCallback: function(){
     	this.directionCallback = null;
     },
 
@@ -103,7 +102,7 @@ const PlayerStateMachine = {
     	this.actionCallback = cb;
     },
 
-    clearActionCallback: function(cb){
+    clearActionCallback: function(){
     	this.actionCallback = null;
     },
 
@@ -121,7 +120,7 @@ const PlayerStateMachine = {
         if (key.isDown && key.repeats == 1) {
             var keyCode = key.keyCode;
 
-            if (this.inputDialogCallback != null) {
+            if (this.inputDialogCallback !== null) {
             	// TODO: Maybe refactor to not do this on the update cycle, instead have a key listener
                 if (keyCode == Phaser.KeyCode.ENTER) {
                     this.inputDialogCallback();
@@ -212,7 +211,7 @@ const PlayerStateMachine = {
 			}
 			switch (this.state) {
 				case PlayerStateMachine.WORLD:
-    				this.enableAction()
+    				this.enableAction();
                     break;
                 case PlayerStateMachine.COMBAT:
                 	OAX6.UI.player.level.actNext();

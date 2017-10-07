@@ -1,8 +1,6 @@
-const Bus = require('./Bus');
 const Geo = require('./Geo');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
-const PlayerStateMachine = require('./PlayerStateMachine');
 
 function Level(){
 	this.mobs = [];	
@@ -18,6 +16,7 @@ Level.prototype = {
 		return false;
 	},
 	getMobAt: function(x, y){
+		// TODO: Replace for this.mobs.find
 		for (var i=0,mob;mob=this.mobs[i];i++) {
 			if (mob.x == x && mob.y == y) {
 				return this.mobs[i];
@@ -69,7 +68,7 @@ Level.prototype = {
 		}
 	},
 	isMobActive: function(){
-		return this.mobs.find(m=>m.executingAction==true);
+		return this.mobs.find(m=>m.executingAction === true);
 	},
 	getCloserMobTo: function(x, y, alignment){
 		const mobs = this.mobs.filter(m=>m.alignment === alignment);
@@ -81,7 +80,13 @@ Level.prototype = {
 	},
 	addItem: function(item, x, y){
 		OAX6.UI.addItemSprite(item, x, y);
+	},
+	findPathTo: function(to, from){
+		return {
+			dx: Math.sign(to.x - from.x),
+			dy: Math.sign(to.y - from.y)
+		};
 	}
-}
+};
 
 module.exports = Level;

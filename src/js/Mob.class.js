@@ -44,9 +44,8 @@ Mob.prototype = {
 				PlayerStateMachine.actionEnabled = true;
 				return Promise.resolve();
 			} else {
-				let dx = Math.sign(player.x - this.x);
-				let dy = Math.sign(player.y - this.y);
-				return this.moveTo(dx, dy);
+				const nextStep = this.level.findPathTo(player, this);
+				return this.moveTo(nextStep.dx, nextStep.dy);
 			}
 		} else {
 			const nearbyTarget = this.getNearbyTarget();
@@ -64,8 +63,9 @@ Mob.prototype = {
 					return Timer.delay(1000);
 				}
 			} else if (nearbyTarget){
-				let dx = Math.sign(nearbyTarget.x - this.x);
-				let dy = Math.sign(nearbyTarget.y - this.y);
+				const nextStep = this.level.findPathTo(nearbyTarget, this);
+				let dx = nextStep.dx;
+				let dy = nextStep.dy;
 				const mob = this.level.getMobAt(this.x + dx, this.y + dy);
 				if (mob){
 					if (mob.alignment !== this.alignment){
