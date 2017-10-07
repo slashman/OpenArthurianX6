@@ -5,7 +5,7 @@ const Items = [
 		id: 'sword',
 		appearance: 'sword',
 		name: 'Sword',
-		damage: 3
+		damage: 6
 	},
 	{
 		id: 'spear',
@@ -19,6 +19,20 @@ const Items = [
 		name: 'Magic Axe',
 		range: 5,
 		damage: 400
+	},
+	{
+		id: 'crossbow',
+		appearance: 'crossbow',
+		name: 'Crossbow',
+		range: 5,
+		damage: 10
+	},
+	{
+		id: 'boomerang',
+		appearance: 'boomerang',
+		name: 'Boomerang',
+		range: 5,
+		damage: 3
 	},
 	{
 		id: 'maingauche',

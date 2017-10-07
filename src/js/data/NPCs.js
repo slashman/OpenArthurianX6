@@ -9,20 +9,29 @@ const NPCs = [
 	{
 		id: 'iolo',
 		name: 'Iolo',
-		type: 'rat',
-		alignment: 'n'
+		type: 'human',
+		alignment: 'b',
+		weapon: 'crossbow'
 	},
 	{
 		id: 'shamino',
 		name: 'Shamino',
-		type: 'demon',
-		alignment: 'b'
+		type: 'human',
+		alignment: 'b',
+		weapon: 'maingauche'
 	},
 	{
-		id: 'shamuru',
-		name: 'Shamuru',
+		id: 'dupre',
+		name: 'Dupre',
+		type: 'human',
+		alignment: 'b',
+		weapon: 'sword'
+	},
+	{
+		id: 'kram',
+		name: 'Skeleton',
 		type: 'skeleton',
-		alignment: 'a',
+		alignment: 'b',
 		dialog: [
 			{
 				key: "greeting",

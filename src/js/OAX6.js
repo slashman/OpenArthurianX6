@@ -37,20 +37,14 @@ const OAX6 = {
 		ItemFactory.setGame(game);
 		
 		const firstLevel = this.loadLevel(game);
-		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 5, 0);
-		const partyMember1 = NPCFactory.buildNPC(game, 'iolo', firstLevel, 11, 6, 0);
-		partyMember1.alignment = 'b';
-		const partyMember2 = NPCFactory.buildNPC(game, 'iolo', firstLevel, 13, 6, 0);
-		partyMember2.alignment = 'b';
-		const partyMember3 = NPCFactory.buildNPC(game, 'iolo', firstLevel, 12, 7, 0);
-		partyMember3.alignment = 'b';
-		player.addMobToParty(partyMember1);
-		player.addMobToParty(partyMember2);
-		player.addMobToParty(partyMember3);
+		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 15, 0);
+		const shamino = NPCFactory.buildNPC(game, 'shamino', firstLevel, 13, 16, 0);
+		const dupre = NPCFactory.buildNPC(game, 'dupre', firstLevel, 12, 17, 0);
+		player.addMobToParty(shamino);
+		player.addMobToParty(dupre);
 		firstLevel.addMob(player);
-		firstLevel.addMob(partyMember1);
-		firstLevel.addMob(partyMember2);
-		firstLevel.addMob(partyMember3);
+		firstLevel.addMob(shamino);
+		firstLevel.addMob(dupre);
 		Dialogs.init(game);
 	},
 	loadLevel: function(game){

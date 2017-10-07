@@ -1,5 +1,6 @@
 const Mob = require('./Mob.class');
 const AppearanceFactory = require('./AppearanceFactory');
+const ItemFactory = require('./ItemFactory');
 const Stat = require('./Stat.class');
 
 const MobFactory = {
@@ -22,6 +23,8 @@ const MobFactory = {
 		mob.hp = new Stat(definition.hp);
 		mob.damage = new Stat(definition.damage);
 		mob.defense = new Stat(definition.defense);
+		if (definition.weapon)
+			mob.weapon = ItemFactory.createItem(definition.weapon);
 		return mob;
 	}
 };

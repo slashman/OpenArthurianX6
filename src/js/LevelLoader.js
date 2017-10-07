@@ -1,5 +1,6 @@
-const Level = require('./Level.class')
-const NPCFactory = require('./NPCFactory')
+const Level = require('./Level.class');
+const NPCFactory = require('./NPCFactory');
+const MobFactory = require('./MobFactory');
 
 const LevelLoader = {
 	loadLevel: function(game){
@@ -13,7 +14,7 @@ const LevelLoader = {
 		return level;
 	},
 	loadTiledMap: function(game){
-		var map = game.add.tilemap('covetous3'); //TODO: Read from Scenario data
+		var map = game.add.tilemap('summoning'); //TODO: Read from Scenario data
 		map.addTilesetImage('terrain', 'terrain');
 		map.addTilesetImage('items', 'items');
 		map.addTilesetImage('monsters', 'monsters');
@@ -27,29 +28,53 @@ const LevelLoader = {
 		return {
 			mobs: this.loadTiledMapMobs(),
 			solidMask: this.loadTiledMapSolidMask(map)
-		}
+		};
 	},
 	loadTiledMapMobs: function() {
 		return [
 				{
-					type: 'npc',
-					id: 'iolo',
+					type: 'mob',
+					id: 'demon',
 					x: 10,
 					y: 4
 				},
 				{
-					type: 'npc',
-					id: 'shamino',
+					type: 'mob',
+					id: 'demon',
 					x: 13,
 					y: 6
 				},
 				{
+					type: 'mob',
+					id: 'demon',
+					x: 10,
+					y: 6
+				},
+				{
+					type: 'mob',
+					id: 'demon',
+					x: 13,
+					y: 7
+				},
+				{
+					type: 'mob',
+					id: 'demon',
+					x: 11,
+					y: 6
+				},
+				{
+					type: 'mob',
+					id: 'demon',
+					x: 13,
+					y: 8
+				}/*,
+				{
 					type: 'npc',
-					id: 'shamuru',
+					id: 'kram',
 					x: 7,
 					y: 10
-				}
-			]
+				}*/
+			];
 	},
 	loadTiledMapSolidMask: function(map) {
 		let w = map.width,
@@ -66,9 +91,15 @@ const LevelLoader = {
 		return solidMask;
 	},
 	loadMob: function(game, mobData, level){
-		const mob = NPCFactory.buildNPC(game, mobData.id, level, mobData.x, mobData.y, 0);
+		let mob = null;
+		if (mobData.type === 'npc'){
+			mob = NPCFactory.buildNPC(game, mobData.id, level, mobData.x, mobData.y, 0);
+		} else {
+			mob = MobFactory.buildMob(game, mobData.id, level, mobData.x, mobData.y, 0);
+			mob.alignment = 'a';
+		}
 		level.addMob(mob);
 	}
-}
+};
 
 module.exports = LevelLoader;
