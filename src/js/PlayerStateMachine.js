@@ -66,7 +66,8 @@ const PlayerStateMachine = {
 		if (varx != 0 || vary != 0){
 			OAX6.UI.hideMarker(); 
 			this.actionEnabled = false;
-			return OAX6.UI.player.moveTo(varx, vary);
+			const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
+			return activeMob.moveTo(varx, vary);
 		} else {
 			return false;
 		}
@@ -148,35 +149,37 @@ const PlayerStateMachine = {
     },
     attackCommand: function(){
     	// Select a direction
+    	const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
     	return new Promise((resolve)=>{
     		this.actionEnabled = false;
-    		OAX6.UI.player.reportAction("Attack - Where?");
+    		activeMob.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, OAX6.UI.player.x, OAX6.UI.player.y);
+    		OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
 			this.setDirectionCallback((dir) => {
 				OAX6.UI.hideIcon();
-				OAX6.UI.player.reportAction("Attack - "+Geo.getDirectionName(dir));
+				activeMob.reportAction("Attack - "+Geo.getDirectionName(dir));
 				this.clearDirectionCallback();
 				Timer.delay(500).then(()=>resolve(dir));
 			});
 		}).then(dir=>{
-			return OAX6.UI.player.attackOnDirection(dir.x, dir.y);
+			return activeMob.attackOnDirection(dir.x, dir.y);
 		});
     },
     rangedAttackCommand: function(){
+    	const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
     	return new Promise((resolve)=>{
     		this.actionEnabled = false;
-    		OAX6.UI.player.reportAction("Attack - Where?");
+    		activeMob.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
     		let cursor = {
-    			x: OAX6.UI.player.x,
-    			y: OAX6.UI.player.y
+    			x: activeMob.x,
+    			y: activeMob.y
     		};
     		OAX6.UI.showIcon(4, cursor.x, cursor.y);
 			this.setDirectionCallback((dir) => {
 				cursor.x += dir.x;
 				cursor.y += dir.y;
-				//TODO: Limit based on player's range
+				//TODO: Limit based on mob's range
 				OAX6.UI.showIcon(4, cursor.x, cursor.y);
 			});
 			this.setActionCallback(() => {
@@ -186,7 +189,7 @@ const PlayerStateMachine = {
 				resolve(cursor);
 			});
 		}).then(position=>{
-			return OAX6.UI.player.attackToPosition(position.x, position.y);
+			return activeMob.attackToPosition(position.x, position.y);
 		});
     },
     updateWorldAction: function() {

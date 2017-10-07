@@ -38,10 +38,10 @@ Level.prototype = {
 	actNext: function(){
 		log("actNext",this.currentTurnCounter);
 		const nextActor = this.mobs[this.currentTurnCounter++];
-		if (this.currentTurnCounter === this.mobs.length) {
+		if (this.currentTurnCounter >= this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
-		if (nextActor.dead){
+		if (!nextActor || nextActor.dead){
 			return this.actNext();
 		}
 		OAX6.UI.locateMarker(nextActor);
@@ -50,11 +50,18 @@ Level.prototype = {
 			OAX6.UI.locateMarker(nextActor);
 			Timer.delay(1000)
 			.then(()=>{
-				OAX6.UI.hideMarker();
+				if (nextActor.alignment !== OAX6.UI.player.alignment){
+					OAX6.UI.hideMarker();
+				}
 				return nextActor.act();
 			})
 			.then(()=>Timer.delay(500))
-			.then(()=>this.actNext());
+			.then(()=>{
+				if (OAX6.UI.activeMob !== nextActor){
+					OAX6.UI.hideMarker();
+					this.actNext();
+				}
+			});
 		} else {
 			nextActor.act();
 			// Player will take its time, then call actNext himself

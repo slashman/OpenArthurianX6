@@ -35,11 +35,19 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 				PlayerStateMachine.actionEnabled = true;
 			}
+			OAX6.UI.activeMob = false;
 			return Promise.resolve();
-		} else if (player && PlayerStateMachine.state !== PlayerStateMachine.COMBAT && this.alignment === player.alignment){
-			let dx = Math.sign(player.x - this.x);
-			let dy = Math.sign(player.y - this.y);
-			return this.moveTo(dx, dy);
+		} else if (player && this.alignment === player.alignment){
+			// This is a party member
+			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+				OAX6.UI.activeMob = this;
+				PlayerStateMachine.actionEnabled = true;
+				return Promise.resolve();
+			} else {
+				let dx = Math.sign(player.x - this.x);
+				let dy = Math.sign(player.y - this.y);
+				return this.moveTo(dx, dy);
+			}
 		} else {
 			const nearbyTarget = this.getNearbyTarget();
 			if (!nearbyTarget || this.alignment == 'n'){
@@ -257,7 +265,12 @@ Mob.prototype = {
 		OAX6.UI.showMessage(outcome);
 	},
 	getBattleDescription: function(){
-		let desc = this.name;
+		let desc = null;
+		if (this.name){
+			desc = this.name;
+		} else {
+			desc = this.definition.name;
+		}
 		if (this.weapon){
 			desc += " armed with "+this.weapon.name;
 		}
@@ -267,7 +280,7 @@ Mob.prototype = {
 		if (this.name){
 			return this.name;
 		} else {
-			return 'The'+ this.definition.name;
+			return 'The '+ this.definition.name;
 		}
 	},
 	addMobToParty: function(mob){
