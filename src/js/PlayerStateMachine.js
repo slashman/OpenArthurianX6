@@ -13,12 +13,6 @@ const PlayerStateMachine = {
     GET         : 5,
     INVENTORY   : 6,
 
-    INPUT: [],
-
-    KEYS: {
-        INVENTORY: 0
-    },
-
     init: function(game) {
         this.game = game;
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -38,37 +32,7 @@ const PlayerStateMachine = {
         this.cursors.left.onDown.add(this.listenDirections, this);
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
-
-        this.game.input.keyboard.addCallbacks(this, this.onKeyDown, this.onKeyUp);
-    },
-    onKeyDown: function(event) {
-        var key = null;
-        if (event.keyCode == Phaser.KeyCode.I) {
-            key = PlayerStateMachine.KEYS.INVENTORY;
-        }
-
-        if (key == null) { return; }
-        if (this.INPUT[key] == 2) { return; }
-
-        this.INPUT[key] = 1;
-    },
-    onKeyUp: function(event) {
-        var key = null;
-        if (event.keyCode == Phaser.KeyCode.I) {
-            key = PlayerStateMachine.KEYS.INVENTORY;
-        }
-
-        if (key == null) { return; }
-
-        this.INPUT[key] = 0;
-    },
-    isPressed: function(keyCode) {
-        // Checks if a key is pressed and locks it until it is released
-        if (this.INPUT[keyCode] === undefined) { return false; }
-        if (this.INPUT[keyCode] != 1) { return false; }
-
-        this.INPUT[keyCode] = 2;
-        return true;
+        this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
     },
     listenDirections: function(){
     	if (this.directionCallback){
@@ -254,6 +218,9 @@ const PlayerStateMachine = {
 		});
     },
     activateInventory: function() {
+        // TODO: Needs to define from where can open the inventory and probably a better way to access it
+        if (PlayerStateMachine.state != PlayerStateMachine.WORLD && PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
+
         return new Promise((resolve) => {
             if (Inventory.isOpen()) {
                 Inventory.close();
@@ -280,10 +247,6 @@ const PlayerStateMachine = {
 				} else if (keyCode === Phaser.KeyCode.G){
 	            	return this.getCommand();
 				}
-            }
-            
-            if (this.isPressed(PlayerStateMachine.KEYS.INVENTORY)) {
-                return this.activateInventory();
             }
 
 			return this.checkMovement();
@@ -329,9 +292,6 @@ const PlayerStateMachine = {
     },
 
     updateInventory: function() {
-        if (this.isPressed(PlayerStateMachine.KEYS.INVENTORY)) {
-            return this.activateInventory();
-        }
     },
 
     update: function() {
