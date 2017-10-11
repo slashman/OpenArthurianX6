@@ -20,7 +20,7 @@ const PlayerStateMachine = {
         this.state = PlayerStateMachine.WORLD;
         this.actionEnabled = true;
 
-        this.inventory = [];
+        PlayerStateMachine.inventory = [];
 
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
@@ -33,6 +33,7 @@ const PlayerStateMachine = {
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
+        this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
     },
     listenDirections: function(){
     	if (this.directionCallback){
@@ -296,6 +297,31 @@ const PlayerStateMachine = {
         Inventory.moveCursor(dir.x, dir.y);
     },
 
+    dropItem: function() {
+        if (PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
+
+        var item = PlayerStateMachine.inventory[Inventory.cursorSlot];
+        if (!item) { return; }
+
+        return new Promise((resolve) => {
+            this.player.reportAction("Drop - Where?");
+            OAX6.UI.hideMarker();
+            OAX6.UI.showIcon(3, this.player.x, this.player.y);
+            this.clearDirectionCallback();
+            this.setDirectionCallback((dir) => {
+                OAX6.UI.hideIcon();
+                this.player.reportAction("Drop - "+Geo.getDirectionName(dir));
+                this.clearDirectionCallback();
+                Timer.delay(500).then(()=>resolve(dir));
+            });
+        }).then((dir) => {
+            this.player.dropOnDirection(dir.x, dir.y, item);
+            Inventory.updateInventory();
+            this.setDirectionCallback(this.updateInventoryDirection.bind(this));
+        });
+        
+    },
+
     update: function() {
         if (!this.actionEnabled) { return; }
 
@@ -308,10 +334,6 @@ const PlayerStateMachine = {
             case PlayerStateMachine.DIALOG:
                 this.updateDialogAction();
                 break;
-
-            /*case PlayerStateMachine.INVENTORY:
-                this.updateInventory();
-                break;*/
         }
     }
 };

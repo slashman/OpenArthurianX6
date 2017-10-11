@@ -145,6 +145,11 @@ Mob.prototype = {
 			this.reportAction("Get - Nothing there!");
 		}
 	},
+	dropOnDirection: function(dx, dy, item) {
+		var ind = this.inventory.indexOf(item);
+		this.inventory.splice(ind, 1);
+		this.level.addItem(item, this.x + dx, this.y + dy);
+	},
 	attackToPosition: function(x, y){
 		const weapon = this.weapon;
 		const range = weapon ? (weapon.range || 1) : 1;

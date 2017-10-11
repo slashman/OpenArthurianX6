@@ -72,7 +72,7 @@ module.exports = {
             }
         }
 
-        this.updateCursorPosition();
+        this.moveCursor(0, 0);
     },
 
     open: function() {
