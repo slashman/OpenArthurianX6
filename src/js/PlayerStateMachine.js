@@ -176,7 +176,7 @@ const PlayerStateMachine = {
     		this.actionEnabled = false;
     		this.player.reportAction("Get - Where?");
     		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, this.player.sprite.x, this.player.sprite.y);
+    		OAX6.UI.showIcon(3, this.player.x, this.player.y);
 			this.setDirectionCallback((dir) => {
 				OAX6.UI.hideIcon();
 				this.player.reportAction("Get - "+Geo.getDirectionName(dir));
@@ -188,7 +188,6 @@ const PlayerStateMachine = {
 		}).then(()=>{
             this.switchState(PlayerStateMachine.WORLD);
             this.actionEnabled = true;
-            OAX6.UI.clearMessage();
         });
     },
     rangedAttackCommand: function(){

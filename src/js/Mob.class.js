@@ -141,10 +141,8 @@ Mob.prototype = {
 			this.inventory.push(item);
 			this.level.removeItem(item);
 			this.reportAction("Got some " + item.name);
-			return Timer.delay(500);
 		} else {
 			this.reportAction("Get - Nothing there!");
-			return Timer.delay(500);
 		}
 	},
 	attackToPosition: function(x, y){
