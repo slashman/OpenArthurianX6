@@ -225,9 +225,11 @@ const PlayerStateMachine = {
             if (Inventory.isOpen()) {
                 Inventory.close();
                 PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+                this.clearDirectionCallback();
             } else {
                 Inventory.open();
                 PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
+                this.setDirectionCallback(this.updateInventoryDirection.bind(this));
             }
 
             resolve(true);
@@ -291,7 +293,8 @@ const PlayerStateMachine = {
         this.player.level.actNext();
     },
 
-    updateInventory: function() {
+    updateInventoryDirection: function(dir) {
+        Inventory.moveCursor(dir.x, dir.y);
     },
 
     update: function() {
@@ -307,9 +310,9 @@ const PlayerStateMachine = {
                 this.updateDialogAction();
                 break;
 
-            case PlayerStateMachine.INVENTORY:
+            /*case PlayerStateMachine.INVENTORY:
                 this.updateInventory();
-                break;
+                break;*/
         }
     }
 };

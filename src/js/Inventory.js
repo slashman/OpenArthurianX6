@@ -1,5 +1,3 @@
-const PlayerStateMachine = require('./PlayerStateMachine');
-
 module.exports = {
     init: function(game) {
         this.MAX_DISPLAY = 12;
@@ -39,6 +37,18 @@ module.exports = {
         this.UI.UILayer.add(this.inventoryGroup);
 
         this.close();
+    },
+
+    moveCursor: function(x, y) {
+        var amount = x + y * 5,
+            inventory = this.UI.player.inventory;
+
+        this.cursorSlot += amount;
+
+        if (this.cursorSlot >= inventory.length) { this.cursorSlot = inventory.length - 1; }
+        if (this.cursorSlot < 0) { this.cursorSlot = 0; }
+
+        this.updateCursorPosition();
     },
 
     updateCursorPosition: function() {
