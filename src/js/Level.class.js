@@ -36,7 +36,6 @@ Level.prototype = {
 		this.mobs.splice(this.mobs.indexOf(mob), 1);
 	},
 	actNext: function(){
-		log("actNext",this.currentTurnCounter);
 		const nextActor = this.mobs[this.currentTurnCounter++];
 		if (this.currentTurnCounter === this.mobs.length) {
 			this.currentTurnCounter = 0;
@@ -74,6 +73,14 @@ Level.prototype = {
 	},
 	addItem: function(item, x, y){
 		OAX6.UI.addItemSprite(item, x, y);
+	},
+	sortForCombat: function(playerGoesFirst){
+		this.currentTurnCounter = 0;
+		this.mobs = this.mobs.sort((a,b)=>a.speed.current - b.speed.current);
+		if (playerGoesFirst){
+			this.removeMob(OAX6.UI.player);
+			this.mobs.unshift(OAX6.UI.player);
+		}
 	}
 }
 

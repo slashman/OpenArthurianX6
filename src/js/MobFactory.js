@@ -22,6 +22,7 @@ const MobFactory = {
 		mob.hp = new Stat(definition.hp);
 		mob.damage = new Stat(definition.damage);
 		mob.defense = new Stat(definition.defense);
+		mob.speed = new Stat(definition.speed)
 		return mob;
 	}
 };
