@@ -1,6 +1,7 @@
 const Geo = require('./Geo');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
+const PF = require('pathfinding');
 
 function Level(){
 	this.mobs = [];	
@@ -24,8 +25,13 @@ Level.prototype = {
 		}
 		return false;
 	},
+	_transpose: function(m) {
+		return m[0].map((x,i) => m.map(x => x[i]));
+	},
 	setSolidMask: function(solidMask) {
 		this.solidMask = solidMask;
+		const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
+		this.pfGrid = new PF.Grid(pfMask);
 	},
 	addMob: function(mob){
 		this.mobs.push(mob);
@@ -82,9 +88,21 @@ Level.prototype = {
 		OAX6.UI.addItemSprite(item, x, y);
 	},
 	findPathTo: function(to, from){
+		//TODO: Single finder object?
+		const finder = new PF.AStarFinder({
+		    allowDiagonal: true,
+    		dontCrossCorners: false
+		});
+		const gridBackup = this.pfGrid.clone();
+		//TODO: Mark other mob positions as solid
+		const path = finder.findPath(from.x, from.y, to.x, to.y, gridBackup);
+		if (path.length == 0){
+			console.log(`Someone is trapped at ${from.x}, ${from.y})`)
+			return {dx:0, dy:0};
+		}
 		return {
-			dx: Math.sign(to.x - from.x),
-			dy: Math.sign(to.y - from.y)
+			dx: Math.sign(path[1][0]-from.x),
+			dy: Math.sign(path[1][1]-from.y)
 		};
 	}
 };
