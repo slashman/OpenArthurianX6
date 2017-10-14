@@ -19,6 +19,8 @@ function Mob(level, x, y, z){
 	this.z = z;
 	this.isTalking = false;
 	this.canStartDialog = false; // Only player "mob" can start dialog
+	//TODO: FAR: Dialogs between NPCs
+	this.speed = null;
 	this.party = [];
 }
 
@@ -137,7 +139,6 @@ Mob.prototype = {
 		this.sprite.frame += 1;
 	},
 	moveTo: function(dx, dy){
-		console.log("is moving "+this.getDescription());
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
 			if (this.canStartDialog && mob.dialog){
@@ -157,8 +158,7 @@ Mob.prototype = {
 			this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
 			this.reportAction("Move");
 
-			return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY)
-			.then(()=>console.log("Tween ends for "+this.getDescription()));
+			return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 		}
 		this.reportAction("Move - Blocked");
 		return Timer.delay(500);

@@ -25,6 +25,7 @@ const MobFactory = {
 		mob.defense = new Stat(definition.defense);
 		if (definition.weapon)
 			mob.weapon = ItemFactory.createItem(definition.weapon);
+		mob.speed = new Stat(definition.speed)
 		return mob;
 	}
 };

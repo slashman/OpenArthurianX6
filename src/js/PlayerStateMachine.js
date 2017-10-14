@@ -1,6 +1,7 @@
 const Bus = require('./Bus');
 const Timer = require('./Timer');
 const Geo = require('./Geo');
+const Random = require('./Random');
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -197,7 +198,7 @@ const PlayerStateMachine = {
 			const keyCode = this._inkey();
 	    	if (keyCode) {
 	    		if (keyCode === Phaser.KeyCode.C){
-	            	return this.startCombat();
+	            	return this.startCombat(true);
 				} else if (keyCode === Phaser.KeyCode.A){
 	            	return this.attackCommand();
 				} else if (keyCode === Phaser.KeyCode.T){
@@ -220,9 +221,10 @@ const PlayerStateMachine = {
 		});
     },
 
-    startCombat: function(){
+    startCombat: function(ensurePlayerFirst){
     	OAX6.UI.modeLabel.text = "Combat";
         this.actionEnabled = false;
+        this.playerGoesFirst = ensurePlayerFirst || Random.chance(50);
         this.switchState(PlayerStateMachine.COMBAT_SYNC);
         // When the state is switched, all mobs will try to make their last move,
         // Calling "checkCombatReady" after acting
@@ -243,6 +245,7 @@ const PlayerStateMachine = {
         // Eventually, the player's "act" function will be called,
         // And action will be enabled.
         this.switchState(PlayerStateMachine.COMBAT);
+        OAX6.UI.player.level.sortForCombat(this.playerGoesFirst);
         OAX6.UI.player.level.actNext();
     },
 
