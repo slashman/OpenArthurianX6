@@ -9,7 +9,7 @@ const MobTypes = [
 		damage: 3,
 		defense: 0,
 		corpse: 'demonCorpse',
-		weapon: 'boomerang'
+		weapon: 'boomerang',
 		speed: 6
 	},
 	{
