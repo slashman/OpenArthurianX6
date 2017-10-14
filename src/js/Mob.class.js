@@ -46,7 +46,8 @@ Mob.prototype = {
 				PlayerStateMachine.actionEnabled = true;
 				return Promise.resolve();
 			} else {
-				const nextStep = this.level.findPathTo(player, this);
+				//TODO: Fix issue with pathfinding empty routes to player
+				const nextStep = this.level.findPathTo(player, this, this.alignment);
 				return this.moveTo(nextStep.dx, nextStep.dy);
 			}
 		} else {
@@ -65,7 +66,7 @@ Mob.prototype = {
 					return Timer.delay(1000);
 				}
 			} else if (nearbyTarget){
-				const nextStep = this.level.findPathTo(nearbyTarget, this);
+				const nextStep = this.level.findPathTo(nearbyTarget, this, this.alignment);
 				let dx = nextStep.dx;
 				let dy = nextStep.dy;
 				const mob = this.level.getMobAt(this.x + dx, this.y + dy);

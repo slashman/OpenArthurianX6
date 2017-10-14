@@ -75,6 +75,9 @@ Level.prototype = {
 	isMobActive: function(){
 		return this.mobs.find(m=>m.executingAction === true);
 	},
+	getMobsOfAlignment: function(alignment){
+		return this.mobs.filter(m=>m.alignment === alignment);
+	},
 	getCloserMobTo: function(x, y, alignment){
 		const mobs = this.mobs.filter(m=>m.alignment === alignment);
 		if (mobs.length > 0){
@@ -86,15 +89,18 @@ Level.prototype = {
 	addItem: function(item, x, y){
 		OAX6.UI.addItemSprite(item, x, y);
 	},
-	findPathTo: function(to, from){
+	findPathTo: function(to, from, includeMobsOfAlignment){
 		//TODO: Single finder object?
 		const finder = new PF.AStarFinder({
 		    allowDiagonal: true,
     		dontCrossCorners: false
 		});
-		const gridBackup = this.pfGrid.clone();
-		//TODO: Mark other mob positions as solid
-		const path = finder.findPath(from.x, from.y, to.x, to.y, gridBackup);
+		const gridClone = this.pfGrid.clone();
+		if (includeMobsOfAlignment){
+			const mobs = this.getMobsOfAlignment(includeMobsOfAlignment);
+			mobs.forEach(m=> gridClone.setWalkableAt(m.x, m.y, false));
+		}
+		const path = finder.findPath(from.x, from.y, to.x, to.y, gridClone);
 		if (path.length == 0){
 			console.log(`Someone is trapped at ${from.x}, ${from.y})`)
 			return {dx:0, dy:0};
