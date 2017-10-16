@@ -98,7 +98,11 @@ Level.prototype = {
 		const gridClone = this.pfGrid.clone();
 		if (includeMobsOfAlignment){
 			const mobs = this.getMobsOfAlignment(includeMobsOfAlignment);
-			mobs.forEach(m=> gridClone.setWalkableAt(m.x, m.y, false));
+			mobs.forEach(m=> {
+				if (m.x !== to.x && m.y !== to.y){
+					gridClone.setWalkableAt(m.x, m.y, false);
+				}
+			});
 		}
 		const path = finder.findPath(from.x, from.y, to.x, to.y, gridClone);
 		if (path.length == 0){
