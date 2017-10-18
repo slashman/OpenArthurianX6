@@ -76,7 +76,7 @@ Level.prototype = {
 			}
 		}
 
-		return false;
+		return null;
 	}
 }
 

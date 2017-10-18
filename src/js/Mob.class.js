@@ -146,9 +146,16 @@ Mob.prototype = {
 		}
 	},
 	dropOnDirection: function(dx, dy, item) {
-		var ind = this.inventory.indexOf(item);
-		this.inventory.splice(ind, 1);
-		this.level.addItem(item, this.x + dx, this.y + dy);
+		var x = this.x + dx,
+			y = this.y + dy;
+
+		if (!this.level.isSolid(x, y) && !this.level.getItemAt(x, y)) {
+			var ind = this.inventory.indexOf(item);
+			this.inventory.splice(ind, 1);
+			this.level.addItem(item, x, y);
+		} else {
+			this.reportAction("Can't drop it there!");
+		}
 	},
 	attackToPosition: function(x, y){
 		const weapon = this.weapon;
