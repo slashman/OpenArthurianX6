@@ -18,6 +18,7 @@ const PlayerStateMachine = {
         this.cursors = this.game.input.keyboard.createCursorKeys();
 
         this.state = PlayerStateMachine.WORLD;
+        this.previousState = this.state;
         this.actionEnabled = true;
 
         PlayerStateMachine.inventory = [];
@@ -32,6 +33,7 @@ const PlayerStateMachine = {
         this.cursors.left.onDown.add(this.listenDirections, this);
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
+        this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
     },
@@ -62,6 +64,30 @@ const PlayerStateMachine = {
     		this.actionCallback();
     	}
     },
+    cancelAction: function() {
+        if (!this.directionCallback && !this.actionCallback) { return; }
+
+        OAX6.UI.player.reportAction("Canceled");
+        
+        if (this.directionCallback) {
+            return this.directionCallback(null, true);
+        }
+
+    	if (this.actionCallback){
+    		this.actionCallback(null, true);
+    	}
+        /*if (!this.directionCallback && !this.actionCallback) { return; }
+
+        //this.switchState(this.previousState);
+        this.actionEnabled = true;
+
+        this.clearActionCallback();
+        this.clearDirectionCallback();
+
+        OAX6.UI.hideIcon();
+
+        OAX6.UI.player.reportAction("Canceled");*/
+    },
     checkMovement: function() {
         var varx = 0;
 		var vary = 0;
@@ -91,6 +117,7 @@ const PlayerStateMachine = {
 
     switchState: function(stateId) {
         //TODO: Maybe restrict switches, like don't switch to dialog from combat
+        this.previousState = this.state;
         this.state = stateId;
     },
 
@@ -166,13 +193,15 @@ const PlayerStateMachine = {
     		OAX6.UI.hideMarker();
     		OAX6.UI.showIcon(3, OAX6.UI.player.x, OAX6.UI.player.y);
 			this.setDirectionCallback((dir) => {
-				OAX6.UI.hideIcon();
+                OAX6.UI.hideIcon();
+                this.clearDirectionCallback();
+                Timer.delay(500).then(()=>resolve(dir));
 				this.player.reportAction("Attack - "+Geo.getDirectionName(dir));
-				this.clearDirectionCallback();
-				Timer.delay(500).then(()=>resolve(dir));
 			});
 		}).then(dir=>{
-			return this.player.attackOnDirection(dir.x, dir.y);
+            if (dir != null) {
+                return this.player.attackOnDirection(dir.x, dir.y);
+            }
 		});
     },
     getCommand: function() {
@@ -183,14 +212,21 @@ const PlayerStateMachine = {
     		this.player.reportAction("Get - Where?");
     		OAX6.UI.hideMarker();
     		OAX6.UI.showIcon(3, this.player.x, this.player.y);
-			this.setDirectionCallback((dir) => {
-				OAX6.UI.hideIcon();
+			this.setDirectionCallback((dir, canceled) => {
+                OAX6.UI.hideIcon();
+                this.clearDirectionCallback();
+
+                if (canceled) {
+                    return resolve(null);
+                }
+				
 				this.player.reportAction("Get - "+Geo.getDirectionName(dir));
-				this.clearDirectionCallback();
 				Timer.delay(500).then(()=>resolve(dir));
 			});
 		}).then(dir=>{
-            return this.player.getOnDirection(dir.x, dir.y);
+            if (dir != null) {
+                return this.player.getOnDirection(dir.x, dir.y);
+            }
 		}).then(()=>{
             this.switchState(PlayerStateMachine.WORLD);
             this.actionEnabled = true;
