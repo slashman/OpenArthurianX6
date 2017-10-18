@@ -53,6 +53,11 @@ const PlayerStateMachine = {
     	}
     },
 	listenAction: function(){
+        // For actions such as pick item in place
+        if (this.directionCallback) {
+            return this.directionCallback({x: 0, y: 0});
+        }
+
     	if (this.actionCallback){
     		this.actionCallback();
     	}
