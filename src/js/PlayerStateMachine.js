@@ -3,6 +3,7 @@ const log = require('./Debug').log;
 const Timer = require('./Timer');
 const Geo = require('./Geo');
 const Inventory = require('./Inventory');
+const ItemFactory = require('./ItemFactory');
 
 const PlayerStateMachine = {
     NOTHING     : 0,

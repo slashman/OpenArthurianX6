@@ -32,6 +32,8 @@ module.exports = {
         this.cursor.frame = 6;
         this.cursorSlot = 0;
 
+        this.scroll = 0;
+
         this.inventoryGroup.add(this.cursor);
 
         this.UI.UILayer.add(this.inventoryGroup);
@@ -40,20 +42,36 @@ module.exports = {
     },
 
     moveCursor: function(x, y) {
-        var amount = x + y * 5,
-            inventory = this.UI.player.inventory;
+        var amount = x + y * this.COLUMNS,
+            inventory = this.UI.player.inventory,
+            scrolled = false;
 
         this.cursorSlot += amount;
 
         if (this.cursorSlot >= inventory.length) { this.cursorSlot = inventory.length - 1; }
         if (this.cursorSlot < 0) { this.cursorSlot = 0; }
 
+        while (this.cursorSlot-this.scroll*this.COLUMNS >= this.MAX_DISPLAY) {
+            this.scroll += 1;
+            scrolled = true;
+        }
+
+        while (this.cursorSlot-this.scroll*this.COLUMNS < 0) {
+            this.scroll -= 1;
+            scrolled = true;
+        }
+
         this.updateCursorPosition();
+
+        if (scrolled) {
+            this.updateInventory();
+        }
     },
 
     updateCursorPosition: function() {
-        var y = 28 + ((this.cursorSlot / this.COLUMNS) << 0) * 18,
-            x = 83 + (this.cursorSlot % this.COLUMNS) * 18;
+        var slot = this.cursorSlot-this.scroll*this.COLUMNS,
+            y = 28 + ((slot / this.COLUMNS) << 0) * 18,
+            x = 83 + (slot % this.COLUMNS) * 18;
 
         this.cursor.x = x;
         this.cursor.y = y;
@@ -61,14 +79,16 @@ module.exports = {
 
     updateInventory: function() {
         var player = OAX6.UI.player,
-            inventory = player.inventory;
+            inventory = player.inventory,
+            start = this.scroll * this.COLUMNS,
+            end = start+this.MAX_DISPLAY;
 
-        for (var i=0;i<this.MAX_DISPLAY;i++) {
+        for (var i=start;i<end;i++) {
             if (inventory[i]) {
                 var appearance = inventory[i].appearance;
-                this.invSlots[i].loadTexture(appearance.tileset, appearance.i);
+                this.invSlots[i-start].loadTexture(appearance.tileset, appearance.i);
             } else {
-                this.invSlots[i].loadTexture('ui', 5);
+                this.invSlots[i-start].loadTexture('ui', 5);
             }
         }
 
