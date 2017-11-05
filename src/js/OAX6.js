@@ -21,6 +21,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const Timer = require('./Timer');
 
 const Dialogs = require('./Dialogs');
+const Inventory = require('./Inventory');
 
 const OAX6 = {
 	run: function(){
@@ -40,6 +41,7 @@ const OAX6 = {
 		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 12, 0);
 		firstLevel.addMob(player);
 		Dialogs.init(game);
+		Inventory.init(game);
 	},
 	loadLevel: function(game){
 		return LevelLoader.loadLevel(game);

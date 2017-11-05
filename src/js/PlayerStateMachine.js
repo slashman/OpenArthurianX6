@@ -2,6 +2,8 @@ const Bus = require('./Bus');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
 const Geo = require('./Geo');
+const Inventory = require('./Inventory');
+const ItemFactory = require('./ItemFactory');
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -9,13 +11,18 @@ const PlayerStateMachine = {
     DIALOG      : 2,
     COMBAT      : 3,
     COMBAT_SYNC : 4,
+    GET         : 5,
+    INVENTORY   : 6,
 
     init: function(game) {
         this.game = game;
         this.cursors = this.game.input.keyboard.createCursorKeys();
 
         this.state = PlayerStateMachine.WORLD;
+        this.previousState = this.state;
         this.actionEnabled = true;
+
+        PlayerStateMachine.inventory = [];
 
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
@@ -27,6 +34,9 @@ const PlayerStateMachine = {
         this.cursors.left.onDown.add(this.listenDirections, this);
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
+        this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
+        this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
+        this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
     },
     listenDirections: function(){
     	if (this.directionCallback){
@@ -46,9 +56,38 @@ const PlayerStateMachine = {
     	}
     },
 	listenAction: function(){
+        // For actions such as pick item in place
+        if (this.directionCallback) {
+            return this.directionCallback({x: 0, y: 0});
+        }
+
     	if (this.actionCallback){
     		this.actionCallback();
     	}
+    },
+    cancelAction: function() {
+        if (!this.directionCallback && !this.actionCallback) { return; }
+
+        OAX6.UI.player.reportAction("Canceled");
+        
+        if (this.directionCallback) {
+            return this.directionCallback(null, true);
+        }
+
+    	if (this.actionCallback){
+    		this.actionCallback(null, true);
+    	}
+        /*if (!this.directionCallback && !this.actionCallback) { return; }
+
+        //this.switchState(this.previousState);
+        this.actionEnabled = true;
+
+        this.clearActionCallback();
+        this.clearDirectionCallback();
+
+        OAX6.UI.hideIcon();
+
+        OAX6.UI.player.reportAction("Canceled");*/
     },
     checkMovement: function() {
         var varx = 0;
@@ -66,7 +105,7 @@ const PlayerStateMachine = {
 		if (varx != 0 || vary != 0){
 			OAX6.UI.hideMarker(); 
 			this.actionEnabled = false;
-			return OAX6.UI.player.moveTo(varx, vary);
+			return this.player.moveTo(varx, vary);
 		} else {
 			return false;
 		}
@@ -79,6 +118,7 @@ const PlayerStateMachine = {
 
     switchState: function(stateId) {
         //TODO: Maybe restrict switches, like don't switch to dialog from combat
+        this.previousState = this.state;
         this.state = stateId;
     },
 
@@ -150,18 +190,48 @@ const PlayerStateMachine = {
     	// Select a direction
     	return new Promise((resolve)=>{
     		this.actionEnabled = false;
-    		OAX6.UI.player.reportAction("Attack - Where?");
+    		this.player.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
     		OAX6.UI.showIcon(3, OAX6.UI.player.x, OAX6.UI.player.y);
 			this.setDirectionCallback((dir) => {
-				OAX6.UI.hideIcon();
-				OAX6.UI.player.reportAction("Attack - "+Geo.getDirectionName(dir));
-				this.clearDirectionCallback();
+                OAX6.UI.hideIcon();
+                this.clearDirectionCallback();
+                Timer.delay(500).then(()=>resolve(dir));
+				this.player.reportAction("Attack - "+Geo.getDirectionName(dir));
+			});
+		}).then(dir=>{
+            if (dir != null) {
+                return this.player.attackOnDirection(dir.x, dir.y);
+            }
+		});
+    },
+    getCommand: function() {
+        // Select a direction
+    	return new Promise((resolve)=>{
+            this.switchState(PlayerStateMachine.GET);
+    		this.actionEnabled = false;
+    		this.player.reportAction("Get - Where?");
+    		OAX6.UI.hideMarker();
+    		OAX6.UI.showIcon(3, this.player.x, this.player.y);
+			this.setDirectionCallback((dir, canceled) => {
+                OAX6.UI.hideIcon();
+                this.clearDirectionCallback();
+
+                if (canceled) {
+                    return resolve(null);
+                }
+				
+				this.player.reportAction("Get - "+Geo.getDirectionName(dir));
 				Timer.delay(500).then(()=>resolve(dir));
 			});
 		}).then(dir=>{
-			return OAX6.UI.player.attackOnDirection(dir.x, dir.y);
-		});
+            if (dir != null) {
+                return this.player.getOnDirection(dir.x, dir.y);
+            }
+		}).then(()=>{
+            this.switchState(PlayerStateMachine.WORLD);
+            this.actionEnabled = true;
+        });
     },
     rangedAttackCommand: function(){
     	return new Promise((resolve)=>{
@@ -189,6 +259,24 @@ const PlayerStateMachine = {
 			return OAX6.UI.player.attackToPosition(position.x, position.y);
 		});
     },
+    activateInventory: function() {
+        // TODO: Needs to define from where can open the inventory and probably a better way to access it
+        if (PlayerStateMachine.state != PlayerStateMachine.WORLD && PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
+
+        return new Promise((resolve) => {
+            if (Inventory.isOpen()) {
+                Inventory.close();
+                PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+                this.clearDirectionCallback();
+            } else {
+                Inventory.open();
+                PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
+                this.setDirectionCallback(this.updateInventoryDirection.bind(this));
+            }
+
+            resolve(true);
+        })
+    },
     updateWorldAction: function() {
     	Promise.resolve()
     	.then(()=>{
@@ -200,8 +288,11 @@ const PlayerStateMachine = {
 	            	return this.attackCommand();
 				} else if (keyCode === Phaser.KeyCode.T){
 	            	return this.rangedAttackCommand();
-				} 
-			}
+				} else if (keyCode === Phaser.KeyCode.G){
+	            	return this.getCommand();
+				}
+            }
+
 			return this.checkMovement();
 		}).then((acted)=>{ 
 			if (acted === false){
@@ -212,7 +303,7 @@ const PlayerStateMachine = {
     				this.enableAction()
                     break;
                 case PlayerStateMachine.COMBAT:
-                	OAX6.UI.player.level.actNext();
+                	this.player.level.actNext();
                     break;
             }
 		});
@@ -232,7 +323,7 @@ const PlayerStateMachine = {
         if (this.state === PlayerStateMachine.COMBAT){
         	return;
         }
-        if (!OAX6.UI.player.level.isMobActive()){
+        if (!this.player.level.isMobActive()){
             this._combatStarted();
         }
     },
@@ -241,7 +332,36 @@ const PlayerStateMachine = {
         // Eventually, the player's "act" function will be called,
         // And action will be enabled.
         this.switchState(PlayerStateMachine.COMBAT);
-        OAX6.UI.player.level.actNext();
+        this.player.level.actNext();
+    },
+
+    updateInventoryDirection: function(dir) {
+        Inventory.moveCursor(dir.x, dir.y);
+    },
+
+    dropItem: function() {
+        if (PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
+
+        var item = PlayerStateMachine.inventory[Inventory.cursorSlot];
+        if (!item) { return; }
+
+        return new Promise((resolve) => {
+            this.player.reportAction("Drop - Where?");
+            OAX6.UI.hideMarker();
+            OAX6.UI.showIcon(3, this.player.x, this.player.y);
+            this.clearDirectionCallback();
+            this.setDirectionCallback((dir) => {
+                OAX6.UI.hideIcon();
+                this.player.reportAction("Drop - "+Geo.getDirectionName(dir));
+                this.clearDirectionCallback();
+                Timer.delay(500).then(()=>resolve(dir));
+            });
+        }).then((dir) => {
+            this.player.dropOnDirection(dir.x, dir.y, item);
+            Inventory.updateInventory();
+            this.setDirectionCallback(this.updateInventoryDirection.bind(this));
+        });
+        
     },
 
     update: function() {
