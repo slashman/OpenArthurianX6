@@ -19,6 +19,9 @@ function Mob(level, x, y, z){
 	this.z = z;
 	this.isTalking = false;
 	this.canStartDialog = false; // Only player "mob" can start dialog
+	//TODO: FAR: Dialogs between NPCs
+	this.speed = null;
+	this.party = [];
 	this.inventory = [];
 }
 
@@ -29,12 +32,25 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		if (this === OAX6.UI.player){
+		const player = OAX6.UI.player;
+		if (this === player){
 			// Enable action
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 				PlayerStateMachine.actionEnabled = true;
 			}
+			OAX6.UI.activeMob = false;
 			return Promise.resolve();
+		} else if (player && this.alignment === player.alignment){
+			// This is a party member
+			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+				OAX6.UI.activeMob = this;
+				PlayerStateMachine.actionEnabled = true;
+				return Promise.resolve();
+			} else {
+				//TODO: Fix issue with pathfinding empty routes to player
+				const nextStep = this.level.findPathTo(player, this, this.alignment);
+				return this.moveTo(nextStep.dx, nextStep.dy);
+			}
 		} else {
 			const nearbyTarget = this.getNearbyTarget();
 			if (!nearbyTarget || this.alignment == 'n'){
@@ -48,11 +64,12 @@ Mob.prototype = {
 				} else {
 					// Do nothing
 					this.reportAction("Stand by");
-					return Promise.resolve();
+					return Timer.delay(1000);
 				}
 			} else if (nearbyTarget){
-				let dx = Math.sign(nearbyTarget.x - this.x);
-				let dy = Math.sign(nearbyTarget.y - this.y);
+				const nextStep = this.level.findPathTo(nearbyTarget, this, this.alignment);
+				let dx = nextStep.dx;
+				let dy = nextStep.dy;
 				const mob = this.level.getMobAt(this.x + dx, this.y + dy);
 				if (mob){
 					if (mob.alignment !== this.alignment){
@@ -68,18 +85,26 @@ Mob.prototype = {
 				} else {
 					return this.moveTo(dx, dy);
 				}
+			} else {
+				return Timer.delay(1000);
 			}
 		}
 	},
 	isHostileMob: function(){
 		return this.alignment === 'a';
 	},
+	isPartyMember: function(){
+		return this.alignment === 'b';
+	},
 	getNearbyTarget: function(){
 		//TODO: Implement some LOS.
-		if (this.isHostileMob())
-			return OAX6.UI.player;
-		else 
+		if (this.isHostileMob()){
+			return this.level.getCloserMobTo(this.x, this.y, 'b');
+		} else if (this.isPartyMember()){
+			return this.level.getCloserMobTo(this.x, this.y, 'a');
+		} else {
 			return false;
+		}
 	},
 	activate: function() {
 		if (this.dead){
@@ -99,7 +124,13 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
 			} 
-			return Timer.delay(this.isHostileMob() ? OAX6.UI.WALK_DELAY : Random.num(500, 3000));
+			if (this.isHostileMob() || this.isPartyMember()){
+				// Reactivate immediately
+				return Timer.next();
+			} else {
+				return Timer.delay(Random.num(500, 3000));
+			}
+			//return Timer.delay(Random.num(500, 3000));
 		}).then(()=>{this.activate();});
 	},
 	lookAt: function(dx, dy) {
@@ -129,11 +160,10 @@ Mob.prototype = {
 			this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
 			this.reportAction("Move");
 
-			OAX6.UI.tween(this.sprite).to({x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY, Phaser.Easing.Linear.None, true);
-			return Timer.delay(OAX6.UI.WALK_DELAY);
+			return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 		}
 		this.reportAction("Move - Blocked");
-		return Promise.resolve();
+		return Timer.delay(500);
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
@@ -211,7 +241,7 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
-		if (mob === OAX6.UI.player){
+		if (mob === OAX6.UI.player || mob.isPartyMember()){
 			if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
 				PlayerStateMachine.startCombat();
 			}
@@ -232,7 +262,7 @@ Mob.prototype = {
 		proportion = Math.floor(proportion * 100 / 25);
 		this.reportOutcome(mob.getDescription()+" is "+ATTACK_DESCRIPTIONS[proportion]+"wounded.");
 		mob._damage(damage);
-		return Timer.delay(1500);
+		return Timer.delay(100);
 	},
 	_damage: function(damage){
 		this.hp.reduce(damage);
@@ -263,7 +293,12 @@ Mob.prototype = {
 		OAX6.UI.showMessage(outcome);
 	},
 	getBattleDescription: function(){
-		let desc = this.name;
+		let desc = null;
+		if (this.name){
+			desc = this.name;
+		} else {
+			desc = this.definition.name;
+		}
 		if (this.weapon){
 			desc += " armed with "+this.weapon.name;
 		}
@@ -273,8 +308,11 @@ Mob.prototype = {
 		if (this.name){
 			return this.name;
 		} else {
-			return 'The'+ this.definition.name;
+			return 'The '+ this.definition.name;
 		}
+	},
+	addMobToParty: function(mob){
+		this.party.push(mob);
 	}
 };
 

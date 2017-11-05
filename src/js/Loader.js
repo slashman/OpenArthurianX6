@@ -16,6 +16,9 @@ const Loader = {
 		game.load.spritesheet('mobs', 'assets/mobs.png', 16, 16);
 		game.load.spritesheet('items', 'assets/items.png', 16, 16);
 
+		game.load.spritesheet('celestialBodies', 'assets/celestialBodies.png', 32, 32);
+		game.load.spritesheet('skies', 'assets/skies.png', 96, 42);
+
 		game.load.spritesheet('ui', 'assets/ui.png', 16, 16);
 
 		game.load.bitmapFont('pixeled', 'assets/font.png', 'assets/font.fnt');

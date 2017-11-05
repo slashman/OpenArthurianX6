@@ -1,7 +1,7 @@
 const Bus = require('./Bus');
-const log = require('./Debug').log;
 const Timer = require('./Timer');
 const Geo = require('./Geo');
+const Random = require('./Random');
 const Inventory = require('./Inventory');
 const ItemFactory = require('./ItemFactory');
 
@@ -68,7 +68,7 @@ const PlayerStateMachine = {
     cancelAction: function() {
         if (!this.directionCallback && !this.actionCallback) { return; }
 
-        OAX6.UI.player.reportAction("Canceled");
+        this.player.reportAction("Canceled");
         
         if (this.directionCallback) {
             return this.directionCallback(null, true);
@@ -87,7 +87,7 @@ const PlayerStateMachine = {
 
         OAX6.UI.hideIcon();
 
-        OAX6.UI.player.reportAction("Canceled");*/
+        this.player.reportAction("Canceled");*/
     },
     checkMovement: function() {
         var varx = 0;
@@ -102,10 +102,11 @@ const PlayerStateMachine = {
 		} else if(this.cursors.right.isDown) {
 			varx = 1;
 		}
-		if (varx != 0 || vary != 0){
+		if (varx !== 0 || vary !== 0){
 			OAX6.UI.hideMarker(); 
 			this.actionEnabled = false;
-			return this.player.moveTo(varx, vary);
+			const activeMob = OAX6.UI.activeMob || this.player;
+			return activeMob.moveTo(varx, vary);
 		} else {
 			return false;
 		}
@@ -134,7 +135,7 @@ const PlayerStateMachine = {
     	this.directionCallback = cb;
     },
 
-    clearDirectionCallback: function(cb){
+    clearDirectionCallback: function(){
     	this.directionCallback = null;
     },
 
@@ -142,7 +143,7 @@ const PlayerStateMachine = {
     	this.actionCallback = cb;
     },
 
-    clearActionCallback: function(cb){
+    clearActionCallback: function(){
     	this.actionCallback = null;
     },
 
@@ -160,7 +161,7 @@ const PlayerStateMachine = {
         if (key.isDown && key.repeats == 1) {
             var keyCode = key.keyCode;
 
-            if (this.inputDialogCallback != null) {
+            if (this.inputDialogCallback !== null) {
             	// TODO: Maybe refactor to not do this on the update cycle, instead have a key listener
                 if (keyCode == Phaser.KeyCode.ENTER) {
                     this.inputDialogCallback();
@@ -188,31 +189,35 @@ const PlayerStateMachine = {
     },
     attackCommand: function(){
     	// Select a direction
+    	const activeMob = OAX6.UI.activeMob || this.player;
     	return new Promise((resolve)=>{
     		this.actionEnabled = false;
-    		this.player.reportAction("Attack - Where?");
+    		activeMob.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, OAX6.UI.player.x, OAX6.UI.player.y);
+    		OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
 			this.setDirectionCallback((dir) => {
-                OAX6.UI.hideIcon();
-                this.clearDirectionCallback();
-                Timer.delay(500).then(()=>resolve(dir));
-				this.player.reportAction("Attack - "+Geo.getDirectionName(dir));
+				OAX6.UI.hideIcon();
+				activeMob.reportAction("Attack - "+Geo.getDirectionName(dir));
+				this.clearDirectionCallback();
+				Timer.delay(500).then(()=>resolve(dir));
 			});
 		}).then(dir=>{
-            if (dir != null) {
-                return this.player.attackOnDirection(dir.x, dir.y);
-            }
+			if (dir !== null) {
+				return activeMob.attackOnDirection(dir.x, dir.y);
+			} else {
+				// ??? Is flow controlled?
+			}
 		});
     },
     getCommand: function() {
         // Select a direction
+        const activeMob = OAX6.UI.activeMob || this.player;
     	return new Promise((resolve)=>{
             this.switchState(PlayerStateMachine.GET);
     		this.actionEnabled = false;
-    		this.player.reportAction("Get - Where?");
+    		activeMob.reportAction("Get - Where?");
     		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, this.player.x, this.player.y);
+    		OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
 			this.setDirectionCallback((dir, canceled) => {
                 OAX6.UI.hideIcon();
                 this.clearDirectionCallback();
@@ -221,12 +226,12 @@ const PlayerStateMachine = {
                     return resolve(null);
                 }
 				
-				this.player.reportAction("Get - "+Geo.getDirectionName(dir));
+				activeMob.reportAction("Get - "+Geo.getDirectionName(dir));
 				Timer.delay(500).then(()=>resolve(dir));
 			});
 		}).then(dir=>{
             if (dir != null) {
-                return this.player.getOnDirection(dir.x, dir.y);
+                return activeMob.getOnDirection(dir.x, dir.y);
             }
 		}).then(()=>{
             this.switchState(PlayerStateMachine.WORLD);
@@ -234,19 +239,20 @@ const PlayerStateMachine = {
         });
     },
     rangedAttackCommand: function(){
+    	const activeMob = OAX6.UI.activeMob || this.player;
     	return new Promise((resolve)=>{
     		this.actionEnabled = false;
-    		OAX6.UI.player.reportAction("Attack - Where?");
+    		activeMob.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
     		let cursor = {
-    			x: OAX6.UI.player.x,
-    			y: OAX6.UI.player.y
+    			x: activeMob.x,
+    			y: activeMob.y
     		};
     		OAX6.UI.showIcon(4, cursor.x, cursor.y);
 			this.setDirectionCallback((dir) => {
 				cursor.x += dir.x;
 				cursor.y += dir.y;
-				//TODO: Limit based on player's range
+				//TODO: Limit based on mob's range
 				OAX6.UI.showIcon(4, cursor.x, cursor.y);
 			});
 			this.setActionCallback(() => {
@@ -256,7 +262,7 @@ const PlayerStateMachine = {
 				resolve(cursor);
 			});
 		}).then(position=>{
-			return OAX6.UI.player.attackToPosition(position.x, position.y);
+			return activeMob.attackToPosition(position.x, position.y);
 		});
     },
     activateInventory: function() {
@@ -283,7 +289,7 @@ const PlayerStateMachine = {
 			const keyCode = this._inkey();
 	    	if (keyCode) {
 	    		if (keyCode === Phaser.KeyCode.C){
-	            	return this.startCombat();
+	            	return this.startCombat(true);
 				} else if (keyCode === Phaser.KeyCode.A){
 	            	return this.attackCommand();
 				} else if (keyCode === Phaser.KeyCode.T){
@@ -300,18 +306,19 @@ const PlayerStateMachine = {
 			}
 			switch (this.state) {
 				case PlayerStateMachine.WORLD:
-    				this.enableAction()
+    				this.enableAction();
                     break;
                 case PlayerStateMachine.COMBAT:
-                	this.player.level.actNext();
+                	this.player.level.actNext(); // TODO: Change for this.currentLevel
                     break;
             }
 		});
     },
 
-    startCombat: function(){
+    startCombat: function(ensurePlayerFirst){
     	OAX6.UI.modeLabel.text = "Combat";
         this.actionEnabled = false;
+        this.playerGoesFirst = ensurePlayerFirst || Random.chance(50);
         this.switchState(PlayerStateMachine.COMBAT_SYNC);
         // When the state is switched, all mobs will try to make their last move,
         // Calling "checkCombatReady" after acting
@@ -323,7 +330,7 @@ const PlayerStateMachine = {
         if (this.state === PlayerStateMachine.COMBAT){
         	return;
         }
-        if (!this.player.level.isMobActive()){
+        if (!this.player.level.isMobActive()){ // TODO: Change for this.currentLevel
             this._combatStarted();
         }
     },
@@ -332,6 +339,7 @@ const PlayerStateMachine = {
         // Eventually, the player's "act" function will be called,
         // And action will be enabled.
         this.switchState(PlayerStateMachine.COMBAT);
+        this.player.level.sortForCombat(this.playerGoesFirst);
         this.player.level.actNext();
     },
 
@@ -345,23 +353,25 @@ const PlayerStateMachine = {
         var item = PlayerStateMachine.inventory[Inventory.cursorSlot];
         if (!item) { return; }
 
+		const activeMob = OAX6.UI.activeMob || this.player;
+        // TODO: Show the inventory of the activeMob
+
         return new Promise((resolve) => {
-            this.player.reportAction("Drop - Where?");
+            activeMob.reportAction("Drop - Where?");
             OAX6.UI.hideMarker();
-            OAX6.UI.showIcon(3, this.player.x, this.player.y);
+            OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
             this.clearDirectionCallback();
             this.setDirectionCallback((dir) => {
                 OAX6.UI.hideIcon();
-                this.player.reportAction("Drop - "+Geo.getDirectionName(dir));
+                activeMob.reportAction("Drop - "+Geo.getDirectionName(dir));
                 this.clearDirectionCallback();
                 Timer.delay(500).then(()=>resolve(dir));
             });
         }).then((dir) => {
-            this.player.dropOnDirection(dir.x, dir.y, item);
+            activeMob.dropOnDirection(dir.x, dir.y, item);
             Inventory.updateInventory();
             this.setDirectionCallback(this.updateInventoryDirection.bind(this));
         });
-        
     },
 
     update: function() {

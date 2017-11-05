@@ -7,6 +7,9 @@ const Timer = {
 	},
 	delay: function(millis){
 		return new Promise(resolve=>Timer.set(millis, resolve));
+	},
+	next: function(){
+		return new Promise(resolve=>setTimeout(resolve, 0));	
 	}
 }
 

@@ -38,8 +38,14 @@ const OAX6 = {
 		ItemFactory.setGame(game);
 		
 		const firstLevel = this.loadLevel(game);
-		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 12, 0);
+		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 15, 0);
+		const shamino = NPCFactory.buildNPC(game, 'shamino', firstLevel, 13, 16, 0);
+		const dupre = NPCFactory.buildNPC(game, 'dupre', firstLevel, 12, 17, 0);
+		player.addMobToParty(shamino);
+		player.addMobToParty(dupre);
 		firstLevel.addMob(player);
+		firstLevel.addMob(shamino);
+		firstLevel.addMob(dupre);
 		Dialogs.init(game);
 		Inventory.init(game);
 	},

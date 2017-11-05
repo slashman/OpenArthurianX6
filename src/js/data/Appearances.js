@@ -21,6 +21,22 @@ const Appearances = [
 			{
 				id: 'magicAxe',
 				i: 49
+			},
+			{
+				id: 'crossbow',
+				i: 49
+			},
+			{
+				id: 'maingauche',
+				i: 49
+			},
+			{
+				id: 'sword',
+				i: 49
+			},
+			{
+				id: 'boomerang',
+				i: 49
 			}
 		]
 	},
