@@ -5,6 +5,7 @@ const PF = require('pathfinding');
 
 function Level(){
 	this.mobs = [];	
+	this.items = [];
 	this.solidMask = null;
 	this.currentTurnCounter = 0;
 }
@@ -86,8 +87,9 @@ Level.prototype = {
 		}
 		return false;
 	},
-	addItem: function(item, x, y){
+	addItem: function(item, x, y) {
 		OAX6.UI.addItemSprite(item, x, y);
+		this.items.push(item);
 	},
 	findPathTo: function(to, from, includeMobsOfAlignment){
 		//TODO: Single finder object?
@@ -121,6 +123,19 @@ Level.prototype = {
 			this.removeMob(OAX6.UI.player);
 			this.mobs.unshift(OAX6.UI.player);
 		}
+	},
+	removeItem: function(item) {
+		this.items.splice(this.items.indexOf(item), 1);
+		OAX6.UI.removeItemSprite(item);
+	},
+	getItemAt: function(x, y) {
+		for (var i=0,item;item=this.items[i];i++) {
+			if (item.x == x && item.y == y) {
+				return item;
+			}
+		}
+
+		return null;
 	}
 };
 

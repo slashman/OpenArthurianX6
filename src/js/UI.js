@@ -94,6 +94,9 @@ const UI = {
 		console.log(message);
 		this.tempCombatLabel.text = message;
 	},
+	clearMessage: function() {
+		this.tempCombatLabel.text = "";
+	},
 	locateMarker: function(mob){
 		this.marker.x = mob.sprite.x;
 		this.marker.y = mob.sprite.y;
@@ -164,12 +167,18 @@ const UI = {
 		Timer.delay(1000).then(()=>this.timeOfDayPass());
 	},
 	addItemSprite: function(item, x, y){
+		item.x = x;
+		item.y = y;
 		item.sprite.x = x * TILE_WIDTH;
 		item.sprite.y = y * TILE_HEIGHT;
 		this.floorLayer.add(item.sprite);
 		item.sprite.visible = true;
 		console.log("item",item.sprite.x);
 		console.log("item",x);
+	},
+	removeItemSprite: function(item) {
+		this.floorLayer.remove(item.sprite);
+		item.sprite.visible = false;
 	}
 }
 

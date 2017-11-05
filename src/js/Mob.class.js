@@ -22,6 +22,7 @@ function Mob(level, x, y, z){
 	//TODO: FAR: Dialogs between NPCs
 	this.speed = null;
 	this.party = [];
+	this.inventory = [];
 }
 
 Mob.prototype = {
@@ -164,6 +165,28 @@ Mob.prototype = {
 		this.reportAction("Move - Blocked");
 		return Timer.delay(500);
 	},
+	getOnDirection: function(dx, dy) {
+		var item = this.level.getItemAt(this.x + dx, this.y + dy);
+		if (item) {
+			this.inventory.push(item);
+			this.level.removeItem(item);
+			this.reportAction("Got some " + item.name);
+		} else {
+			this.reportAction("Get - Nothing there!");
+		}
+	},
+	dropOnDirection: function(dx, dy, item) {
+		var x = this.x + dx,
+			y = this.y + dy;
+
+		if (!this.level.isSolid(x, y) && !this.level.getItemAt(x, y)) {
+			var ind = this.inventory.indexOf(item);
+			this.inventory.splice(ind, 1);
+			this.level.addItem(item, x, y);
+		} else {
+			this.reportAction("Can't drop it there!");
+		}
+	},
 	attackToPosition: function(x, y){
 		const weapon = this.weapon;
 		const range = weapon ? (weapon.range || 1) : 1;
@@ -260,6 +283,10 @@ Mob.prototype = {
 	reportAction: function(action){
 		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT || this === OAX6.UI.player){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
+		} else if (OAX6.UI.player == this){ 
+			if (PlayerStateMachine.state === PlayerStateMachine.GET){
+				OAX6.UI.showMessage(action);
+			}
 		}
 	},
 	reportOutcome: function(outcome){

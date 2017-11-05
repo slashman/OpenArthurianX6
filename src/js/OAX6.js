@@ -21,6 +21,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const Timer = require('./Timer');
 
 const Dialogs = require('./Dialogs');
+const Inventory = require('./Inventory');
 
 const OAX6 = {
 	run: function(){
@@ -46,6 +47,7 @@ const OAX6 = {
 		firstLevel.addMob(shamino);
 		firstLevel.addMob(dupre);
 		Dialogs.init(game);
+		Inventory.init(game);
 	},
 	loadLevel: function(game){
 		return LevelLoader.loadLevel(game);

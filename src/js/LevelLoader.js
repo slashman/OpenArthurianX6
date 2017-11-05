@@ -1,15 +1,18 @@
 const Level = require('./Level.class');
 const NPCFactory = require('./NPCFactory');
 const MobFactory = require('./MobFactory');
+const ItemFactory = require('./ItemFactory');
 
 const LevelLoader = {
 	loadLevel: function(game){
 		const level = new Level();
 		const tiledMap = this.loadTiledMap(game);
 		const mobsData = tiledMap.mobs;
+		const itemsData = tiledMap.items;
 
 		level.setSolidMask(tiledMap.solidMask);
 		mobsData.forEach((mobData) => this.loadMob(game, mobData, level));
+		itemsData.forEach((itemData) => this.loadItem(game, itemData, level));
 		
 		return level;
 	},
@@ -27,8 +30,25 @@ const LevelLoader = {
 
 		return {
 			mobs: this.loadTiledMapMobs(),
+			items: this.loadTiledMapItems(),
 			solidMask: this.loadTiledMapSolidMask(map)
 		};
+	},
+	loadTiledMapItems: function() {
+		return [
+			{
+				id: 'fish',
+				amount: 1,
+				x: 15,
+				y: 14
+			},
+			{
+				id: 'lobster',
+				amount: 1,
+				x: 16,
+				y: 15
+			}
+		];
 	},
 	loadTiledMapMobs: function() {
 		return [
@@ -99,6 +119,10 @@ const LevelLoader = {
 			mob.alignment = 'a';
 		}
 		level.addMob(mob);
+	},
+	loadItem: function(game, itemData, level) {
+		const item = ItemFactory.createItem(itemData.id);
+		level.addItem(item, itemData.x, itemData.y);
 	}
 };
 

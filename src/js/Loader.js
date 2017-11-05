@@ -6,10 +6,10 @@ const Loader = {
 			game.load.tilemap(map.name, 'scenario/maps/'+map.filename, null, Phaser.Tilemap.TILED_JSON);
 		});
 		// TODO: Load the tileset based on the content packs related to the scenario
-		game.load.image('items', 'assets/items.png');
 		game.load.image('monsters', 'assets/monsters.png');
 		game.load.image('terrain', 'assets/terrain.png');
 		game.load.image('dialogBack', 'assets/dialogBack.png')
+		game.load.image('inventory', 'assets/inventory.png')
 		game.load.image('uiVariants', 'assets/uiVariants_8x8.png')
 
 		game.load.spritesheet('player', 'assets/player.png', 16, 16);
