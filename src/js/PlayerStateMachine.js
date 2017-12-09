@@ -306,6 +306,7 @@ const PlayerStateMachine = {
 			}
 			switch (this.state) {
 				case PlayerStateMachine.WORLD:
+				case PlayerStateMachine.DIALOG:
     				this.enableAction();
                     break;
                 case PlayerStateMachine.COMBAT:
