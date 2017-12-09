@@ -136,6 +136,15 @@ Level.prototype = {
 		}
 
 		return null;
+	},
+	canMoveFrom: function(x, y, dx, dy) {
+		if (dx === 0 || dy === 0){
+			return !this.isSolid(x+dx, y+dy);
+		}
+		if (this.isSolid(x+dx, y) && this.isSolid(x, y+dy)){
+			return false;
+		}
+		return !this.isSolid(x+dx, y+dy);
 	}
 };
 

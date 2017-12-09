@@ -141,6 +141,11 @@ Mob.prototype = {
 		this.sprite.frame += 1;
 	},
 	moveTo: function(dx, dy){
+		if (!this.level.canMoveFrom(this.x, this.y, dx, dy)){
+			this.reportAction("Move - Blocked");
+			return Timer.delay(500);
+		}
+
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
 			if (this.canStartDialog && mob.dialog){
@@ -151,7 +156,9 @@ Mob.prototype = {
 				mob.lookAt(-dx, -dy);
 			}
 			// What should we return here? :|
-		} else if (!this.level.isSolid(this.x + dx, this.y + dy)) {
+			this.reportAction("Move - Talk");
+			return Timer.delay(500);
+		} else {
 			// Position changes before the tween to "reserve" the spot
 			this.x += dx;
 			this.y += dy;
@@ -162,8 +169,7 @@ Mob.prototype = {
 
 			return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 		}
-		this.reportAction("Move - Blocked");
-		return Timer.delay(500);
+		
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
