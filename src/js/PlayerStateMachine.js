@@ -310,7 +310,16 @@ const PlayerStateMachine = {
     				this.enableAction();
                     break;
                 case PlayerStateMachine.COMBAT:
-                	this.player.level.actNext(); // TODO: Change for this.currentLevel
+                	// End combat if no enemies nearby
+                	if (this.player.level.isSafeAround(this.player.x, this.player.y, this.player.alignment)){
+                		this.switchState(PlayerStateMachine.WORLD);
+                		this.player.level.activateAll();
+                		OAX6.UI.activeMob = this.player;
+                		this.enableAction();
+                		OAX6.UI.showMessage("Combat is over!");
+                	} else {
+                		this.player.level.actNext(); // TODO: Change for this.currentLevel
+                	}
                     break;
             }
 		});

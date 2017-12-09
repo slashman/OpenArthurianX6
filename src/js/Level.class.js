@@ -145,6 +145,12 @@ Level.prototype = {
 			return false;
 		}
 		return !this.isSolid(x+dx, y+dy);
+	},
+	isSafeAround: function(x, y, alignment){
+		return this.mobs.find(m=>m.alignment !== alignment && Geo.flatDist(x,y,m.x,m.y) < 10) === undefined;
+	},
+	activateAll: function(){
+		this.mobs.forEach(m=>m.activate());	
 	}
 };
 
