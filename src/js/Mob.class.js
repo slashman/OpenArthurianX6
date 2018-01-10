@@ -48,6 +48,12 @@ Mob.prototype = {
 				return Promise.resolve();
 			} else {
 				//TODO: Fix issue with pathfinding empty routes to player
+				if (this.x === player.x && this.y === player.y){
+					//TODO: Move to an open space?
+					// Do nothing
+					this.reportAction("Stand by");
+					return Timer.delay(1000);
+				}
 				const nextStep = this.level.findPathTo(player, this, this.alignment);
 				return this.moveTo(nextStep.dx, nextStep.dy);
 			}
@@ -154,22 +160,28 @@ Mob.prototype = {
 				// Look at each other while talking
 				this.lookAt(dx, dy);
 				mob.lookAt(-dx, -dy);
+				this.reportAction("Move - Talk");
+				return Timer.delay(500);
+			} else if (this === OAX6.UI.player || OAX6.UI.activeMob === this){
+				if (mob.isPartyMember() && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
+					console.log("Pass thru");
+				} else {
+					this.reportAction("Move - Blocked");
+					return Timer.delay(500);
+				}
+			} else {
+				this.reportAction("Move - Blocked");
+				return Timer.delay(500);
 			}
-			// What should we return here? :|
-			this.reportAction("Move - Talk");
-			return Timer.delay(500);
-		} else {
-			// Position changes before the tween to "reserve" the spot
-			this.x += dx;
-			this.y += dy;
+		} 
+		// Position changes before the tween to "reserve" the spot
+		this.x += dx;
+		this.y += dy;
 
-			var dir = OAX6.UI.selectDir(dx, dy);
-			this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
-			this.reportAction("Move");
-
-			return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
-		}
-		
+		var dir = OAX6.UI.selectDir(dx, dy);
+		this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
+		this.reportAction("Move");
+		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
