@@ -211,7 +211,7 @@ Mob.prototype = {
 		const dist = Geo.flatDist(this.x, this.y, x, y);
 		if (dist > range){
 			this.reportAction("Attack - Out of range!");
-			return Promise.resolve();
+      return Promise.resolve(false);
 		}
 		const isRangedAttack = dist > 1; 
 		//TODO: Handle case of diagonals (cannot use simple flatDist, diff geometry)
@@ -222,11 +222,11 @@ Mob.prototype = {
 		 * For now, we'll do a melee attack if too close
 		 */
 		if (isRangedAttack){
-			// Add a projectile sprite, tween it to destination
-			// TODO: Depending on weapon, do one of: a: Fixed image b. Rotate on direction c. Rotate continuously
-			// TODO: Doesn't look good having appearance details at this class
-			return OAX6.UI.tweenFixedProjectile(weapon.appearance.tileset, weapon.appearance.i, this.x, this.y, x, y)
-			.then(()=> this._attackPosition(x, y));
+      const ammo = this.getAmmunitionFor(weapon);
+      if (!ammo) {
+        return Promise.resolve(false);
+      }
+      return weapon.playProjectileAnimation(this.x, this.y, x, y).then(()=> this._attackPosition(x, y));
 		} else if (dist <= 1){
 			// Simple melee attack? but use the weapon's melee mode instead of ranged
 			// Or may be prevent attack from happening, depends on the weapon
@@ -236,6 +236,12 @@ Mob.prototype = {
 			return Promise.resolve();
 		}
 	},
+  getAmmunitionFor: function(weapon) {
+    const ammoType = weapon.usesProjectileType;
+    const onInventory = inventory.find(i => i.id === ammoType);
+    // TODO: Handle quantities? 
+    return onInventory;
+  },
 	attackOnDirection: function(dx, dy){
 		return this._attackPosition(this.x + dx, this.y + dy);
 	},

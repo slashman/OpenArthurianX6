@@ -1,5 +1,6 @@
 const Stat = require('./Stat.class');
 const AppearanceFactory = require('./AppearanceFactory');
+const Item = require('./Item.class');
 
 const ItemFactory = {
 	init: function(itemData){
@@ -16,7 +17,10 @@ const ItemFactory = {
 	createItem: function(id){
 		const def = this.itemsMap[id];
 		const appearance = AppearanceFactory.getAppearance(def.appearance);
-		const item = Object.assign({},def);
+		const item = Object.assign(new Item(), def);
+    if (def.flyAppearance) {
+      item.flyAppearance = AppearanceFactory.getAppearance(def.flyAppearance);
+    }
 		if (item.damage){
 			item.damage = new Stat(item.damage);
 		}

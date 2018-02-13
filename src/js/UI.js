@@ -9,6 +9,8 @@ const Geo = require('./Geo');
 const TILE_WIDTH = 16;
 const TILE_HEIGHT = 16;
 
+const FlyType = require('./Constants').FlyType;
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
@@ -115,22 +117,21 @@ const UI = {
 	hideIcon: function(){
 		this.floatingIcon.visible = false;
 	},
-	tweenFixedProjectile: function(tileset, index, fromX, fromY, toX, toY){
-		return Promise.resolve()
-		.then(()=>{
-			this.floatingIcon.loadTexture(tileset, index);
-			fromX *= TILE_WIDTH;
-			fromY *= TILE_HEIGHT;
-			toX *= TILE_WIDTH;
-			toY *= TILE_HEIGHT;
-			this.floatingIcon.x = fromX;
-			this.floatingIcon.y = fromY;
-			const distance = Math.floor(Geo.flatDist(fromX, fromY, toX, toY)/16); //TODO: Use hDistance
-			const projectileSpeed = distance * 50; //TODO: Receive param, based for example on weapon's speed
-			this.floatingIcon.visible = true;
-			this.tween(this.floatingIcon).to({x: toX, y: toY}, projectileSpeed, Phaser.Easing.Linear.None, true);
-			return Timer.delay(projectileSpeed);
-		}).then(()=>{
+	tweenFixedProjectile: function(appearance, fromX, fromY, toX, toY){
+    const tileset = appearance.tileset;
+    const index = appearance.id;
+		this.floatingIcon.loadTexture(tileset, index);
+		fromX *= TILE_WIDTH;
+		fromY *= TILE_HEIGHT;
+		toX *= TILE_WIDTH;
+		toY *= TILE_HEIGHT;
+		this.floatingIcon.x = fromX;
+		this.floatingIcon.y = fromY;
+		const distance = Math.floor(Geo.flatDist(fromX, fromY, toX, toY)/16); //TODO: Use hDistance
+		const projectileSpeed = distance * 50; //TODO: Receive param, based for example on weapon's speed
+		this.floatingIcon.visible = true;
+		this.tween(this.floatingIcon).to({x: toX, y: toY}, projectileSpeed, Phaser.Easing.Linear.None, true);
+		return Timer.delay(projectileSpeed).then(()=>{
 			this.floatingIcon.visible = false;
 		});
 	},
@@ -179,7 +180,21 @@ const UI = {
 	removeItemSprite: function(item) {
 		this.floorLayer.remove(item.sprite);
 		item.sprite.visible = false;
-	}
+	},
+
+  playProjectileAnimation: function (flyType, appearance, fromX, fromY, toX, toY) {
+    // TODO: Depending on weapon, do one of: a: Fixed image b. Rotate on direction c. Rotate continuously
+    switch (flyType){
+      case FlyType.STRAIGHT:
+        // Use atan to calculate the angle between both, then rotate the projectile sprite
+        return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY);
+      case FlyType.ROTATE:
+
+      break;
+      case FlyType.STATIC:
+        return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY);
+    }
+  }
 }
 
 module.exports = UI;

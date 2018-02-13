@@ -35,8 +35,17 @@ const Items = [
 		appearance: 'crossbow',
 		name: 'Crossbow',
 		range: 5,
-		damage: 10
+    usesProjectileType: 'ironBolt', //TODO: Groups of ammo types
+    flyType: 'straight',
+		damage: 5
 	},
+  {
+    id: 'ironBolt',
+    appearance: 'ironBolt',
+    flyAppearance: 'ironBolt_p',
+    name: 'Iron Bolt',
+    damage: 5
+  },
 	{
 		id: 'boomerang',
 		appearance: 'boomerang',

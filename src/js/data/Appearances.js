@@ -37,9 +37,23 @@ const Appearances = [
 			{
 				id: 'boomerang',
 				i: 49
-			}
+			},
+      {
+        id: 'ironBolt',
+        i: 71
+      }
 		]
 	},
+  // Projectiles
+    {
+    tileset: 'items',
+    items: [
+      {
+        id: 'ironBolt_p',
+        i: 160
+      }
+    ]
+  },
 	{
 		tileset: 'mobs',
 		items: [

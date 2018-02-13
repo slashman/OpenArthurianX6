@@ -291,8 +291,8 @@ const PlayerStateMachine = {
 	    		if (keyCode === Phaser.KeyCode.C){
 	            	return this.startCombat(true);
 				} else if (keyCode === Phaser.KeyCode.A){
-	            	return this.attackCommand();
-				} else if (keyCode === Phaser.KeyCode.T){
+	            	return this.attackCommand(); //TODO: Instead of a direction, this should allow targetting based on range (Similar to T)
+				} else if (keyCode === Phaser.KeyCode.T){ // Throw
 	            	return this.rangedAttackCommand();
 				} else if (keyCode === Phaser.KeyCode.G){
 	            	return this.getCommand();

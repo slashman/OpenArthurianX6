@@ -43,7 +43,7 @@ const LevelLoader = {
 				y: 14
 			},
 			{
-				id: 'lobster',
+				id: 'ironBolt',
 				amount: 1,
 				x: 16,
 				y: 15
@@ -51,8 +51,8 @@ const LevelLoader = {
 		];
 	},
 	loadTiledMapMobs: function() {
-		return [
-				{
+		return [ 
+				/*{
 					type: 'mob',
 					id: 'demon',
 					x: 10,
@@ -87,13 +87,13 @@ const LevelLoader = {
 					id: 'demon',
 					x: 13,
 					y: 8
-				}/*,
+				}/*/,
 				{
 					type: 'npc',
 					id: 'kram',
 					x: 7,
 					y: 10
-				}*/
+				}/**/
 			];
 	},
 	loadTiledMapSolidMask: function(map) {
