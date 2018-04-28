@@ -56,27 +56,21 @@ const PlayerStateMachine = {
     	}
     },
 	listenAction: function(){
-        // For actions such as pick item in place
-        if (this.directionCallback) {
-            return this.directionCallback({x: 0, y: 0});
-        }
-
-    	if (this.actionCallback){
-    		this.actionCallback();
-    	}
-    },
-    cancelAction: function() {
-        if (!this.directionCallback && !this.actionCallback) { return; }
-
-        this.player.reportAction("Canceled");
-        
-        if (this.directionCallback) {
-            return this.directionCallback(null, true);
-        }
-
-    	if (this.actionCallback){
-    		this.actionCallback(null, true);
-    	}
+    if (this.actionCallback){
+      this.actionCallback();
+    } else if (this.directionCallback) {
+      // For actions such as pick item in place
+      return this.directionCallback({x: 0, y: 0});
+    }
+  },
+  cancelAction: function() {
+    this.player.reportAction("Canceled");
+    if (this.directionCallback) {
+      this.directionCallback(null, true);
+    }
+    if (this.actionCallback){
+      this.actionCallback(true);
+    }
         /*if (!this.directionCallback && !this.actionCallback) { return; }
 
         //this.switchState(this.previousState);
@@ -249,20 +243,37 @@ const PlayerStateMachine = {
     			y: activeMob.y
     		};
     		OAX6.UI.showIcon(4, cursor.x, cursor.y);
-			this.setDirectionCallback((dir) => {
+			this.setDirectionCallback((dir, cancelled) => {
+        if (cancelled) {
+          return;
+        }
 				cursor.x += dir.x;
 				cursor.y += dir.y;
 				//TODO: Limit based on mob's range
 				OAX6.UI.showIcon(4, cursor.x, cursor.y);
 			});
-			this.setActionCallback(() => {
+			this.setActionCallback((cancelled) => {
 				this.clearDirectionCallback();
 				this.clearActionCallback();
 				OAX6.UI.hideIcon();
+        if (cancelled) {
+          resolve(null);
+        }
 				resolve(cursor);
 			});
-		}).then(position=>{
-			return activeMob.attackToPosition(position.x, position.y);
+		}).then(position => {
+      if (position !== null) {
+        return activeMob.attackToPosition(position.x, position.y).then(done => {
+          if (!done) {
+            this.actionEnabled = true;
+            OAX6.UI.hideIcon();
+          };
+        });
+      } else {
+        this.actionEnabled = true;
+        OAX6.UI.hideIcon();
+        this.player.reportAction("Canceled");
+      }
 		});
     },
     activateInventory: function() {
@@ -354,7 +365,9 @@ const PlayerStateMachine = {
     },
 
     updateInventoryDirection: function(dir) {
+      if (dir !== null) {
         Inventory.moveCursor(dir.x, dir.y);
+      }
     },
 
     dropItem: function() {

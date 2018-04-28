@@ -1,5 +1,6 @@
 const Phaser = require('phaser');
 
+const Random = require('./Random');
 const Loader = require('./Loader');
 const Timer = require('./Timer');
 
@@ -55,6 +56,7 @@ const UI = {
 		this.marker.visible = false;
 		this.floatingIcon = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.floatingIcon.visible = false;
+    this.floatingIcon.anchor.setTo(0.5);
 		this.currentMinuteOfDay = 8 * 60;
 		this.start();
 		this.timeOfDayPass();
@@ -109,22 +111,31 @@ const UI = {
 		this.marker.visible = false;	
 	},
 	showIcon: function(index, x, y){
-		this.floatingIcon.x = x * TILE_WIDTH;
-		this.floatingIcon.y = y * TILE_HEIGHT;
+		this.floatingIcon.x = x * TILE_WIDTH + TILE_WIDTH / 2;
+		this.floatingIcon.y = y * TILE_HEIGHT + TILE_HEIGHT / 2;
 		this.floatingIcon.loadTexture('ui', index);
+    this.floatingIcon.rotation = 0;
 		this.floatingIcon.visible = true;
 	},
 	hideIcon: function(){
 		this.floatingIcon.visible = false;
 	},
-	tweenFixedProjectile: function(appearance, fromX, fromY, toX, toY){
+	tweenFixedProjectile: function(appearance, fromX, fromY, toX, toY, angleRadians){
+    if (angleRadians === undefined) {
+      angleRadians = Random.fnum(0, 2 * Math.PI);
+    }
     const tileset = appearance.tileset;
-    const index = appearance.id;
+    const index = appearance.i;
 		this.floatingIcon.loadTexture(tileset, index);
+    this.floatingIcon.rotation = angleRadians;
 		fromX *= TILE_WIDTH;
 		fromY *= TILE_HEIGHT;
 		toX *= TILE_WIDTH;
 		toY *= TILE_HEIGHT;
+    fromX += TILE_WIDTH / 2;
+    fromY += TILE_HEIGHT / 2
+    toX += TILE_WIDTH / 2;
+    toY += TILE_HEIGHT / 2
 		this.floatingIcon.x = fromX;
 		this.floatingIcon.y = fromY;
 		const distance = Math.floor(Geo.flatDist(fromX, fromY, toX, toY)/16); //TODO: Use hDistance
@@ -156,7 +167,7 @@ const UI = {
 		const hourIncrement = (2 * Math.PI) / 24;
 		const sunRads = (currentHourOfDay + 6) * hourIncrement;
 		const moonRads = (currentHourOfDay + 6 + 12) * hourIncrement;
-		console.log(`Current hour is ${currentHourOfDay}, radians are ${sunRads}`);
+		// console.log(`Current hour is ${currentHourOfDay}, radians are ${sunRads}`);
 		const xPos = Math.cos(sunRads) * skyboxRadius;
 		const yPos = Math.sin(sunRads) * skyboxRadius;
 		this.sunSprite.x = xPos + skyboxPosition.x;
@@ -186,8 +197,8 @@ const UI = {
     // TODO: Depending on weapon, do one of: a: Fixed image b. Rotate on direction c. Rotate continuously
     switch (flyType){
       case FlyType.STRAIGHT:
-        // Use atan to calculate the angle between both, then rotate the projectile sprite
-        return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY);
+        const angle = Math.atan2(fromY - toY, fromX - toX) - (Math.PI / 2);
+        return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY, angle);
       case FlyType.ROTATE:
 
       break;

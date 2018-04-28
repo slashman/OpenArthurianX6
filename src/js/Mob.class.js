@@ -224,9 +224,10 @@ Mob.prototype = {
 		if (isRangedAttack){
       const ammo = this.getAmmunitionFor(weapon);
       if (!ammo) {
+        this.reportAction("Attack - No Ammo.");
         return Promise.resolve(false);
       }
-      return weapon.playProjectileAnimation(this.x, this.y, x, y).then(()=> this._attackPosition(x, y));
+      return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> this._attackPosition(x, y));
 		} else if (dist <= 1){
 			// Simple melee attack? but use the weapon's melee mode instead of ranged
 			// Or may be prevent attack from happening, depends on the weapon
@@ -238,7 +239,7 @@ Mob.prototype = {
 	},
   getAmmunitionFor: function(weapon) {
     const ammoType = weapon.usesProjectileType;
-    const onInventory = inventory.find(i => i.id === ammoType);
+    const onInventory = this.inventory.find(i => i.id === ammoType);
     // TODO: Handle quantities? 
     return onInventory;
   },
