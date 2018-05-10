@@ -146,6 +146,34 @@ const UI = {
 			this.floatingIcon.visible = false;
 		});
 	},
+
+  tweenRotatedProjectile: function(appearance, fromX, fromY, toX, toY){
+    const tileset = appearance.tileset;
+    const index = appearance.i;
+    this.floatingIcon.loadTexture(tileset, index);
+    this.floatingIcon.rotation = 0;
+    fromX *= TILE_WIDTH;
+    fromY *= TILE_HEIGHT;
+    toX *= TILE_WIDTH;
+    toY *= TILE_HEIGHT;
+    fromX += TILE_WIDTH / 2;
+    fromY += TILE_HEIGHT / 2
+    toX += TILE_WIDTH / 2;
+    toY += TILE_HEIGHT / 2
+    this.floatingIcon.x = fromX;
+    this.floatingIcon.y = fromY;
+    const distance = Math.floor(Geo.flatDist(fromX, fromY, toX, toY)/16); //TODO: Use hDistance
+    const projectileSpeed = distance * 300; //TODO: Receive param, based for example on weapon's speed
+    this.floatingIcon.visible = true;
+    this.tween(this.floatingIcon).to({x: toX, y: toY}, projectileSpeed, Phaser.Easing.Linear.None, true);
+    const spinTween = this.tween(this.floatingIcon).to({rotation: Math.PI * 2}, 300, Phaser.Easing.Linear.None, true, 0, -1);
+    return Timer.delay(projectileSpeed).then(()=>{
+      spinTween.stop();
+      this.floatingIcon.rotation = 0;
+      this.floatingIcon.visible = false;
+    });
+  },
+
 	timeOfDayPass: function(){
 		if (PlayerStateMachine.state !== PlayerStateMachine.WORLD){
 			Timer.delay(1000).then(()=>this.timeOfDayPass());
@@ -200,7 +228,7 @@ const UI = {
         const angle = Math.atan2(fromY - toY, fromX - toX) - (Math.PI / 2);
         return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY, angle);
       case FlyType.ROTATE:
-
+        return this.tweenRotatedProjectile(appearance, fromX, fromY, toX, toY);
       break;
       case FlyType.STATIC:
         return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY);
