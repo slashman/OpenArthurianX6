@@ -227,7 +227,17 @@ Mob.prototype = {
         this.reportAction("Attack - No Ammo.");
         return Promise.resolve(false);
       }
-      return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> this._attackPosition(x, y));
+      this.inventory.splice(this.inventory.findIndex(i => i.id === ammo.id), 1);
+      if (ammo === this.weapon) {
+        this.weapon = undefined;
+      }
+      // TODO: Stashes of ammo
+      return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
+        if (ammo.throwable) {
+          this.level.addItem(ammo, x, y);
+        }
+        return this._attackPosition(x, y);
+      });
 		} else if (dist <= 1){
 			// Simple melee attack? but use the weapon's melee mode instead of ranged
 			// Or may be prevent attack from happening, depends on the weapon
@@ -239,9 +249,13 @@ Mob.prototype = {
 	},
   getAmmunitionFor: function(weapon) {
     const ammoType = weapon.usesProjectileType;
-    const onInventory = this.inventory.find(i => i.id === ammoType);
-    // TODO: Handle quantities? 
-    return onInventory;
+    if (ammoType) {
+      const onInventory = this.inventory.find(i => i.id === ammoType);
+      return onInventory;
+    } else {
+      // No ammo, throw the weapon!
+      return weapon;
+    }
   },
 	attackOnDirection: function(dx, dy){
 		return this._attackPosition(this.x + dx, this.y + dy);
