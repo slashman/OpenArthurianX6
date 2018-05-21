@@ -129,7 +129,7 @@ Level.prototype = {
 		OAX6.UI.removeItemSprite(item);
 	},
 	getItemAt: function(x, y) {
-		for (var i=0,item;item=this.items[i];i++) {
+		for (var i=0,item; item=this.items[i]; i++) {
 			if (item.x == x && item.y == y) {
 				return item;
 			}

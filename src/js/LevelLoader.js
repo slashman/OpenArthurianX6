@@ -42,12 +42,30 @@ const LevelLoader = {
 				x: 15,
 				y: 14
 			},
+      {
+        id: 'ironBolt',
+        amount: 8,
+        x: 18,
+        y: 15
+      },
 			{
 				id: 'ironBolt',
-				amount: 1,
+				amount: 6,
 				x: 16,
 				y: 15
-			}
+			},
+      {
+        id: 'ironBolt',
+        amount: 1,
+        x: 14,
+        y: 15
+      },
+      {
+        id: 'ironBolt',
+        amount: 9,
+        x: 12,
+        y: 15
+      }
 		];
 	},
 	loadTiledMapMobs: function() {
@@ -121,7 +139,7 @@ const LevelLoader = {
 		level.addMob(mob);
 	},
 	loadItem: function(game, itemData, level) {
-		const item = ItemFactory.createItem(itemData.id);
+		const item = ItemFactory.createItem(itemData.id, itemData.amount);
 		level.addItem(item, itemData.x, itemData.y);
 	}
 };

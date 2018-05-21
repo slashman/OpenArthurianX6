@@ -185,10 +185,31 @@ Mob.prototype = {
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
+    const pickedQuantity = item.quantity;
 		if (item) {
-			this.inventory.push(item);
+      if (item.def.stackLimit) {
+        const existingItem = this.inventory.find(i => i.id === item.id);
+        if (existingItem) {
+          if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
+            existingItem.quantity += item.quantity;
+          } else {
+            item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
+            existingItem.quantity = existingItem.def.stackLimit;
+            this.inventory.push(item);
+          }
+        } else {
+          this.inventory.push(item);
+        }
+      } else {
+        this.inventory.push(item);
+      }
 			this.level.removeItem(item);
-			this.reportAction("Got some " + item.name);
+      if (item.quantity === 1) {
+        this.reportAction("Got a " + item.name);  
+      } else {
+        this.reportAction("Got " + pickedQuantity + " " + item.name);  
+      }
+			
 		} else {
 			this.reportAction("Get - Nothing there!");
 		}
@@ -227,7 +248,11 @@ Mob.prototype = {
         this.reportAction("Attack - No Ammo.");
         return Promise.resolve(false);
       }
-      this.inventory.splice(this.inventory.findIndex(i => i.id === ammo.id), 1);
+      if (ammo.quantity && ammo.quantity > 1) {
+        ammo.quantity--;
+      } else {
+        this.inventory.splice(this.inventory.findIndex(i => i.id === ammo.id), 1);
+      }
       if (ammo === this.weapon) {
         this.weapon = undefined;
       }

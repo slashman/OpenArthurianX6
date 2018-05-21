@@ -47,7 +47,8 @@ const Items = [
     appearance: 'ironBolt',
     flyAppearance: 'ironBolt_p',
     name: 'Iron Bolt',
-    damage: 5
+    damage: 5,
+    stackLimit: 10
   },
 	{
 		id: 'boomerang',

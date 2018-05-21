@@ -14,10 +14,15 @@ const ItemFactory = {
 	getAppearance: function(id){
 		return this.appearancesMap[id];
 	},
-	createItem: function(id){
+	createItem: function(id, quantity){
 		const def = this.itemsMap[id];
 		const appearance = AppearanceFactory.getAppearance(def.appearance);
 		const item = Object.assign(new Item(), def);
+    if (quantity !== undefined) {
+      item.quantity = quantity;
+    } else {
+      item.quantity = 1;
+    }
     if (def.flyAppearance) {
       item.flyAppearance = AppearanceFactory.getAppearance(def.flyAppearance);
     }
@@ -27,6 +32,7 @@ const ItemFactory = {
 		item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		item.sprite.visible = false;
 		item.appearance = appearance;
+    item.def = def;
 		return item;
 	}
 };

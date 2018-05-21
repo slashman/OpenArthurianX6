@@ -1,4 +1,5 @@
 function Item(){
+  this.quantity = 1;
 }
 
 Item.prototype = {

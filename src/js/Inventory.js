@@ -15,12 +15,19 @@ module.exports = {
         this.inventoryGroup.add(this.inventoryBackground);
 
         this.invSlots = [];
+        this.quantityLabels = [];
+
         var x = 0, y = 0;
         for (var i=0;i<this.MAX_DISPLAY;i++) {
-            var invSlot = this.game.add.image(74 + (x++ * 18), 21 + (y * 18), 'ui');
+            var invSlot = this.game.add.image(74 + x * 18, 21 + y * 18, 'ui');
+            const quantityLabel = this.game.add.bitmapText(84 + x * 18, 28 + y * 18, 'pixeled', '0', 12);
+            quantityLabel.visible = false;
+            x++;
 
             this.invSlots.push(invSlot);
+            this.quantityLabels.push(quantityLabel);
             this.inventoryGroup.add(invSlot);
+            this.inventoryGroup.add(quantityLabel);
 
             if (x == this.COLUMNS) {
                 x = 0;
@@ -87,8 +94,15 @@ module.exports = {
             if (inventory[i]) {
                 var appearance = inventory[i].appearance;
                 this.invSlots[i-start].loadTexture(appearance.tileset, appearance.i);
+                if (inventory[i].quantity !== undefined && inventory[i].quantity > 1){
+                  this.quantityLabels[i-start].visible = true;
+                  this.quantityLabels[i-start].text = inventory[i].quantity;
+                } else {
+                  this.quantityLabels[i-start].visible = false;
+                }
             } else {
                 this.invSlots[i-start].loadTexture('ui', 5);
+                this.quantityLabels[i-start].visible = false;
             }
         }
 
