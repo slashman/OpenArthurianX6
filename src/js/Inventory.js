@@ -49,7 +49,7 @@ module.exports = {
             item: null,
             sprite: this.game.add.image(-100, -100, 'ui'),
             anchor: {x: 0, y: 0},
-            slot: 0,
+            slot: -1,
             dropSlot: 0
         };
 
@@ -64,12 +64,23 @@ module.exports = {
     moveCursor: function(x, y) {
         var amount = x + y * this.COLUMNS,
             inventory = this.UI.player.inventory,
-            scrolled = false;
+            scrolled = false,
+            dir = Math.sign(amount),
+            prevSlot = this.cursorSlot,
+            item = null;
 
         this.cursorSlot += amount;
+        item = inventory[this.cursorSlot];
 
-        if (this.cursorSlot >= inventory.length) { this.cursorSlot = inventory.length - 1; }
-        if (this.cursorSlot < 0) { this.cursorSlot = 0; }
+        while (item == null) {
+            this.cursorSlot += dir;
+            item = inventory[this.cursorSlot];
+
+            if (this.cursorSlot >= inventory.length || this.cursorSlot < 0) { 
+                this.cursorSlot = prevSlot; 
+                break;
+            }
+        }
 
         while (this.cursorSlot-this.scroll*this.COLUMNS >= this.MAX_DISPLAY) {
             this.scroll += 1;
@@ -136,6 +147,8 @@ module.exports = {
     },
 
     replaceDragItems: function() {
+        if (this.drag.slot == -1) { return; }
+
         if (this.drag.slot != this.drag.dropSlot) { 
             var player = OAX6.UI.player,
                 helper = null;
@@ -147,6 +160,9 @@ module.exports = {
             player.inventory[this.drag.dropSlot] = this.drag.item;
             player.inventory[this.drag.slot] = helper;
         }
+
+        this.drag.item = null;
+        this.drag.slot = -1;
 
         this.updateInventory(); 
         this.hideDragCursor();
