@@ -38,8 +38,14 @@ const LevelLoader = {
 		return [
 			{
 				id: 'fish',
-				amount: 1,
+				amount: 2,
 				x: 15,
+				y: 14
+			},
+			{
+				id: 'lobster',
+				amount: 1,
+				x: 16,
 				y: 14
 			},
       {

@@ -37,6 +37,9 @@ const PlayerStateMachine = {
         this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
+        
+        this.game.input.mouse.enabled = true;
+        this.game.input.mouse.capture = true;
     },
     listenDirections: function(){
     	if (this.directionCallback){
@@ -397,6 +400,14 @@ const PlayerStateMachine = {
         });
     },
 
+    updateInventory: function() {
+        if (this.game.input.mousePointer.leftButton.isDown) {
+            Inventory.onMouseDown(this.game.input.mousePointer.x, this.game.input.mousePointer.y);
+        }else if (this.game.input.mousePointer.leftButton.isUp) {
+            Inventory.onMouseUp();
+        }
+    },
+
     update: function() {
         if (!this.actionEnabled) { return; }
 
@@ -408,6 +419,10 @@ const PlayerStateMachine = {
 
             case PlayerStateMachine.DIALOG:
                 this.updateDialogAction();
+                break;
+
+            case PlayerStateMachine.INVENTORY:
+                this.updateInventory();
                 break;
         }
     }

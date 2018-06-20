@@ -185,8 +185,8 @@ Mob.prototype = {
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
-    const pickedQuantity = item.quantity;
 		if (item) {
+			const pickedQuantity = item.quantity;
       if (item.def.stackLimit) {
         const existingItem = this.inventory.find(i => i.id === item.id);
         if (existingItem) {
