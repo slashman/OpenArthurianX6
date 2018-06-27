@@ -284,12 +284,14 @@ const PlayerStateMachine = {
         if (PlayerStateMachine.state != PlayerStateMachine.WORLD && PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
 
         return new Promise((resolve) => {
-            if (Inventory.isOpen()) {
-                Inventory.close();
+            const inventory = this.player.backpack;
+
+            if (inventory.isOpen()) {
+                inventory.close();
                 PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
                 this.clearDirectionCallback();
             } else {
-                Inventory.open();
+                inventory.open();
                 PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
                 this.setDirectionCallback(this.updateInventoryDirection.bind(this));
             }
@@ -401,10 +403,18 @@ const PlayerStateMachine = {
     },
 
     updateInventory: function() {
+        const inventory = this.player.backpack;
+        if (!inventory.isOpen()) { return; }
+
         if (this.game.input.mousePointer.leftButton.isDown) {
-            Inventory.onMouseDown(this.game.input.mousePointer.x, this.game.input.mousePointer.y);
+            inventory.onMouseDown(this.game.input.mousePointer.x, this.game.input.mousePointer.y);
         }else if (this.game.input.mousePointer.leftButton.isUp) {
-            Inventory.onMouseUp();
+            inventory.onMouseUp();
+            
+            if (!inventory.isOpen()) {
+                PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+                this.clearDirectionCallback();
+            }
         }
     },
 

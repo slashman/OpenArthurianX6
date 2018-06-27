@@ -22,6 +22,9 @@ const Loader = {
 		game.load.spritesheet('ui', 'assets/ui.png', 16, 16);
 
 		game.load.bitmapFont('pixeled', 'assets/font.png', 'assets/font.fnt');
+
+		// Containers
+		game.load.image('containerMedium', 'assets/containerMedium.png')
 	}
 }
 

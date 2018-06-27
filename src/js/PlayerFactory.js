@@ -1,12 +1,16 @@
 const NPCFactory = require('./NPCFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
 
+const Container = require('./Container').Container;
+const containerSizes = require('./Container').SIZES;
+
 const PlayerFactory = {
 	buildPlayer: function(UI, game, level, x, y, z){
 		const mob = NPCFactory.buildNPC(game, "iolo", level, x, y, x);
 		mob.canStartDialog = true;
 		UI.player = mob;
 		mob.inventory = PlayerStateMachine.inventory;
+		mob.backpack = new Container(game, containerSizes.medium);
 		mob.name = "Iolo";
 		mob.alignment = 'b';
 		
