@@ -175,7 +175,7 @@ module.exports = {
             clientY = Math.floor(invY / INVENTORY_SLOTS.h);
         
         if (clientX < 0 || clientX >= this.COLUMNS || clientY < 0 || clientY >= this.ROWS) { 
-            return; 
+            return this.updateDragItem(x, y);
         }
             
         this.cursorSlot = clientX + (clientY + this.scroll) * this.COLUMNS;
