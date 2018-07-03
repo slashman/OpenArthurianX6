@@ -9,8 +9,8 @@ const PlayerFactory = {
 		const mob = NPCFactory.buildNPC(game, "iolo", level, x, y, x);
 		mob.canStartDialog = true;
 		UI.player = mob;
-		mob.inventory = PlayerStateMachine.inventory;
 		mob.backpack = new Container(game, containerSizes.medium);
+		mob.inventory = mob.backpack.inventory;
 		mob.name = "Iolo";
 		mob.alignment = 'b';
 		

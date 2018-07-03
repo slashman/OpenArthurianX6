@@ -403,19 +403,21 @@ const PlayerStateMachine = {
     },
 
     updateInventory: function() {
-        const inventory = this.player.backpack;
-        if (!inventory.isOpen()) { return; }
-
         if (this.game.input.mousePointer.leftButton.isDown) {
-            inventory.onMouseDown(this.game.input.mousePointer.x, this.game.input.mousePointer.y);
-        }else if (this.game.input.mousePointer.leftButton.isUp) {
+            const inventory = OAX6.UI.getContainerAtPoint(this.game.input.mousePointer);
+            if (!inventory) { return; }
+
+            inventory.onMouseDown(this.game.input.mousePointer);
+        }
+        
+        /*else if (this.game.input.mousePointer.leftButton.isUp) {
             inventory.onMouseUp();
             
             if (!inventory.isOpen()) {
                 PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
                 this.clearDirectionCallback();
             }
-        }
+        }*/
     },
 
     update: function() {

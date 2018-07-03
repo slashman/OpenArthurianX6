@@ -12,6 +12,9 @@ const TILE_HEIGHT = 16;
 
 const FlyType = require('./Constants').FlyType;
 
+const Container = require('./Container').Container;
+const containerSizes = require('./Container').SIZES;
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
@@ -27,6 +30,7 @@ const UI = {
 		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
 		this.game.scale.setUserScale(2, 2);
 		this.nextMove = 0;
+		this.openContainers = [];
 	},
 	create: function(){
 		this.mapLayer = this.game.add.group();
@@ -60,6 +64,8 @@ const UI = {
 		this.currentMinuteOfDay = 8 * 60;
 		this.start();
 		this.timeOfDayPass();
+
+		(new Container(this.game, containerSizes.medium)).open();
 	},
 	update: function(){
 		PlayerStateMachine.update();
@@ -233,7 +239,39 @@ const UI = {
       case FlyType.STATIC:
         return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY);
     }
-  }
+	},
+	
+	addContainer: function(container) {
+		if (this.openContainers.indexOf(container) != -1) { return; }
+
+		this.openContainers.push(container);
+	},
+
+	removeContainer: function(container) {
+		const ind = this.openContainers.indexOf(container);
+
+		if (ind != -1) {
+			this.openContainers.splice(ind, 1);
+		}
+	},
+
+	getContainerAtPoint: function(mousePointer) {
+		let ret = null;
+
+		for (let i=0,container;container=this.openContainers[i];i++) {
+			if (container.isMouseOver(mousePointer)) {
+				if (ret == null || ret.group.z < container.group.z) {
+					ret = container;
+				}
+			}
+		}
+
+		if (ret != null) {
+			this.UILayer.bringToTop(ret.group);
+		}
+
+		return ret;
+	}
 }
 
 module.exports = UI;
