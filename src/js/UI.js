@@ -266,10 +266,6 @@ const UI = {
 			}
 		}
 
-		if (ret != null) {
-			this.UILayer.bringToTop(ret.group);
-		}
-
 		return ret;
 	}
 }

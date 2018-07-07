@@ -213,6 +213,10 @@ Container.prototype.isOpen = function() {
     return this.group.visible;
 };
 
+Container.prototype.bringToTop = function() {
+    this.UI.UILayer.bringToTop(this.group);
+}
+
 module.exports = {
     Container: Container,
     SIZES: SIZES
