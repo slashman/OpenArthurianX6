@@ -5,8 +5,8 @@ var fs = require('fs'),
     watchify = require('watchify');
 
 function createScenarioSymlink() {
-    var path = '../../scenarios/wod6/Info.js',
-        target = '../../src/js/ScenarioInfo.js';
+    var path = './scenarios/wod6/Info.js',
+        target = './src/js/ScenarioInfo.js';
 
     if (fs.existsSync(target)) {
         return Promise.resolve();
@@ -19,14 +19,14 @@ function bundle(b) {
     console.log("Creating bundle");
 
     b.bundle()
-        .pipe(fs.createWriteStream('../../build/oax6.js'));
+        .pipe(fs.createWriteStream('./build/oax6.js'));
 }
 
 gulp.task('build', function() {
     createScenarioSymlink()
     .then(function() {
         var b = browserify({
-            entries: ['../../src/js/OAX6.js'],
+            entries: ['./src/js/OAX6.js'],
             debug: true
         });
 
@@ -41,7 +41,7 @@ gulp.task('watch', function() {
     createScenarioSymlink()
     .then(function() {
         var b = browserify({
-            entries: ['../../src/js/OAX6.js'],
+            entries: ['./src/js/OAX6.js'],
             cache: {},
             packageCache: {},
             plugin: [watchify],
