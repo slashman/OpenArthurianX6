@@ -23,6 +23,7 @@ function Mob(level, x, y, z){
 	this.speed = null;
 	this.party = [];
 	this.inventory = [];
+	this.flags = {};
 }
 
 Mob.prototype = {
@@ -160,7 +161,7 @@ Mob.prototype = {
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
 			if (this.canStartDialog && mob.dialog){
-				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
+				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog, player: OAX6.UI.player});
 				
 				// Look at each other while talking
 				this.lookAt(dx, dy);

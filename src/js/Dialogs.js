@@ -113,24 +113,56 @@ module.exports = {
 
 		return lines;
 	},
+
+	selectVariant(variants) {
+		return variants.find((v) => {
+			if (!v.condition) {
+				return true;
+			}
+			if (v.condition.value === false) {
+				// Undefined flags count as false!
+				return this.player.flags[v.condition.flag] === false || 
+					this.player.flags[v.condition.flag] === undefined;
+			} else {
+				return this.player.flags[v.condition.flag] === true;
+			}
+		});
+	},
+
 	addDialog: function(dialog, isShowMore) {
-		var msg = dialog.dialog;
+		let fragment = dialog;
+		if (dialog.variants) {
+			fragment = this.selectVariant(dialog.variants);
+		}
+		this.addDialogFragment(fragment);
+	},
+
+	addDialogFragment(fragment) {
+		var msg = fragment.dialog;
 		if (!Array.isArray(msg)) {
 			msg = [msg];
 		}
-
 		// Queue all message pieces
 		this.messageQueue = [];
 		msg.forEach(m => this.messageQueue.unshift(m));
 		this.showNextDialogPiece();
-		
-		if (dialog.trigger) {
-			switch (dialog.trigger.type) {
-				case 'joinParty':
-					Bus.emit('addToParty', this.currentMob);
-					break;
-			}
+		if (fragment.triggers) {
+			fragment.triggers.forEach(trigger => {
+				switch (trigger.type) {
+					case 'joinParty':
+						Bus.emit('addToParty', this.currentMob);
+						break;
+					case 'setFlag':
+						let value = true;
+						if (trigger.value !== undefined) {
+							value = trigger.value;
+						}
+						this.player.flags[trigger.flagName] = value;
+						break;
+				}
+			});
 		}
+		
 	},
 	showNextDialogPiece(){
 		PlayerStateMachine.clearInputDialogCallback();
@@ -182,6 +214,7 @@ module.exports = {
 	},
 	
 	startDialog: function(chat){
+		this.player = chat.player;
 		var mob = chat.mob,
 			dialog = chat.dialog;
 
