@@ -36,7 +36,6 @@ const OAX6 = {
 		UI.launch(this.startGame.bind(this));
 	},
 	startGame: function(game){
-		Timer.init(game);
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);
 		
