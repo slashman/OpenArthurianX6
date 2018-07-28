@@ -212,6 +212,7 @@ const UI = {
       Bus.emit('showMessage', this.currentScene[this.currentSceneIndex]);
     } else {
       Bus.emit('hideMessage');
+      PlayerStateMachine.clearActionCallback();
       PlayerStateMachine.resetState();
     }
   }
