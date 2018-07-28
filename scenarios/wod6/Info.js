@@ -2,7 +2,19 @@ module.exports = {
   startingState: {
     map: 'forest1',
     x: 24,
-    y: 26
+    y: 26,
+    party: [
+      {
+        id: 'shamino',
+        x: 13,
+        y: 16
+      },
+      {
+        id: 'dupre',
+        x: 26,
+        y: 26
+      }
+    ]
   },
 	maps: [
     {
