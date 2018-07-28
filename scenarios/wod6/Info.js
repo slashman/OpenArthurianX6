@@ -5,6 +5,7 @@ module.exports = {
     x: 24,
     y: 26,
     party: [
+    /*
       {
         id: 'shamino',
         x: 13,
@@ -15,6 +16,7 @@ module.exports = {
         x: 26,
         y: 26
       }
+    */
     ],
     scene: 'intro'
   },
@@ -26,8 +28,9 @@ module.exports = {
 	],
   scenes: {
     intro: [
-      'As the light from the moongate fades away, the Britannian night welcomes you into a forest clearing,',
-      'You cannot forget the smell of these woods, this is unmistakably the forest of the druids, near Yew.'
+      'You are standing on a clearing surrounded by a dark and forbidding forest. Overhead, rolling, black clouds fill the sky while thunder and lightning continue to crash around you.',
+      'Britannia! It must be Britannia!',
+      'But something is wrong. Instead of the sense of elation expected upon returning here after all these years, you are overcome with a foreboding sense of wrongness.'
     ]
   }
 }
