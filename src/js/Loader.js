@@ -9,6 +9,7 @@ const Loader = {
 		game.load.image('monsters', 'assets/monsters.png');
 		game.load.image('terrain', 'assets/terrain.png');
 		game.load.image('dialogBack', 'assets/dialogBack.png')
+		game.load.image('messageBack', 'assets/messageBack.png')
 		game.load.image('inventory', 'assets/inventory.png')
 		game.load.image('uiVariants', 'assets/uiVariants_8x8.png')
 

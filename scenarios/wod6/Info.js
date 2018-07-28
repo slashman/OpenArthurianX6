@@ -14,7 +14,8 @@ module.exports = {
         x: 26,
         y: 26
       }
-    ]
+    ],
+    scene: 'intro'
   },
 	maps: [
     {
@@ -24,7 +25,7 @@ module.exports = {
 	],
   scenes: {
     intro: [
-      'As the light from the moongate fades away, the Britannian night welcomes you into a a forest clearing,',
+      'As the light from the moongate fades away, the Britannian night welcomes you into a forest clearing,',
       'You cannot forget the smell of these woods, this is unmistakably the forest of the druids, near Yew.'
     ]
   }
