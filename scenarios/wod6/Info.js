@@ -1,5 +1,6 @@
 module.exports = {
   startingState: {
+    minuteOfDay: 1380,
     map: 'forest1',
     x: 24,
     y: 26,

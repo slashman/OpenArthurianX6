@@ -3,6 +3,7 @@ window.p2     = require('phaser/build/custom/p2');
 window.Phaser = require('phaser/build/custom/phaser-split');
 
 const UI = require('./UI');
+const SkyBox = require('./SkyBox');
 const LevelLoader = require('./LevelLoader');
 
 const NPCsData = require('./data/NPCs');
@@ -57,6 +58,9 @@ const OAX6 = {
 		if (startingState.scene) {
 			var scene = scenarioInfo.scenes[startingState.scene];
 			UI.showScene(scene)
+		}
+		if (startingState.minuteOfDay !== undefined) {
+			SkyBox.setMinuteOfDay(startingState.minuteOfDay);
 		}
 	},
 	loadLevel: function(game){

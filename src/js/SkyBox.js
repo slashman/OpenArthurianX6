@@ -1,6 +1,7 @@
 const PlayerStateMachine = require('./PlayerStateMachine');
 const Timer = require('./Timer');
 
+// TODO: Update color of skybox background based on time
 
 const SkyBox = {
   init(game, layer) {
@@ -55,6 +56,11 @@ const SkyBox = {
     this.moonSprite.visible = true;
     Timer.delay(1000).then(()=>this.timeOfDayPass());
   },
+
+  setMinuteOfDay(minuteOfDay) {
+    this.currentMinuteOfDay = minuteOfDay;
+    this.updateTimeOfDay();
+  }
 }
 
 module.exports = SkyBox;
