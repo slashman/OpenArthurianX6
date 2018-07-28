@@ -41,6 +41,7 @@ module.exports = {
 
   showMessage(msg) {
     var lines = this.splitInLines(msg);
+    this.dialogLines.forEach(l => l.text = '');
     for (var i = 0; i < lines.length; i++) {
       var dialogLine = this.dialogLines[i];
       dialogLine.text = lines[i];
