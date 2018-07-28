@@ -20,6 +20,7 @@ const ItemFactory = require('./ItemFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
 
 const Timer = require('./Timer');
+const Bus = require('./Bus');
 
 const Dialogs = require('./Dialogs');
 const MessageBox = require('./MessageBox');
@@ -46,6 +47,7 @@ const OAX6 = {
 
 		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, startingState.x, startingState.y, 0);
 		firstLevel.addMob(player);
+		Bus.listen('addToParty', npc => player.addMobToParty(npc));
 
 		startingState.party.forEach(function(partyMember) {
 			const npc = NPCFactory.buildNPC(game, partyMember.id, firstLevel, partyMember.x, partyMember.y, 0);

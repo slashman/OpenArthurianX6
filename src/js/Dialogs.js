@@ -123,6 +123,14 @@ module.exports = {
 		this.messageQueue = [];
 		msg.forEach(m => this.messageQueue.unshift(m));
 		this.showNextDialogPiece();
+		
+		if (dialog.trigger) {
+			switch (dialog.trigger.type) {
+				case 'joinParty':
+					Bus.emit('addToParty', this.currentMob);
+					break;
+			}
+		}
 	},
 	showNextDialogPiece(){
 		PlayerStateMachine.clearInputDialogCallback();
@@ -184,6 +192,7 @@ module.exports = {
 
 		this.name.text = mob.npcDefinition.name;
 		this.addDialog(dialog.greeting, false);
+		this.currentMob = mob;
 
 		this.dialogUI.visible = true;
 
@@ -222,7 +231,6 @@ module.exports = {
 			dialog = this.chat.dialog.unknown;
 		}
 
-		this.addDialog({dialog: "> " + line}, false);
 		this.addDialog(dialog, false);
 
 		if (line.toLowerCase() == "bye") {

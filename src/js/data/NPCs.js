@@ -38,13 +38,17 @@ const NPCs = [
 			},
 			{
 				key: "join",
-				dialog: "Of course I'll join you!"
+				dialog: [
+					"Yes, please join me! Britannia needs you in this dark hour. [Iolo] will fill you with all the information you need about the latest happenings...",
+					"Lord [British] is missing, and the whole realm is being torn apart!"
+				]
 			},
 			{
 				key: "bye",
 				dialog: "We will find aid at Iolo's. It is but a short walk to the west!",
-				// TODO: Launch scene 2?
-				// TODO: join party
+				trigger: {
+					type: "joinParty"
+				}
 			},
 			{
 				key: "unknown",
