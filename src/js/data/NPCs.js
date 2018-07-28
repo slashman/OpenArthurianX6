@@ -3,27 +3,57 @@
 const NPCs = [
 	{
 		id: 'avatar',
-		type: 'human',
+		name: 'Avatar',
+		type: 'man1',
+		alignment: 'b',
 		weapon: 'magicAxe'
 	},
 	{
 		id: 'iolo',
 		name: 'Iolo',
-		type: 'human',
+		type: 'man2',
 		alignment: 'b',
 		weapon: 'crossbow'
 	},
 	{
 		id: 'shamino',
 		name: 'Shamino',
-		type: 'human',
+		type: 'man2',
 		alignment: 'b',
-		weapon: 'maingauche'
+		weapon: 'maingauche',
+		dialog: [
+			{
+				key: "greeting",
+				dialog: "You see your friend Shamino, someone you thought you might never see again."
+			},
+			{
+				key: "name",
+				dialog: "Why are you asking me that? I am Shamino of course! has the [summoning] caused you any memory issues?"
+			},
+			{
+				key: "summoning",
+				dialog: "Strongly grasping you hand, he exclaims: We were afraid the summoning would fail! Tis' nigh impossible to use any magic without invoking intervention from [Blackthorn]."
+			},
+			{
+				key: "blackthorn",
+				dialog: "Let us not tarry for the summoning has surely not gone unnoticed."
+			},
+			{
+				key: "bye",
+				dialog: "Iolo's secret hut is close by, he is waiting for us!",
+				// TODO: Launch scene 2?
+				// TODO: join party
+			},
+			{
+				key: "unknown",
+				dialog: "Let us not tarry for the summoning has surely not gone unnoticed."
+			}
+		]
 	},
 	{
 		id: 'dupre',
 		name: 'Dupre',
-		type: 'human',
+		type: 'man2',
 		alignment: 'b',
 		weapon: 'sword'
 	},

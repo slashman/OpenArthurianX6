@@ -13,8 +13,18 @@ const MobTypes = [
 		speed: 6
 	},
 	{
-		id: 'human',
-		appearance: 'human',
+		id: 'man1',
+		appearance: 'man1',
+		name: 'Man',
+		hp: 20,
+		damage: 3,
+		defense: 0,
+		speed: 5,
+		corpse: 'manCorpse'
+	},
+	{
+		id: 'man2',
+		appearance: 'man2',
 		name: 'Man',
 		hp: 20,
 		damage: 3,
