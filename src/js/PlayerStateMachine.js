@@ -420,6 +420,16 @@ const PlayerStateMachine = {
             case PlayerStateMachine.MESSAGE_BOX:
                 break;
         }
+    },
+
+    allowMobsActing() {
+        switch (this.state) {
+            case PlayerStateMachine.WORLD:
+            case PlayerStateMachine.COMBAT:
+            case PlayerStateMachine.COMBAT_SYNC: // Note: Must check if needed.
+                return true;
+        }
+        return false;
     }
 };
 

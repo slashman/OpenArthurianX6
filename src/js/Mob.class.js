@@ -40,7 +40,12 @@ Mob.prototype = {
 			}
 			OAX6.UI.activeMob = false;
 			return Promise.resolve();
-		} else if (player && this.alignment === player.alignment){
+		}
+		if (!PlayerStateMachine.allowMobsActing()) {
+			this.reportAction("Stand by");
+			return Timer.delay(1000);
+		}
+		if (player && this.alignment === player.alignment){
 			// This is a party member
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 				OAX6.UI.activeMob = this;
