@@ -16,12 +16,12 @@ module.exports = {
     this.maxLines = 6;
     this.fontSize = 12;
 
-    this.background = game.add.image(64, 176, "messageBack");
+    const background = game.add.image(64, 176, "messageBack");
     this.measureTool = game.add.bitmapText(0, 0, 'pixeled', '', this.fontSize);
     this.dialogLines = [];
     
     this.dialogUI = game.add.group();
-    this.dialogUI.add(this.background);
+    this.dialogUI.add(background);
     
     for (var i=0;i<this.maxLines;i++) {
       var line = game.add.bitmapText(88, 190 + this.fontSize * i, 'pixeled', '', this.fontSize);
@@ -33,9 +33,10 @@ module.exports = {
     this.dialogUI.visible = false;
 
     Bus.listen('showMessage', this.showMessage, this);
+    Bus.listen('hideMessage', this.hideMessage, this);
 
-    /*Bus.listen('updateDialogInput', this.updateDialogInput, this);
-    Bus.listen('sendInput', this.sendInput, this);*/
+    background.inputEnabled = true;
+    background.events.onInputDown.add(() => Bus.emit('nextMessage'));
   },
 
   showMessage(msg) {
@@ -45,6 +46,10 @@ module.exports = {
       dialogLine.text = lines[i];
     }
     this.dialogUI.visible = true;
+  },
+
+  hideMessage() {
+    this.dialogUI.visible = false;
   },
 
   splitInLines: function(text) {

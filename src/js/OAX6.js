@@ -25,7 +25,6 @@ const MessageBox = require('./MessageBox');
 const Inventory = require('./Inventory');
 
 const scenarioInfo = require('./ScenarioInfo');
-const Bus = require('./Bus');
 
 const OAX6 = {
 	run: function(){
@@ -58,10 +57,8 @@ const OAX6 = {
 		Inventory.init(game);
 		if (startingState.scene) {
 			var scene = scenarioInfo.scenes[startingState.scene];
-			// TODO: Send all lines to the UI
-			Bus.emit('showMessage', scene[0]);
+			UI.showScene(scene)
 		}
-		// Bus.emit('showMessage', 'Testing a very long message. Once upon a time there a very old wizard who had a lot of potions at home.');
 	},
 	loadLevel: function(game){
 		const startingState = scenarioInfo.startingState;

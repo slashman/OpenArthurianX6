@@ -12,6 +12,8 @@ const TILE_HEIGHT = 16;
 
 const FlyType = require('./Constants').FlyType;
 
+const Bus = require('./Bus');
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
@@ -27,6 +29,7 @@ const UI = {
 		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
 		this.game.scale.setUserScale(2, 2);
 		this.nextMove = 0;
+    Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
 	create: function(){
 		this.mapLayer = this.game.add.group();
@@ -232,6 +235,26 @@ const UI = {
       break;
       case FlyType.STATIC:
         return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY);
+    }
+  },
+
+  showScene(scene) {
+    this.currentScene = scene;
+    this.currentSceneIndex = -1;
+    PlayerStateMachine.setActionCallback(() => {
+      this.showNextSceneFragment();
+    });
+    PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
+    this.showNextSceneFragment();
+  },
+
+  showNextSceneFragment() {
+    this.currentSceneIndex++;
+    if (this.currentSceneIndex < this.currentScene.length) {
+      Bus.emit('showMessage', this.currentScene[this.currentSceneIndex]);
+    } else {
+      Bus.emit('hideMessage');
+      PlayerStateMachine.resetState();
     }
   }
 }

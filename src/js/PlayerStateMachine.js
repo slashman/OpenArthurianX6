@@ -13,6 +13,7 @@ const PlayerStateMachine = {
     COMBAT_SYNC : 4,
     GET         : 5,
     INVENTORY   : 6,
+    MESSAGE_BOX : 7,
 
     init: function(game) {
         this.game = game;
@@ -117,6 +118,10 @@ const PlayerStateMachine = {
         this.state = stateId;
     },
 
+    resetState: function() {
+        this.switchState(this.previousState);
+    },
+
     setInputDialogCallback: function(callback, context) {
         this.inputDialogCallback = callback.bind(context);
     },
@@ -149,6 +154,8 @@ const PlayerStateMachine = {
         	return false;
         }
     },
+
+    
 
     updateDialogAction: function() {
         var key = this.game.input.keyboard.lastKey;
@@ -408,6 +415,9 @@ const PlayerStateMachine = {
 
             case PlayerStateMachine.DIALOG:
                 this.updateDialogAction();
+                break;
+
+            case PlayerStateMachine.MESSAGE_BOX:
                 break;
         }
     }
