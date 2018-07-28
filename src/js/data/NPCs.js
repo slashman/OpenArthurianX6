@@ -24,29 +24,31 @@ const NPCs = [
 		dialog: [
 			{
 				key: "greeting",
-				dialog: "You see your friend Shamino, someone you thought you might never see again."
+				dialog: [
+					"*You see your friend Shamino, someone you thought you might never see again.",
+					"My friend!",
+					"*Strongly grasping your hand, he exclaims:",
+					"We were afraid the [summoning] would fail! Tis' nigh impossible to use any magic without invoking intervention from [Blackthorn].",
+					"This is a very long message, I really jsut want to make it go overboard and see if the more prompt continues working as expected. Actually it seems like it needs to be really really long, I don't know what else to say, my mind is blank. This is a very long message, I really jsut want to make it go overboard and see if the more prompt continues working as expected. Actually it seems like it needs to be really really long, I don't know what else to say, my mind is blank."
+				]
 			},
 			{
 				key: "name",
-				dialog: "Why are you asking me that? I am Shamino of course! has the [summoning] caused you any memory issues?"
+				dialog: "Why are you asking me that? has the [summoning] caused you any memory issues?"
 			},
 			{
-				key: "summoning",
-				dialog: "Strongly grasping you hand, he exclaims: We were afraid the summoning would fail! Tis' nigh impossible to use any magic without invoking intervention from [Blackthorn]."
-			},
-			{
-				key: "blackthorn",
-				dialog: "Let us not tarry for the summoning has surely not gone unnoticed."
+				key: "join",
+				dialog: "Of course I'll join you!"
 			},
 			{
 				key: "bye",
-				dialog: "Iolo's secret hut is close by, he is waiting for us!",
+				dialog: "We will find aid at Iolo's. It is but a short walk to the west!",
 				// TODO: Launch scene 2?
 				// TODO: join party
 			},
 			{
 				key: "unknown",
-				dialog: "Let us not tarry for the summoning has surely not gone unnoticed."
+				dialog: "Let us not tarry, for the summoning has surely not gone unnoticed!"
 			}
 		]
 	},
