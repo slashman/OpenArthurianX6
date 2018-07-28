@@ -4,9 +4,9 @@ const MobFactory = require('./MobFactory');
 const ItemFactory = require('./ItemFactory');
 
 const LevelLoader = {
-	loadLevel: function(game){
+	loadLevel: function(game, mapId){
 		const level = new Level();
-		const tiledMap = this.loadTiledMap(game);
+		const tiledMap = this.loadTiledMap(game, mapId);
 		const mobsData = tiledMap.mobs;
 		const itemsData = tiledMap.items;
 
@@ -16,8 +16,8 @@ const LevelLoader = {
 		
 		return level;
 	},
-	loadTiledMap: function(game){
-		var map = game.add.tilemap('summoning'); //TODO: Read from Scenario data
+	loadTiledMap: function(game, mapId){
+		var map = game.add.tilemap(mapId);
 		map.addTilesetImage('terrain', 'terrain');
 		map.addTilesetImage('items', 'items');
 		map.addTilesetImage('monsters', 'monsters');

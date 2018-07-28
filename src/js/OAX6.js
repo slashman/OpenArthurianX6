@@ -23,6 +23,8 @@ const Timer = require('./Timer');
 const Dialogs = require('./Dialogs');
 const Inventory = require('./Inventory');
 
+const scenarioInfo = require('./ScenarioInfo');
+
 const OAX6 = {
 	run: function(){
 		console.log("Running OAX6");
@@ -37,8 +39,11 @@ const OAX6 = {
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);
 		
+		const startingState = scenarioInfo.startingState;
+
 		const firstLevel = this.loadLevel(game);
-		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, 12, 15, 0);
+
+		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, startingState.x, startingState.y, 0);
 		const shamino = NPCFactory.buildNPC(game, 'shamino', firstLevel, 13, 16, 0);
 		const dupre = NPCFactory.buildNPC(game, 'dupre', firstLevel, 12, 17, 0);
 		player.addMobToParty(shamino);
@@ -50,7 +55,8 @@ const OAX6 = {
 		Inventory.init(game);
 	},
 	loadLevel: function(game){
-		return LevelLoader.loadLevel(game);
+		const startingState = scenarioInfo.startingState;
+		return LevelLoader.loadLevel(game, startingState.map);
 	}
 };
 
