@@ -109,8 +109,8 @@ const LevelLoader = {
 				{
 					type: 'npc',
 					id: 'shamino',
-					x: 23,
-					y: 8
+					x: 32,
+					y: 16
 				}/**/
 			];
 	},
