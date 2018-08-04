@@ -43,9 +43,12 @@ const OAX6 = {
 		
 		const startingState = scenarioInfo.startingState;
 
+		const player = PlayerFactory.buildPlayer(UI, game, undefined, startingState.x, startingState.y, 0);
+
 		const firstLevel = this.loadLevel(game);
 
-		const player = PlayerFactory.buildPlayer(UI, game, firstLevel, startingState.x, startingState.y, 0);
+		player.level = firstLevel;
+		
 		firstLevel.addMob(player);
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
 

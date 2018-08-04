@@ -47,25 +47,35 @@ Mob.prototype = {
 			return Timer.delay(1000);
 		}
 		if (player && this.alignment === player.alignment){
-			// This is a party member
-			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
-				OAX6.UI.activeMob = this;
-				PlayerStateMachine.actionEnabled = true;
-				return Promise.resolve();
-			} else {
-				//TODO: Fix issue with pathfinding empty routes to player
-				if (this.x === player.x && this.y === player.y){
-					//TODO: Move to an open space?
-					// Do nothing
-					this.reportAction("Stand by");
-					return Timer.delay(1000);
+			if (this.isPartyMember()){
+				// This is a party member
+				if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+					OAX6.UI.activeMob = this;
+					PlayerStateMachine.actionEnabled = true;
+					return Promise.resolve();
+				} else {
+					//TODO: Fix issue with pathfinding empty routes to player
+					if (this.x === player.x && this.y === player.y){
+						//TODO: Move to an open space?
+						// Do nothing
+						this.reportAction("Stand by");
+						return Timer.delay(1000);
+					}
+					const nextStep = this.level.findPathTo(player, this, this.alignment);
+					return this.moveTo(nextStep.dx, nextStep.dy);
 				}
-				const nextStep = this.level.findPathTo(player, this, this.alignment);
-				return this.moveTo(nextStep.dx, nextStep.dy);
+			} else {
+				// TODO: Follow schedule
+				var dx = Random.num(-1,1);
+				var dy = Random.num(-1,1);
+				if (dx === 0 && dy === 0){
+					dx = 1;
+				}
+				return this.moveTo(dx, dy);
 			}
 		} else {
 			const nearbyTarget = this.getNearbyTarget();
-			if (!nearbyTarget || this.alignment == 'n'){
+			if (!nearbyTarget || this.alignment === 'n'){
 				if (Random.chance(50)){
 					var dx = Random.num(-1,1);
 					var dy = Random.num(-1,1);
@@ -106,12 +116,18 @@ Mob.prototype = {
 		return this.alignment === 'a';
 	},
 	isPartyMember: function(){
-		return this.alignment === 'b';
+		return OAX6.UI.player.party.indexOf(this) !== -1;
 	},
 	getNearbyTarget: function(){
 		//TODO: Implement some LOS.
 		if (this.isHostileMob()){
-			return this.level.getCloserMobTo(this.x, this.y, 'b');
+			const closerMob = this.level.getCloserMobTo(this.x, this.y, 'b');
+			const dist = Geo.flatDist(closerMob.x, closerMob.y, this.x, this.y);
+			if (dist < 10) {
+				return closerMob;
+			} else {
+				return false;
+			}
 		} else if (this.isPartyMember()){
 			return this.level.getCloserMobTo(this.x, this.y, 'a');
 		} else {
