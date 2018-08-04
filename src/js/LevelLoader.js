@@ -29,7 +29,7 @@ const LevelLoader = {
 		game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
 
 		return {
-			mobs: this.loadTiledMapMobs(),
+			mobs: this.loadTiledMapMobs(map),
 			items: this.loadTiledMapItems(),
 			solidMask: this.loadTiledMapSolidMask(map)
 		};
@@ -68,51 +68,27 @@ const LevelLoader = {
       }
 		];
 	},
-	loadTiledMapMobs: function() {
-		return [ 
-				/*{
-					type: 'mob',
-					id: 'demon',
-					x: 10,
-					y: 4
-				},
-				{
-					type: 'mob',
-					id: 'demon',
-					x: 13,
-					y: 6
-				},
-				{
-					type: 'mob',
-					id: 'demon',
-					x: 10,
-					y: 6
-				},
-				{
-					type: 'mob',
-					id: 'demon',
-					x: 13,
-					y: 7
-				},
-				{
-					type: 'mob',
-					id: 'demon',
-					x: 11,
-					y: 6
-				},
-				{
-					type: 'mob',
-					id: 'demon',
-					x: 13,
-					y: 8
-				}/*/,
-				{
-					type: 'npc',
-					id: 'shamino',
-					x: 32,
-					y: 16
-				}/**/
-			];
+	loadTiledMapMobs: function(map) {
+		const w = map.width;
+		const h = map.height;
+		const mobData = [];
+		for (let x = 0; x < w; x++) {
+			for (let y = 0; y < h; y++) {
+				const tile = map.getTile(x, y, 'Mobs');
+				if (tile !== null) {
+					console.log(tile.properties);
+					const mobType = tile.properties.type || 'mob';
+					const mobTypeId = tile.properties.id;
+					mobData.push({
+						type: mobType,
+						id: mobTypeId,
+						x: x,
+						y: y
+					});
+				}
+			}
+		}
+		return mobData;
 	},
 	loadTiledMapSolidMask: function(map) {
 		let w = map.width,

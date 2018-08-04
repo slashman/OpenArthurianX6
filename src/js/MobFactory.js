@@ -5,10 +5,14 @@ const Stat = require('./Stat.class');
 
 const MobFactory = {
 	init: function(mobTypeData){
+		this.mobTypeData = mobTypeData;
 		this.mobTypeMap = [];
 		for (var mobType of mobTypeData){
 			this.mobTypeMap[mobType.id] = mobType;
 		}
+	},
+	getMobTypeByTileId(tileIndex) {
+		return this.mobTypeData.find(t => t.tileIndex === tileIndex);
 	},
 	buildMob: function(game, typeId, level, x, y, z){
 		const mob = new Mob(level, x, y, z);

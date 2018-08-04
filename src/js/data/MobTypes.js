@@ -51,6 +51,16 @@ const MobTypes = [
 		defense: 0,
 		speed: 3,
 		corpse: 'bones'
+	},
+	{
+		id: 'soldier',
+		appearance: 'soldier',
+		name: 'Solider',
+		hp: 40,
+		damage: 5,
+		defense: 3,
+		speed: 2,
+		corpse: 'manCorpse'
 	}
 ]
 

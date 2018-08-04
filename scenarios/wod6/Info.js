@@ -2,7 +2,7 @@ module.exports = {
   startingState: {
     minuteOfDay: 1380,
     map: 'forest1',
-    x: 32,
+    x: 80,
     y: 34,
     party: [
     /*
