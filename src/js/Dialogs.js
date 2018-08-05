@@ -280,10 +280,8 @@ module.exports = {
 	},
 	sendInput: function(line) {
 		var dialog = this.chat.dialog[line.toLowerCase()];
-		if (!dialog) {
-			// Look into the synonyms
-			const synonymousDialogKey = Object.keys(this.chat.dialog).find(d => d.synonym === line.toLowerCase());
-			dialog = this.chat.dialog[synonymousDialogKey];
+		if (dialog && dialog.synonym) {
+			dialog = this.chat.dialog[dialog.synonym];
 		}
 		if (!dialog) {
 			dialog = this.chat.dialog.unknown;
