@@ -49,18 +49,18 @@ Level.prototype = {
 		if (!nextActor || nextActor.dead){
 			return this.actNext();
 		}
-		OAX6.UI.locateMarker(nextActor);
+		if (nextActor.isPartyMember() || nextActor === OAX6.UI.player) {
+			OAX6.UI.locateMarker(nextActor);
+		}
 		OAX6.UI.showMessage(nextActor.getBattleDescription()+":");
 		if (nextActor !== OAX6.UI.player){
-			OAX6.UI.locateMarker(nextActor);
-			Timer.delay(1000)
+			Timer.delay(250)
 			.then(()=>{
 				if (nextActor.alignment !== OAX6.UI.player.alignment){
 					OAX6.UI.hideMarker();
 				}
-				return nextActor.act();
-			})
-			.then(()=>Timer.delay(500))
+			});
+			nextActor.act()
 			.then(()=>{
 				if (OAX6.UI.activeMob !== nextActor){
 					OAX6.UI.hideMarker();
