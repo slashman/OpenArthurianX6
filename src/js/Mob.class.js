@@ -4,6 +4,7 @@ const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
 const Geo = require('./Geo');
+const Line = require('./Line');
 
 /**
  * Represents a being living inside a world
@@ -125,9 +126,15 @@ Mob.prototype = {
 		}
 	},
 	canTrack: function (mob) {
-		// TODO: Use LOS and Memory (last known position) instead
+		// TODO: Use Memory (last known position)
 		const dist = Geo.flatDist(mob.x, mob.y, this.x, this.y);
-		return dist < 10;
+		if (dist > 20) {
+			return false;
+		}
+		// Else trace a line and check no opaque tiles hit
+		return !Line.checkInLine(mob.x, mob.y, this.x, this.y, (x, y) => {
+			return this.level.isSolid(x, y);
+		});
 	},
 	isHostileMob: function(){
 		return this.alignment === 'a';
