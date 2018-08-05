@@ -133,6 +133,10 @@ module.exports = {
 		let fragment = dialog;
 		if (dialog.variants) {
 			fragment = this.selectVariant(dialog.variants);
+			if (fragment === undefined) {
+				this.addDialog(this.chat.dialog.unknown);
+				return;
+			}
 		}
 		this.addDialogFragment(fragment);
 	},
@@ -146,37 +150,48 @@ module.exports = {
 		this.messageQueue = [];
 		msg.forEach(m => this.messageQueue.unshift(m));
 		this.showNextDialogPiece();
-		if (fragment.triggers) {
-			fragment.triggers.forEach(trigger => {
-				switch (trigger.type) {
+	},
+	showNextDialogPiece(){
+		PlayerStateMachine.clearInputDialogCallback();
+		let msg = this.messageQueue.pop();
+		if (typeof msg === 'object'){
+			if (!msg.type || msg.type === 'dialogInterruption') {
+				this.name.text = msg.name;
+				msg = msg.text;
+			} else {
+				switch (msg.type) {
 					case 'joinParty':
 						Bus.emit('addToParty', this.currentMob);
 						break;
 					case 'setFlag':
 						let value = true;
-						if (trigger.value !== undefined) {
-							value = trigger.value;
+						if (msg.value !== undefined) {
+							value = msg.value;
 						}
-						this.player.flags[trigger.flagName] = value;
+						this.player.flags[msg.flagName] = value;
+						break;
+					case 'endConversation':
+						this.endDialog();
+						this.playerInput.visible = false;
 						break;
 				}
-			});
+				this.playerInput.visible = true;
+				if (this.messageQueue.length > 0) {
+					this.showNextDialogPiece();
+					this.playerInput.visible = false;
+				}
+				return;
+			}
+		} else {
+			this.name.text = this.currentMob.npcDefinition.name;
 		}
-		
-	},
-	showNextDialogPiece(){
-		PlayerStateMachine.clearInputDialogCallback();
 		this.dialogLines.forEach(l => l.text = '');
-		const msg = this.messageQueue.pop();
 		const lines = this.splitInLines(msg);
-
-		this.playerInput.visible = true;
-		
 		if (lines.length > this.maxLines) {
 			const nextPart = lines.splice(this.maxLines).join(" ");
 			this.messageQueue.push(nextPart);
 		}
-
+		this.playerInput.visible = true;
 		if (this.messageQueue.length > 0) {
 			PlayerStateMachine.setInputDialogCallback(this.showNextDialogPiece, this);
 			this.playerInput.visible = false;
@@ -217,7 +232,7 @@ module.exports = {
 		this.player = chat.player;
 		var mob = chat.mob,
 			dialog = chat.dialog;
-
+		this.currentMob = mob;
 		this.chat = chat;
 
 		PlayerStateMachine.switchState(PlayerStateMachine.DIALOG);
@@ -225,7 +240,7 @@ module.exports = {
 
 		this.name.text = mob.npcDefinition.name;
 		this.addDialog(dialog.greeting, false);
-		this.currentMob = mob;
+		
 
 		this.dialogUI.visible = true;
 
@@ -259,16 +274,14 @@ module.exports = {
 	},
 	sendInput: function(line) {
 		var dialog = this.chat.dialog[line.toLowerCase()];
-
+		if (!dialog) {
+			// Look into the synonyms
+			const synonymousDialogKey = Object.keys(this.chat.dialog).find(d => d.synonym === line.toLowerCase());
+			dialog = this.chat.dialog[synonymousDialogKey];
+		}
 		if (!dialog) {
 			dialog = this.chat.dialog.unknown;
 		}
-
 		this.addDialog(dialog, false);
-
-		if (line.toLowerCase() == "bye") {
-			PlayerStateMachine.setInputDialogCallback(this.endDialog, this);
-			this.playerInput.visible = false;
-		}
 	}
 }

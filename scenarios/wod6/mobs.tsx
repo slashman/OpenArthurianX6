@@ -19,4 +19,10 @@
    <property name="id" value="soldier"/>
   </properties>
  </tile>
+ <tile id="241">
+  <properties>
+   <property name="id" value="asteroth"/>
+   <property name="type" value="npc"/>
+  </properties>
+ </tile>
 </tileset>
