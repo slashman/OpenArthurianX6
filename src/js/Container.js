@@ -19,11 +19,6 @@ const CURSOR_STATUS = {
     RELEASED: 2
 };
 
-const DRAGGING_ELEMENTS = {
-    NONE: 0,
-    CONTAINER: 1
-};
-
 /**
  * Represents a items container, it could be the player inventory,
  * the loot of a corpse or the content of a barrel
@@ -49,7 +44,6 @@ function Container(game, sizeDef) {
         x: 0,
         y: 0,
         status: CURSOR_STATUS.IDDLE,
-        dragging: DRAGGING_ELEMENTS.NONE,
         dragAnchor: { x: 0, y: 0 }
     };
 
@@ -137,7 +131,7 @@ Container.prototype._getItemIndexAtPoint = function(point) {
 };
 
 Container.prototype._updateDragging = function(mousePointer) {
-    if (this.cursor.dragging == DRAGGING_ELEMENTS.CONTAINER) {
+    if (this.cursor.status == CURSOR_STATUS.DRAGGING) {
         const width = this.game.width - this.sizeDef.size.w,
             height = this.game.height - this.sizeDef.size.h;
             
@@ -159,7 +153,6 @@ Container.prototype.onMouseDown = function(mousePointer) {
 
     if (this._pointInRect(this.cursor, this.sizeDef.topBar)) {
         this.cursor.status = CURSOR_STATUS.DRAGGING;
-        this.cursor.dragging = DRAGGING_ELEMENTS.CONTAINER;
         this.cursor.dragAnchor.x = this.cursor.x;
         this.cursor.dragAnchor.y = this.cursor.y;
 
@@ -186,7 +179,6 @@ Container.prototype.onMouseUp = function() {
     if (this.cursor.status === CURSOR_STATUS.RELEASED) { return; }
 
     this.cursor.status = CURSOR_STATUS.RELEASED;
-    this.cursor.dragging = DRAGGING_ELEMENTS.NONE;
 
     if (this.UI.draggingElement === this) {
         this.UI.releaseDrag();

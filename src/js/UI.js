@@ -74,8 +74,6 @@ const UI = {
 		this.UILayer.add(display);
 
 		this.draggingItem = { item: null, container: null, display: display };
-
-		(new Container(this.game, containerSizes.medium)).open();
 	},
 	update: function(){
 		PlayerStateMachine.update();
