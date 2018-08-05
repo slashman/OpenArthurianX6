@@ -61,12 +61,19 @@ const UI = {
 		this.marker.visible = false;
 		this.floatingIcon = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.floatingIcon.visible = false;
-    this.floatingIcon.anchor.setTo(0.5);
+    	this.floatingIcon.anchor.setTo(0.5);
 		this.currentMinuteOfDay = 8 * 60;
 		this.start();
 		this.timeOfDayPass();
 
 		this.draggingElement = null;
+		
+		const display = this.game.add.image(100,100,'ui', 0);
+		display.anchor.set(0.5, 0.5);
+		display.visible = false;
+		this.UILayer.add(display);
+
+		this.draggingItem = { item: null, container: null, display: display };
 
 		(new Container(this.game, containerSizes.medium)).open();
 	},
@@ -278,8 +285,35 @@ const UI = {
 		this.draggingElement = element;
 	},
 
+	dragItem: function(item, container) {
+		const appearance = item.appearance;
+
+		this.draggingItem.display.loadTexture(appearance.tileset, appearance.i);
+		this.draggingItem.display.bringToTop();
+		this.draggingItem.display.visible = true;
+
+		this.draggingItem.item = item;
+
+		this.draggingItem.container = container;
+
+		this.updateDragItem(this.game.input.mousePointer);
+	},
+
+	isDraggingItem: function() {
+		return this.draggingItem.display.visible;
+	},
+
+	updateDragItem: function(mousePointer) {
+		this.draggingItem.display.x = mousePointer.x;
+		this.draggingItem.display.y = mousePointer.y;
+	},
+
 	releaseDrag: function() {
 		this.draggingElement = null;
+
+		this.draggingItem.display.visible = false;
+		this.draggingItem.item = null;
+		this.draggingItem.container = null;
 	}
 }
 

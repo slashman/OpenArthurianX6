@@ -53,6 +53,8 @@ function Container(game, sizeDef) {
         dragAnchor: { x: 0, y: 0 }
     };
 
+    this.lastItemIndex = -1;
+
     this._initItemsGrid();
     
     this.UI.UILayer.add(this.group);
@@ -170,7 +172,10 @@ Container.prototype.onMouseDown = function(mousePointer) {
 
         if (item) {
             this.inventory[index] = null;
+            this.lastItemIndex = index;
             this._syncInventoryIcons();
+
+            this.UI.dragItem(item, this);
         }
     }
     
@@ -197,6 +202,30 @@ Container.prototype.isMouseOver = function(mousePointer) {
         my = mousePointer.y;
 
     return !(mx < this.group.x || my < this.group.y || mx >= this.group.x+this.sizeDef.size.w || my >= this.group.y+this.sizeDef.size.h);
+};
+
+Container.prototype.returnItem = function(item) {
+    this.inventory[this.lastItemIndex] = item;
+    this._syncInventoryIcons();
+};
+
+Container.prototype.addItem = function(item, originalContainer, mousePointer) {
+    this.cursor.x = mousePointer.x - this.group.x;
+    this.cursor.y = mousePointer.y - this.group.y;
+
+    const index = this._getItemIndexAtPoint(this.cursor);
+
+    if (index == null) {
+        return originalContainer.returnItem(item);
+    }
+
+    if (this.inventory[index]) {
+        const replacementItem = this.inventory[index];
+        originalContainer.returnItem(replacementItem);
+    }
+
+    this.inventory[index] = item;
+    this._syncInventoryIcons();
 };
 
 Container.prototype.open = function() {

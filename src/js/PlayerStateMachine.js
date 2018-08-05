@@ -403,13 +403,33 @@ const PlayerStateMachine = {
     },
 
     updateInventory: function() {
-        const inventory = OAX6.UI.getContainerAtPoint(this.game.input.mousePointer);
+        const UI = OAX6.UI,
+            mousePointer = this.game.input.mousePointer;
+
+        if (UI.isDraggingItem()) {
+            UI.updateDragItem(mousePointer);
+            if (mousePointer.leftButton.isUp) {
+                const item = UI.draggingItem.item,
+                    originalContainer = UI.draggingItem.container;
+
+                UI.releaseDrag();
+
+                const container = UI.getContainerAtPoint(mousePointer);
+                if (container) {
+                    container.addItem(item, originalContainer, mousePointer);
+                }
+            }
+
+            return;
+        }
+
+        const inventory = UI.getContainerAtPoint(mousePointer);
         if (!inventory) { return; }
 
-        if (this.game.input.mousePointer.leftButton.isDown) {
+        if (mousePointer.leftButton.isDown) {
             inventory.bringToTop();
-            inventory.onMouseDown(this.game.input.mousePointer);
-        } else if (this.game.input.mousePointer.leftButton.isUp) {
+            inventory.onMouseDown(mousePointer);
+        } else if (mousePointer.leftButton.isUp) {
             inventory.onMouseUp();
             
             if (!this.player.backpack.isOpen()) {
