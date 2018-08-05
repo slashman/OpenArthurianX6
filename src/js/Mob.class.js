@@ -70,7 +70,11 @@ Mob.prototype = {
 			}
 		}
 		if (subIntent === 'seekPlayer') {
-			if (!this.canTrack(player)) {
+			if (this.canTrack(player)) {
+				if (this.isHostileMob()) {
+					this.intent = 'combat';
+				}
+			} else {
 				subIntent = 'waitCommand';
 			}
 		}
@@ -147,12 +151,13 @@ Mob.prototype = {
 	},
 	getNearbyTarget: function(){
 		if (this.isHostileMob()){
+			const closerMob = this.level.getCloserMobTo(this.x, this.y, 'b')
 			if (this.canTrack(closerMob)) {
 				return closerMob;
 			} else {
 				return false;
 			}
-		} else if (this.isPartyMember()){
+		} else if (this.isPartyMember()){ // ? Is this being used now? Party members are controlled by the player
 			return this.level.getCloserMobTo(this.x, this.y, 'a');
 		} else {
 			return false;
