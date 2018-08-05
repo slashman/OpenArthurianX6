@@ -81,7 +81,11 @@ Mob.prototype = {
 		
 		if (subIntent === 'waitCommand') {
 			this.reportAction("Stand by");
-			return Timer.delay(1000);
+			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+				return Promise.resolve();
+			} else {
+				return Timer.delay(1000);
+			}
 		} else if (subIntent === 'seekPlayer') {
 			return this.bumpTowards(player);
 		} else if (subIntent === 'wander') {
