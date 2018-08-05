@@ -32,9 +32,15 @@ const NPCs = [
 							value: false
 						},
 						dialog: [
-							"*You see your friend Shamino, someone you thought you might never see again.",
+							{
+								type: "event",
+								text: "You see your friend Shamino, someone you thought you might never see again."
+							},
 							"My friend!",
-							"*Strongly grasping your hand, he exclaims:",
+							{
+								type: "event",
+								text: "Strongly grasping your hand, he exclaims:"
+							},
 							"We were afraid the [summoning] would fail! Tis' nigh impossible to use any magic without invoking intervention from [Blackthorn].",
 							"This is a very long message, I really jsut want to make it go overboard and see if the more prompt continues working as expected. Actually it seems like it needs to be really really long, I don't know what else to say, my mind is blank. This is a very long message, I really jsut want to make it go overboard and see if the more prompt continues working as expected. Actually it seems like it needs to be really really long, I don't know what else to say, my mind is blank."
 						]
@@ -127,7 +133,10 @@ const NPCs = [
 							value: false
 						},
 						dialog: [
-							"A group of heavily armed soldiers aproaches hastily. From within their ranks, a middle aged nobleman clad in shining armor yells:",
+							{
+								type: "event",
+								text: "A group of heavily armed soldiers aproaches hastily. From within their ranks, a middle aged nobleman clad in shining armor yells",
+							},
 							"Rebels! In the name of the eight virtues, I, Asteroth, Lord of Empath Abbey, demand your immediate [surrender]!",
 							"Drop your weapons now and your life will be forfeit, otherwise you will meet your death by the virtues of [Justice] and [Honor]!"
 						]
@@ -172,7 +181,10 @@ const NPCs = [
 								name: "Shamino",
 								text: "Are you out of your senses, Avatar! you are not aware of your words, we will end up dead or worse, as prisoners in a cage in Yew!"
 							},
-							"Asteroth looks puzzled for a moment.",
+							{
+								type: "event",
+								text: "Asteroth looks puzzled for a moment.",
+							},
 							"Avatar? are you really the Avatar? If that is the case then our Lord [Blackthorn] will be most grateful of having your presence, please [join] us and we will escort you to his presence.",
 							{ type: "setFlag", flagName: "asterothKnowsAvatar" }
 						]
@@ -196,7 +208,10 @@ const NPCs = [
 								name: "Shamino",
 								text: "I am sorry Avatar, I cannot allow this!"
 							},
-							"In a flash, Shamino draws his sword and runs towards the soldiers.",
+							{
+								type: "event",
+								text: "In a flash, Shamino draws his sword and runs towards the soldiers.",
+							},
 							{
 								type: "endConversation"
 							}

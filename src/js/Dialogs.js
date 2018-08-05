@@ -155,8 +155,14 @@ module.exports = {
 		PlayerStateMachine.clearInputDialogCallback();
 		let msg = this.messageQueue.pop();
 		if (typeof msg === 'object'){
-			if (!msg.type || msg.type === 'dialogInterruption') {
+			if (!msg.type) {
+				msg.type = 'event';
+			}
+			if (msg.type === 'dialogInterruption') {
 				this.name.text = msg.name;
+				msg = msg.text;
+			} else if (msg.type === 'event') {
+				this.name.text = '';
 				msg = msg.text;
 			} else {
 				switch (msg.type) {
@@ -183,7 +189,7 @@ module.exports = {
 				return;
 			}
 		} else {
-			this.name.text = this.currentMob.npcDefinition.name;
+			this.name.text = this.currentMob.npcDefinition.name; // Only if known?
 		}
 		this.dialogLines.forEach(l => l.text = '');
 		const lines = this.splitInLines(msg);
