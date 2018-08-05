@@ -31,6 +31,7 @@ const UI = {
 		this.game.scale.setUserScale(2, 2);
 		this.nextMove = 0;
 		this.openContainers = [];
+		this.draggingElement = null;
 	},
 	create: function(){
 		this.mapLayer = this.game.add.group();
@@ -64,6 +65,8 @@ const UI = {
 		this.currentMinuteOfDay = 8 * 60;
 		this.start();
 		this.timeOfDayPass();
+
+		this.draggingElement = null;
 
 		(new Container(this.game, containerSizes.medium)).open();
 	},
@@ -256,6 +259,8 @@ const UI = {
 	},
 
 	getContainerAtPoint: function(mousePointer) {
+		if (this.draggingElement) { return this.draggingElement; }
+
 		let ret = null;
 
 		for (let i=0,container;container=this.openContainers[i];i++) {
@@ -267,6 +272,14 @@ const UI = {
 		}
 
 		return ret;
+	},
+
+	dragElement: function(element) {
+		this.draggingElement = element;
+	},
+
+	releaseDrag: function() {
+		this.draggingElement = null;
 	}
 }
 

@@ -139,8 +139,8 @@ Container.prototype._updateDragging = function(mousePointer) {
         const width = this.game.width - this.sizeDef.size.w,
             height = this.game.height - this.sizeDef.size.h;
             
-        const x = Math.min(Math.max(mousePointer.x - this.cursor.dragAnchor.x, 0), width),
-            y = Math.min(Math.max(mousePointer.y - this.cursor.dragAnchor.y, 0), height);
+        const x = mousePointer.x - this.cursor.dragAnchor.x,
+            y = mousePointer.y - this.cursor.dragAnchor.y;
 
         this.group.x = x;
         this.group.y = y;
@@ -160,6 +160,9 @@ Container.prototype.onMouseDown = function(mousePointer) {
         this.cursor.dragging = DRAGGING_ELEMENTS.CONTAINER;
         this.cursor.dragAnchor.x = this.cursor.x;
         this.cursor.dragAnchor.y = this.cursor.y;
+
+        this.UI.dragElement(this);
+        
         return;
     } else {
         const index = this._getItemIndexAtPoint(this.cursor),
@@ -179,6 +182,10 @@ Container.prototype.onMouseUp = function() {
 
     this.cursor.status = CURSOR_STATUS.RELEASED;
     this.cursor.dragging = DRAGGING_ELEMENTS.NONE;
+
+    if (this.UI.draggingElement === this) {
+        this.UI.releaseDrag();
+    }
 
     if (this._pointInRect(this.cursor, this.sizeDef.closeButton)) {
         return this.close();

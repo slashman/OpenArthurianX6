@@ -412,7 +412,7 @@ const PlayerStateMachine = {
         } else if (this.game.input.mousePointer.leftButton.isUp) {
             inventory.onMouseUp();
             
-            if (!inventory.isOpen()) {
+            if (!this.player.backpack.isOpen()) {
                 PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
                 this.clearDirectionCallback();
             }
