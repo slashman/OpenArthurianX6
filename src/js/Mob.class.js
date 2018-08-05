@@ -46,6 +46,12 @@ Mob.prototype = {
 			this.reportAction("Stand by");
 			return Timer.delay(1000);
 		}
+		// Regardless of any further checks, check if wants to talk first
+		if (this.dialog && this.firstTalk && Geo.flatDist(player.x, player.y, this.x, this.y) < this.firstTalk){
+			Bus.emit('startDialog', {mob: this, dialog: this.dialog, player: OAX6.UI.player});
+			this.firstTalk = 0;
+			return Promise.resolve();
+		}
 		if (player && this.alignment === player.alignment){
 			if (this.isPartyMember()){
 				// This is a party member

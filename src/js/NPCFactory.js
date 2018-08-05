@@ -28,6 +28,7 @@ const NPCFactory = {
 			npc.weapon = ItemFactory.createItem(definition.weapon);
 		npc.name = definition.name;
 		npc.alignment = definition.alignment || 'a';
+		npc.firstTalk = definition.firstTalk;
 		return npc;
 	}
 };
