@@ -61,7 +61,7 @@ const MobTypes = [
 		defense: 3,
 		speed: 2,
 		corpse: 'manCorpse',
-		intent: 'waitCommand'
+		intent: 'seekPlayer'
 	}
 ]
 
