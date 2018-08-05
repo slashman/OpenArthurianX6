@@ -126,6 +126,9 @@ Mob.prototype = {
 		}
 	},
 	canTrack: function (mob) {
+		if (mob === OAX6.UI.player && this.isPartyMember()) {
+			return true;
+		}
 		// TODO: Use Memory (last known position)
 		const dist = Geo.flatDist(mob.x, mob.y, this.x, this.y);
 		if (dist > 20) {
