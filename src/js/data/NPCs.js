@@ -21,6 +21,7 @@ const NPCs = [
 		type: 'man2',
 		alignment: 'b',
 		weapon: 'maingauche',
+		firstTalk: 10,
 		dialog: [
 			{
 				key: "greeting",
@@ -71,10 +72,11 @@ const NPCs = [
 							flag: "firstShaminoConversation",
 							value: false
 						},
-						dialog: "We will find aid at Iolo's. It is but a short walk to the west!",
-						triggers: [
+						dialog: [
+							"We will find aid at Iolo's. It is but a short walk to the west!",
 							{ type: "joinParty" },
 							{ type: "setFlag", flagName: "firstShaminoConversation" },
+							{ type: "endConversation" }
 						]
 					},
 					{
@@ -83,11 +85,15 @@ const NPCs = [
 							value: false
 						},
 						dialog: [
-							"Don't look back!"
+							"Don't look back!",
+							{ type: "endConversation" }
 						]
 					},
 					{
-						dialog: "Goodbye!"
+						dialog: [
+							"Goodbye!",
+							{ type: "endConversation" }
+						]
 					}
 				]
 			},
@@ -103,6 +109,143 @@ const NPCs = [
 		type: 'man2',
 		alignment: 'b',
 		weapon: 'sword'
+	},
+	{
+		id: 'asteroth',
+		name: 'Asteroth',
+		type: 'soldier',
+		alignment: 'a',
+		weapon: 'sword',
+		firstTalk: 10,
+		dialog: [
+			{
+				key: "greeting",
+				variants: [
+					{
+						condition: {
+							flag: "firstAsterothConversation",
+							value: false
+						},
+						dialog: [
+							"A group of heavily armed soldiers aproaches hastily. From within their ranks, a middle aged nobleman clad in shining armor yells:",
+							"Rebels! In the name of the eight virtues, I, Asteroth, Lord of Empath Abbey, demand your immediate [surrender]!",
+							"Drop your weapons now and your life will be forfeit, otherwise you will meet your death by the virtues of [Justice] and [Honor]!"
+						]
+					}
+				]
+			},
+			{
+				key: "name",
+				variants: [
+					{
+						condition: {
+							flag: "asterothKnowsAvatar",
+							value: true
+						},
+						dialog: "I am Asteroth, Lord of Empath Abbey and High Minister of [Welfare]."
+					}
+				]
+			},
+			{
+				key: "welfare",
+				variants: [
+					{
+						condition: {
+							flag: "asterothKnowsAvatar",
+							value: true
+						},
+						dialog: "My office seeks all riches of Britannia to be distributen fairly among the population."
+					}
+				]
+			},
+			{
+				key: "surrender",
+				variants: [
+					{
+						condition: {
+							flag: "asterothKnowsAvatar",
+							value: false
+						},
+						dialog: [
+							{
+								type: "dialogInterruption",
+								name: "Shamino",
+								text: "Are you out of your senses, Avatar! you are not aware of your words, we will end up dead or worse, as prisoners in a cage in Yew!"
+							},
+							"Asteroth looks puzzled for a moment.",
+							"Avatar? are you really the Avatar? If that is the case then our Lord [Blackthorn] will be most grateful of having your presence, please [join] us and we will escort you to his presence.",
+							{ type: "setFlag", flagName: "asterothKnowsAvatar" }
+						]
+					},
+					{
+						dialog: "There is no need for that now, if you really are the Avatar, just drop your weapons and [join] us to Blackthorn's castle"
+					}
+				]
+			},
+			{
+				key: "join",
+				variants: [
+					{
+						condition: {
+							flag: "asterothKnowsAvatar",
+							value: true
+						},
+						dialog: [
+							{
+								type: "dialogInterruption",
+								name: "Shamino",
+								text: "I am sorry Avatar, I cannot allow this!"
+							},
+							"In a flash, Shamino draws his sword and runs towards the soldiers.",
+							{
+								type: "endConversation"
+							}
+						]
+					}
+				]
+			},
+			{
+				key: "perish",
+				variants: [
+					{
+						condition: {
+							flag: "asterothKnowsAvatar",
+							value: true
+						},
+						dialog: [
+							"I knew it... the Avatar, the paladin of virtue, would never side with vicious rebels...",
+							"Your deceit will be punished with death!",
+							{ type: "endConversation" }
+						]
+					},
+					{
+						dialog: [
+							"You were warned, now die!",
+							{ type: "endConversation" }
+						]
+					}
+				]
+			},
+			{
+				key: "unknown",
+				variants: [
+					{
+						condition: {
+							flag: "asterothKnowsAvatar",
+							value: true
+						},
+						dialog: "There is no time to lose, [join] us and let's partake happily with our Lord, he will be delighted to see you"
+					},
+					{
+						dialog: "Was I not clear enough? [Surrender] now or [perish]!"
+					}
+				]
+			},
+			{
+				key: "bye",
+				synonym: "perish"
+			}
+		]
 	},
 	{
 		id: 'kram',
