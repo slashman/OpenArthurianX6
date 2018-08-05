@@ -52,36 +52,44 @@ Mob.prototype = {
 			this.firstTalk = 0;
 			return Promise.resolve();
 		}
-		if (player && this.alignment === player.alignment){
-			if (this.isPartyMember()){
-				// This is a party member
-				if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
-					OAX6.UI.activeMob = this;
-					PlayerStateMachine.actionEnabled = true;
-					return Promise.resolve();
-				} else {
-					//TODO: Fix issue with pathfinding empty routes to player
-					if (this.x === player.x && this.y === player.y){
-						//TODO: Move to an open space?
-						// Do nothing
-						this.reportAction("Stand by");
-						return Timer.delay(1000);
-					}
-					const nextStep = this.level.findPathTo(player, this, this.alignment);
-					return this.moveTo(nextStep.dx, nextStep.dy);
-				}
+		let subIntent = this.intent; // While we have a general intent, it may change for this action
+		if (this.isPartyMember()){
+			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+				OAX6.UI.activeMob = this;
+				PlayerStateMachine.actionEnabled = true;
+				return Promise.resolve();
 			} else {
-				// TODO: Follow schedule
-				var dx = Random.num(-1,1);
-				var dy = Random.num(-1,1);
-				if (dx === 0 && dy === 0){
-					dx = 1;
+				//TODO: Fix issue with pathfinding empty routes to player
+				if (this.x === player.x && this.y === player.y){
+					//TODO: Move to an open space?
+					subIntent = 'waitCommand';
+				} else {
+					subIntent = 'seekPlayer';
 				}
-				return this.moveTo(dx, dy);
 			}
-		} else {
+		}
+		if (subIntent === 'seekPlayer') {
+			if (!this.canTrack(player)) {
+				subIntent = 'waitCommand';
+			}
+		}
+		
+		if (subIntent === 'waitCommand') {
+			this.reportAction("Stand by");
+			return Timer.delay(1000);
+		} else if (subIntent === 'seekPlayer') {
+			return this.bumpTowards(player);
+		} else if (subIntent === 'wander') {
+			// TODO: Follow schedule
+			var dx = Random.num(-1,1);
+			var dy = Random.num(-1,1);
+			if (dx === 0 && dy === 0){
+				dx = 1;
+			}
+			return this.moveTo(dx, dy);
+		} else if (subIntent === 'combat') {
 			const nearbyTarget = this.getNearbyTarget();
-			if (!nearbyTarget || this.alignment === 'n'){
+			if (!nearbyTarget){
 				if (Random.chance(50)){
 					var dx = Random.num(-1,1);
 					var dy = Random.num(-1,1);
@@ -94,29 +102,32 @@ Mob.prototype = {
 					this.reportAction("Stand by");
 					return Timer.delay(1000);
 				}
-			} else if (nearbyTarget){
-				const nextStep = this.level.findPathTo(nearbyTarget, this, this.alignment);
-				let dx = nextStep.dx;
-				let dy = nextStep.dy;
-				const mob = this.level.getMobAt(this.x + dx, this.y + dy);
-				if (mob){
-					if (mob.alignment !== this.alignment){
-						return this.attackOnDirection(dx, dy);
-					} else {
-						dx = Random.num(-1,1);
-						dy = Random.num(-1,1);
-						if (dx === 0 && dy === 0){
-							dx = 1;
-						}
-						return this.moveTo(dx, dy);
-					}
-				} else {
-					return this.moveTo(dx, dy);
-				}
+			} else {
+				return this.bumpTowards(nearbyTarget);
+			} 
+		} else {
+			return Timer.delay(1000);
+		}
+	},
+	bumpTowards: function (targetMob) {
+		const nextStep = this.level.findPathTo(targetMob, this, this.alignment);
+		let dx = nextStep.dx;
+		let dy = nextStep.dy;
+		const mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		if (mob){
+			if (mob.alignment !== this.alignment){
+				return this.attackOnDirection(dx, dy);
 			} else {
 				return Timer.delay(1000);
 			}
+		} else {
+			return this.moveTo(dx, dy);
 		}
+	},
+	canTrack: function (mob) {
+		// TODO: Use LOS and Memory (last known position) instead
+		const dist = Geo.flatDist(mob.x, mob.y, this.x, this.y);
+		return dist < 10;
 	},
 	isHostileMob: function(){
 		return this.alignment === 'a';
@@ -125,11 +136,8 @@ Mob.prototype = {
 		return OAX6.UI.player.party.indexOf(this) !== -1;
 	},
 	getNearbyTarget: function(){
-		//TODO: Implement some LOS.
 		if (this.isHostileMob()){
-			const closerMob = this.level.getCloserMobTo(this.x, this.y, 'b');
-			const dist = Geo.flatDist(closerMob.x, closerMob.y, this.x, this.y);
-			if (dist < 10) {
+			if (this.canTrack(closerMob)) {
 				return closerMob;
 			} else {
 				return false;
@@ -158,7 +166,7 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
 			} 
-			if (this.isHostileMob() || this.isPartyMember()){
+			if (this.isHostileMob() || this.isPartyMember() || this.intent === 'seekPlayer'){
 				// Reactivate immediately
 				return Timer.next();
 			} else {

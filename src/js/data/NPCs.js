@@ -21,7 +21,8 @@ const NPCs = [
 		type: 'man2',
 		alignment: 'b',
 		weapon: 'maingauche',
-		firstTalk: 10,
+		firstTalk: 5,
+		intent: 'seekPlayer',
 		dialog: [
 			{
 				key: "greeting",
@@ -122,7 +123,8 @@ const NPCs = [
 		type: 'soldier',
 		alignment: 'a',
 		weapon: 'sword',
-		firstTalk: 10,
+		firstTalk: 5,
+		intent: 'seekPlayer',
 		dialog: [
 			{
 				key: "greeting",

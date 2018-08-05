@@ -60,7 +60,8 @@ const MobTypes = [
 		damage: 5,
 		defense: 3,
 		speed: 2,
-		corpse: 'manCorpse'
+		corpse: 'manCorpse',
+		intent: 'waitCommand'
 	}
 ]
 

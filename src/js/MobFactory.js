@@ -30,6 +30,7 @@ const MobFactory = {
 		if (definition.weapon)
 			mob.weapon = ItemFactory.createItem(definition.weapon);
 		mob.speed = new Stat(definition.speed)
+		mob.intent = definition.intent;
 		return mob;
 	}
 };

@@ -29,6 +29,7 @@ const NPCFactory = {
 		npc.name = definition.name;
 		npc.alignment = definition.alignment || 'a';
 		npc.firstTalk = definition.firstTalk;
+		npc.intent = definition.intent;
 		return npc;
 	}
 };
