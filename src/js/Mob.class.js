@@ -183,25 +183,35 @@ Mob.prototype = {
 		this.reportAction("Move");
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
+	addItemToFreeSlot: function(item) {
+		for (let i=0,len=this.inventory.length;i<len;i++) {
+			if (!this.inventory[i]) {
+				return this.inventory[i] = item;
+			}
+		}
+
+		// TODO: Will cause issues when there are more items than the ones that can be displayed
+		this.inventory.push(item);
+	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
 		if (item) {
 			const pickedQuantity = item.quantity;
       if (item.def.stackLimit) {
-        const existingItem = this.inventory.find(i => i.id === item.id);
+        const existingItem = this.inventory.find(i => i && i.id === item.id);
         if (existingItem) {
           if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
             existingItem.quantity += item.quantity;
           } else {
             item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
             existingItem.quantity = existingItem.def.stackLimit;
-            this.inventory.push(item);
+            this.addItemToFreeSlot(item);
           }
         } else {
-          this.inventory.push(item);
+          this.addItemToFreeSlot(item);
         }
       } else {
-        this.inventory.push(item);
+        this.addItemToFreeSlot(item);
       }
 			this.level.removeItem(item);
       if (item.quantity === 1) {
