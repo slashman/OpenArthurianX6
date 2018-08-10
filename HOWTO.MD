@@ -6,6 +6,7 @@ Disclaimer
 This guide applies for v0.1, first version publicly available to backers. We are in a very early stage still, the engine is limited both in what it can do and on how easy it can be used.
 
 This build is provided for the following reasons:
+
 - So you can fulfill your curiosity on how the game works.
 - So you can start having an idea of the capabilities and format of the engine for your future projects using it.
 - So that more people (who cares about the project) has access to the source in case something terrible happens.
@@ -13,6 +14,7 @@ This build is provided for the following reasons:
 Setup
 =====
 After cloning the repository
+
 - Run npm install
 - Run ./build.sh
 - Run http-server on the build directory
@@ -27,6 +29,7 @@ Tiled maps are saved on scenarios/wod6/maps.
 Make sure you are using uncompressed JSON format. 
 
 The maps should have the following layers:
+
 - Solid Tiles: Any tile in this layer is considered as solid when loaded on the engine
 - Mobs: Tiles placed here should have at least an 'id' custom property, pointing to a valid MobType. It can additionally have a type, which can be 'mob' or 'npc', if the type is npc, then it should have a NPC id instead of a MobType id
   - Buildings: This and the following 4 layers don't have any logical effect, use them to make cool maps.
@@ -39,6 +42,7 @@ Scenario Data
 Set your scenario data in scenarios/wod6/Info.js
 
 startingState
+
 - minuteOfDay: Determines the stating time
 - map: Points to the list of maps below (name)
 - x: Starting player position
@@ -47,7 +51,8 @@ startingState
 - scene: Points to the list of scenes below
  
 maps
-- name: Identifies the name
+
+- name: Identifies the map
 - filename: Filename in scenario/wod6/maps/
 
 scenes
@@ -64,6 +69,7 @@ Items
 =====
 
 Defined in src/js/data/Items.js Each item can have the following attributes:
+
 - id: Identifies the item
 - name: Description of the item
 - appearance: Referencing an item appearance on Appearances.js
@@ -77,12 +83,13 @@ MobTypes
 ========
 
 Defined in src/js/data/MobTypes.js
-- id: 'soldier',
-- name: 'Solider',
-- appearance: 'soldier',
-- hp: 40,
-- damage: 5,
-- defense: 3,
+
+- id
+- name
+- appearance: Points to Appearances
+- hp
+- damage
+- defense
 - speed: Determines the order in the queue for combat mode
 - corpse: References Items.js, item placed on the floor when the mob dies
 - intent: 'seekPlayer', 'waitCommand', 'wander', 'combat'
@@ -95,8 +102,7 @@ Defined in src/js/data/NPCs.js
 - id
 - name
 - type: Points to MobTypes
-- alignment: 'b' for friendly, 'a' for enemy, 'c' for neutral. Likely to be
-  revised
+- alignment: 'b' for friendly, 'a' for enemy, 'c' for neutral. Likely to be revised
 - weapon: Points to Items
 - firstTalk: Number, will talk to player first if he gets closer than this.
 - intent: Same options as MobTypes
@@ -108,6 +114,7 @@ The conversation trees are defined in the "dialog" attribute of each NPC.
 They are a list of objects, each object is a dialog fragment, tied to a keyword.
 
 Each dialog fragment can have either
+
 - A list of dialog pieces (see below)
 - A list of dialog variants (see below)
 - A synonym keyword
@@ -115,6 +122,7 @@ Each dialog fragment can have either
 A dialog variant contains a condition with a flag name and value, and a list of dialog pieces. If the condition is met the conversation will follow these dialog pieces.
 
 A dialog piece can be either
+
 - A string of text
 - An object with the following types:
   - "event" is similar to a normal text, except it describes something happening instead of something the NPC is saying.
