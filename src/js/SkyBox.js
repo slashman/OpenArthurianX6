@@ -19,6 +19,14 @@ const SkyBox = {
     this.moonSprite.anchor.y = 0.5;
     this.moonSprite.visible = false;
     this.currentMinuteOfDay = 8 * 60;
+
+    this.mask = this.game.add.graphics(0, 0, this.skyboxLayer);
+    this.mask.beginFill(0xffffff);
+    this.mask.drawRect(-this.skySprite.width/2, -this.skySprite.height, this.skySprite.width, this.skySprite.height);
+  
+    this.sunSprite.mask = this.mask;
+    this.moonSprite.mask = this.mask;
+
     this.updateTimeOfDay();
   },
   timeOfDayPass: function(){
@@ -41,6 +49,9 @@ const SkyBox = {
     };
     this.skySprite.x = skyboxPosition.x;
     this.skySprite.y = skyboxPosition.y;
+    // TODO: Add mask as a child of skySprite
+    this.mask.x = this.skySprite.x;
+    this.mask.y = this.skySprite.y;
 
     const hourIncrement = (2 * Math.PI) / 24;
     const sunRads = (currentHourOfDay + 6) * hourIncrement;
