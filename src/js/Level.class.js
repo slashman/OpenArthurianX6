@@ -2,6 +2,7 @@ const Geo = require('./Geo');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
 const PF = require('pathfinding');
+const Line = require('./Line');
 
 function Level(){
 	this.mobs = [];	
@@ -151,6 +152,9 @@ Level.prototype = {
 	},
 	activateAll: function(){
 		this.mobs.forEach(m=>m.activate());	
+	},
+	isLineClear: function (xa, ya, xb, yb) {
+		return !Line.checkInLine(xa, ya, xb, yb, (x, y) => this.isSolid(x, y));
 	}
 };
 

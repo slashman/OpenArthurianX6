@@ -4,7 +4,7 @@ const NPCs = [
 	{
 		id: 'avatar',
 		name: 'Avatar',
-		type: 'man1',
+		type: 'avatar',
 		alignment: 'b',
 		weapon: 'magicAxe'
 	},

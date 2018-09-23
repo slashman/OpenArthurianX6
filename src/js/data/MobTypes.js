@@ -13,6 +13,16 @@ const MobTypes = [
 		speed: 6
 	},
 	{
+		id: 'avatar',
+		appearance: 'man1',
+		name: 'Avatar',
+		hp: 200,
+		damage: 15,
+		defense: 2,
+		speed: 5,
+		corpse: 'manCorpse'
+	},
+	{
 		id: 'man1',
 		appearance: 'man1',
 		name: 'Man',
@@ -56,7 +66,7 @@ const MobTypes = [
 		id: 'swordSoldier',
 		appearance: 'soldier',
 		name: 'Soldier',
-		hp: 40,
+		hp: 10,
 		damage: 5,
 		defense: 3,
 		speed: 2,
@@ -68,8 +78,8 @@ const MobTypes = [
 		id: 'xbowSoldier',
 		appearance: 'soldier',
 		name: 'Soldier',
-		hp: 40,
-		damage: 5,
+		hp: 5,
+		damage: 3,
 		defense: 3,
 		speed: 2,
 		corpse: 'manCorpse',

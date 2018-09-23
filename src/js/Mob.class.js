@@ -112,7 +112,15 @@ Mob.prototype = {
 					return Timer.delay(1000);
 				}
 			} else {
-				return this.bumpTowards(nearbyTarget);
+				if (this.weapon && 
+					this.weapon.range && 
+					Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.range &&
+					this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y)
+					) {
+					return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
+				} else {
+					return this.bumpTowards(nearbyTarget);
+				}
 			} 
 		} else {
 			return Timer.delay(1000);
@@ -143,9 +151,7 @@ Mob.prototype = {
 			return false;
 		}
 		// Else trace a line and check no opaque tiles hit
-		return !Line.checkInLine(mob.x, mob.y, this.x, this.y, (x, y) => {
-			return this.level.isSolid(x, y);
-		});
+		return this.level.isLineClear(mob.x, mob.y, this.x, this.y);
 	},
 	isHostileMob: function(){
 		return this.alignment === 'a';
@@ -314,7 +320,14 @@ Mob.prototype = {
       if (ammo === this.weapon) {
         this.weapon = undefined;
       }
-      // TODO: Stashes of ammo
+      // Here we must check in advance if this attack will trigger the combat mode!
+      // We cannot wait til the projectile animation is over!
+      var mob = this.level.getMobAt(x, y);
+      if (mob
+      	&& (mob === OAX6.UI.player || mob.isPartyMember()) 
+      	&& PlayerStateMachine.state === PlayerStateMachine.WORLD) {
+				PlayerStateMachine.startCombat(true);
+			}
       return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
         if (ammo.throwable) {
           this.level.addItem(ammo, x, y);
@@ -365,7 +378,7 @@ Mob.prototype = {
 	attack: function(mob){
 		if (mob === OAX6.UI.player || mob.isPartyMember()){
 			if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
-				PlayerStateMachine.startCombat();
+				PlayerStateMachine.startCombat(true);
 			}
 		}
 		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
