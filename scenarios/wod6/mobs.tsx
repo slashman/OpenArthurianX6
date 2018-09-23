@@ -16,13 +16,18 @@
  </tile>
  <tile id="240" type="soldier">
   <properties>
-   <property name="id" value="soldier"/>
+   <property name="id" value="swordSoldier"/>
   </properties>
  </tile>
  <tile id="241">
   <properties>
    <property name="id" value="asteroth"/>
    <property name="type" value="npc"/>
+  </properties>
+ </tile>
+ <tile id="242">
+  <properties>
+   <property name="id" value="xbowSoldier"/>
   </properties>
  </tile>
 </tileset>

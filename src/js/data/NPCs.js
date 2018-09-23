@@ -123,7 +123,7 @@ const NPCs = [
 	{
 		id: 'asteroth',
 		name: 'Asteroth',
-		type: 'soldier',
+		type: 'xbowSoldier',
 		alignment: 'a',
 		weapon: 'sword',
 		firstTalk: 5,

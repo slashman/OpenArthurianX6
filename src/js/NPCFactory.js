@@ -24,22 +24,7 @@ const NPCFactory = {
 		const npc = MobFactory.buildMob(game, definition.type, level, x, y, z);
 		npc.npcDefinition = definition;
 		npc.dialog = this.parseDialog(definition.dialog);
-		if (definition.weapon) {
-			npc.weapon = ItemFactory.createItem(definition.weapon);
-		}
-		if (definition.items) {
-			definition.items.forEach(item => {
-				let id, quantity;
-				if (typeof item === 'string') {
-					id = item;
-					quantity = 1;
-				} else {
-					id = item.id;
-					quantity = item.quantity;
-				}
-				npc.addItem(ItemFactory.createItem(id, quantity));
-			})
-		}
+		MobFactory.addItems(npc, definition);
 		npc.name = definition.name;
 		npc.alignment = definition.alignment || 'a';
 		npc.firstTalk = definition.firstTalk;

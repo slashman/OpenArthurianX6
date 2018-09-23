@@ -53,15 +53,31 @@ const MobTypes = [
 		corpse: 'bones'
 	},
 	{
-		id: 'soldier',
+		id: 'swordSoldier',
 		appearance: 'soldier',
-		name: 'Solider',
+		name: 'Soldier',
 		hp: 40,
 		damage: 5,
 		defense: 3,
 		speed: 2,
 		corpse: 'manCorpse',
-		intent: 'seekPlayer'
+		intent: 'seekPlayer',
+		weapon: 'sword'
+	},
+	{
+		id: 'xbowSoldier',
+		appearance: 'soldier',
+		name: 'Soldier',
+		hp: 40,
+		damage: 5,
+		defense: 3,
+		speed: 2,
+		corpse: 'manCorpse',
+		intent: 'seekPlayer',
+		weapon: 'crossbow',
+		items: [
+			{ id: 'ironBolt', quantity: 10 }
+		]
 	}
 ]
 
