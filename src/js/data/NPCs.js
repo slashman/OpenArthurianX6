@@ -20,7 +20,10 @@ const NPCs = [
 		name: 'Shamino',
 		type: 'man2',
 		alignment: 'b',
-		weapon: 'maingauche',
+		weapon: 'crossbow',
+		items: [
+			{ id: 'ironBolt', quantity: 50 }
+		],
 		firstTalk: 5,
 		intent: 'seekPlayer',
 		dialog: [

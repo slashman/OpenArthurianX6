@@ -238,26 +238,29 @@ Mob.prototype = {
 		this.reportAction("Move");
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
-	getOnDirection: function(dx, dy) {
-		var item = this.level.getItemAt(this.x + dx, this.y + dy);
-    const pickedQuantity = item.quantity;
-		if (item) {
-      if (item.def.stackLimit) {
-        const existingItem = this.inventory.find(i => i.id === item.id);
-        if (existingItem) {
-          if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
-            existingItem.quantity += item.quantity;
-          } else {
-            item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
-            existingItem.quantity = existingItem.def.stackLimit;
-            this.inventory.push(item);
-          }
+	addItem: function(item) {
+    if (item.def.stackLimit) {
+      const existingItem = this.inventory.find(i => i.id === item.id);
+      if (existingItem) {
+        if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
+          existingItem.quantity += item.quantity;
         } else {
+          item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
+          existingItem.quantity = existingItem.def.stackLimit;
           this.inventory.push(item);
         }
       } else {
         this.inventory.push(item);
       }
+    } else {
+      this.inventory.push(item);
+    }
+	},
+	getOnDirection: function(dx, dy) {
+		var item = this.level.getItemAt(this.x + dx, this.y + dy);
+    const pickedQuantity = item.quantity;
+		if (item) {
+			this.addItem(item);
 			this.level.removeItem(item);
       if (item.quantity === 1) {
         this.reportAction("Got a " + item.name);  
