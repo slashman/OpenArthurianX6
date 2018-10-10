@@ -159,7 +159,7 @@ const PlayerStateMachine = {
 
     updateDialogAction: function() {
         var key = this.game.input.keyboard.lastKey;
-        if (key.isDown && key.repeats == 1) {
+        if (key && key.isDown && key.repeats == 1) {
             var keyCode = key.keyCode;
 
             if (this.inputDialogCallback !== null) {
