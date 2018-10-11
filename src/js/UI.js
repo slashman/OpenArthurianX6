@@ -14,6 +14,7 @@ const FlyType = require('./Constants').FlyType;
 
 const Bus = require('./Bus');
 const SkyBox = require('./SkyBox');
+const GameOver = require('./GameOver');
 
 const UI = {
 	launch: function(then){
@@ -44,6 +45,7 @@ const UI = {
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
 
 		SkyBox.init(this.game, this.UILayer);
+		GameOver.init(this.game, this.UILayer);
 
 		this.marker = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.marker.animations.add('blink', [0,1], 8);

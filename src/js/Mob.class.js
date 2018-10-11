@@ -5,6 +5,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
 const Geo = require('./Geo');
 const Line = require('./Line');
+const GameOver = require('./GameOver');
 
 /**
  * Represents a being living inside a world
@@ -34,6 +35,8 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
+		if (GameOver.active) { return Promise.resolve(); }
+
 		const player = OAX6.UI.player;
 		if (this === player){
 			// Enable action
@@ -162,7 +165,7 @@ Mob.prototype = {
 	getNearbyTarget: function(){
 		if (this.isHostileMob()){
 			const closerMob = this.level.getCloserMobTo(this.x, this.y, 'b')
-			if (this.canTrack(closerMob)) {
+			if (closerMob && this.canTrack(closerMob)) {
 				return closerMob;
 			} else {
 				return false;
@@ -384,6 +387,7 @@ Mob.prototype = {
 		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
 		let damage = combinedDamage - combinedDefense;
+		damage = 9999;
 		if (damage < 0)
 			damage = 0;
 		if (damage === 0){
@@ -409,6 +413,9 @@ Mob.prototype = {
 				const corpse = ItemFactory.createItem(this.definition.corpse);
 				this.level.removeMob(this);
 				this.level.addItem(corpse, this.x, this.y);
+			}
+			if (this.isPartyMember()){
+				this.checkForGameOver();
 			}
 		}
 	},
@@ -448,6 +455,20 @@ Mob.prototype = {
 	},
 	addMobToParty: function(mob){
 		this.party.push(mob);
+	},
+	checkForGameOver: function() {
+		let dead = true;
+		const length = this.party.length;
+		for (let i=0;i<length;i++) {
+			if (!this.party[i].dead) {
+				dead = false;
+				i = length;
+			}
+		}
+
+		if (dead) {
+			GameOver.activate();
+		}
 	}
 };
 
