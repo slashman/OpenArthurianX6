@@ -12,6 +12,8 @@ const PlayerFactory = {
 		
 		UI.player = mob;
 		PlayerStateMachine.player = mob;
+
+		mob.addMobToParty(mob);
 		
 		game.camera.follow(mob.sprite);
 
