@@ -387,7 +387,6 @@ Mob.prototype = {
 		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
 		let damage = combinedDamage - combinedDefense;
-		damage = 9999;
 		if (damage < 0)
 			damage = 0;
 		if (damage === 0){
