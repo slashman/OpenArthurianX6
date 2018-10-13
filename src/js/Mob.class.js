@@ -5,7 +5,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
 const Geo = require('./Geo');
 const Line = require('./Line');
-const GameOver = require('./GameOver');
+const MessageBox = require('./MessageBox');
 
 /**
  * Represents a being living inside a world
@@ -35,8 +35,6 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		if (GameOver.active) { return Promise.resolve(); }
-
 		const player = OAX6.UI.player;
 		if (this === player){
 			// Enable action
@@ -458,7 +456,7 @@ Mob.prototype = {
 	checkForGameOver: function() {
 		const player = OAX6.UI.player;
 		if (player.dead && !player.party.find(p => !p.dead)) {
-			GameOver.activate();
+			MessageBox.showMessage("GAME OVER!")
 		}
 	}
 };
