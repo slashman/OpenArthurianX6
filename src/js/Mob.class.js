@@ -413,7 +413,7 @@ Mob.prototype = {
 				this.level.removeMob(this);
 				this.level.addItem(corpse, this.x, this.y);
 			}
-			if (this.isPartyMember()){
+			if (this === OAX6.UI.player || this.isPartyMember()){
 				this.checkForGameOver();
 			}
 		}
@@ -456,16 +456,8 @@ Mob.prototype = {
 		this.party.push(mob);
 	},
 	checkForGameOver: function() {
-		let dead = true;
-		const length = this.party.length;
-		for (let i=0;i<length;i++) {
-			if (!this.party[i].dead) {
-				dead = false;
-				i = length;
-			}
-		}
-
-		if (dead) {
+		const player = OAX6.UI.player;
+		if (player.dead && !player.party.find(p => !p.dead)) {
 			GameOver.activate();
 		}
 	}
