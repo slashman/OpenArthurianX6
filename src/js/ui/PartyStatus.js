@@ -11,14 +11,7 @@ const PartyStatus = {
     },
 
     update() {
-        const length = this.party.length;
-
-        for (let i=0;i<length;i++) {
-            const uiMob = this.party[i],
-                hp = uiMob.mob.hp.getProportion();
-
-                uiMob.health.width = HEALTH_BAR_WIDTH * hp;
-        }
+        this.party.forEach(p => p.health.width = HEALTH_BAR_WIDTH * p.mob.hp.getProportion());
     },
 
     addMob(mob) {
@@ -29,6 +22,7 @@ const PartyStatus = {
 
         this.party.push({
             mob: mob,
+            // TODO: Add here the portrait of the character instead of the regular appareance tile
             sprite: game.add.sprite(x, y, appearance.tileset, appearance.d[1], this.layer),
             healthBack: this.createHealthBar(x, y + 20, 0x330000),
             health: this.createHealthBar(x, y + 20, 0xff0000),
@@ -38,36 +32,29 @@ const PartyStatus = {
     },
 
     reorderOnUI() {
-        const length = this.party.length;
+        this.party.forEach((partyMember, index) => {
+            const x = 7 + index * 30;
 
-        for (let i=0;i<length;i++) {
-            const uiMob = this.party[i];
-            const x = 7 + i * 30;
-
-            uiMob.sprite.x = x;
-            uiMob.healthBack.x = x;
-            uiMob.health.x = x;
-        }
+            partyMember.sprite.x = x;
+            partyMember.healthBack.x = x;
+            partyMember.health.x = x;
+        });
     },
 
     removeMob(mob) {
-        const length = this.party.length;
+        const index = this.party.findIndex(p => { return p.mob === mob; });
 
-        for (let i=0;i<length;i++) {
-            const uiMob = this.party[i];
+        if (index != -1) {
+            const partyMember = this.party[index];
 
-            if (uiMob.mob === mob) {
-                uiMob.sprite.destroy();
-                uiMob.healthBack.destroy();
-                uiMob.health.destroy();
+            partyMember.sprite.destroy();
+            partyMember.healthBack.destroy();
+            partyMember.health.destroy();
 
-                this.party.splice(i, 1);
+            this.party.splice(index, 1);
 
-                i = length;
-            }
+            this.reorderOnUI();
         }
-
-        this.reorderOnUI();
     },
 
     createHealthBar(x, y, color) {
