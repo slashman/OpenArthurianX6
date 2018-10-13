@@ -42,7 +42,7 @@ const PartyStatus = {
     },
 
     removeMob(mob) {
-        const index = this.party.findIndex(p => { return p.mob === mob; });
+        const index = this.party.findIndex(p => p.mob === mob);
 
         if (index != -1) {
             const partyMember = this.party[index];
