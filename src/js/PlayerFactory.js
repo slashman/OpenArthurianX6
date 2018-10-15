@@ -1,5 +1,6 @@
 const NPCFactory = require('./NPCFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
+const PartyStatus = require('./ui/PartyStatus');
 
 const PlayerFactory = {
 	buildPlayer: function(UI, game, level, x, y, z){
@@ -13,8 +14,8 @@ const PlayerFactory = {
 		UI.player = mob;
 		PlayerStateMachine.player = mob;
 
-		mob.addMobToParty(mob);
-		
+		PartyStatus.addMob(mob);
+
 		game.camera.follow(mob.sprite);
 
 		return mob;
