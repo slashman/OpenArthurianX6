@@ -15,6 +15,8 @@ const FlyType = require('./Constants').FlyType;
 const Bus = require('./Bus');
 const SkyBox = require('./SkyBox');
 
+const PartyStatus = require('./ui/PartyStatus');
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
@@ -40,10 +42,14 @@ const UI = {
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
-		this.modeLabel = this.game.add.bitmapText(20, 20, 'pixeled', 'Exploration', 12, this.UILayer);
+		this.modeLabel = this.game.add.bitmapText(this.game.width - 48, 60, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
 
+		this.modeLabel.anchor.set(0.5);
+
 		SkyBox.init(this.game, this.UILayer);
+
+		PartyStatus.init(this.game, this.UILayer);
 
 		this.marker = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.marker.animations.add('blink', [0,1], 8);
@@ -56,6 +62,7 @@ const UI = {
 	},
 	update: function(){
 		PlayerStateMachine.update();
+		PartyStatus.update();
 	},
 	start: function(){
 		this.scrollingEnabled = true;

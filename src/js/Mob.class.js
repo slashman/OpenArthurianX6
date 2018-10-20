@@ -5,6 +5,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
 const Geo = require('./Geo');
 const Line = require('./Line');
+const PartyStatus = require('./ui/PartyStatus');
 
 /**
  * Represents a being living inside a world
@@ -448,6 +449,7 @@ Mob.prototype = {
 	},
 	addMobToParty: function(mob){
 		this.party.push(mob);
+		PartyStatus.addMob(mob);
 	}
 };
 
