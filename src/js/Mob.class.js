@@ -26,6 +26,8 @@ function Mob(level, x, y, z){
 	this.party = [];
 	this.inventory = [];
 	this.flags = {};
+	this.triggers = [];
+	this.combatTurns = 0;
 }
 
 Mob.prototype = {
@@ -98,34 +100,37 @@ Mob.prototype = {
 			}
 			return this.moveTo(dx, dy);
 		} else if (subIntent === 'combat') {
-			const nearbyTarget = this.getNearbyTarget();
-			if (!nearbyTarget){
-				if (Random.chance(50)){
-					var dx = Random.num(-1,1);
-					var dy = Random.num(-1,1);
-					if (dx === 0 && dy === 0){
-						dx = 1;
-					}
-					return this.moveTo(dx, dy);
-				} else {
-					// Do nothing
-					this.reportAction("Stand by");
-					return Timer.delay(1000);
-				}
-			} else {
-				if (this.weapon && 
-					this.weapon.range && 
-					Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.range &&
-					this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y)
-					) {
-					return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
-				} else {
-					return this.bumpTowards(nearbyTarget);
-				}
-			} 
+			return this.combatAction().then(() => this.onCombatTurn());
 		} else {
 			return Timer.delay(1000);
 		}
+	},
+	combatAction: function () {
+		const nearbyTarget = this.getNearbyTarget();
+		if (!nearbyTarget){
+			if (Random.chance(50)){
+				var dx = Random.num(-1,1);
+				var dy = Random.num(-1,1);
+				if (dx === 0 && dy === 0){
+					dx = 1;
+				}
+				return this.moveTo(dx, dy);
+			} else {
+				// Do nothing
+				this.reportAction("Stand by");
+				return Timer.delay(1000);
+			}
+		} else {
+			if (this.weapon && 
+				this.weapon.range && 
+				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.range &&
+				this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y)
+				) {
+				return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
+			} else {
+				return this.bumpTowards(nearbyTarget);
+			}
+		} 
 	},
 	bumpTowards: function (targetMob) {
 		const nextStep = this.level.findPathTo(targetMob, this, this.alignment);
@@ -141,6 +146,28 @@ Mob.prototype = {
 		} else {
 			return this.moveTo(dx, dy);
 		}
+	},
+	onCombatTurn: function() {
+		console.log('recording combat turn for '+this.getDescription());
+		if (this.triggers.length === 0) {
+			return;
+		}
+		this.combatTurns++;
+		const combatTurnsOverTriggers = this.triggers.filter(t => t.type === 'combatTurnsOver');
+		combatTurnsOverTriggers.forEach(t => {
+			if (this.combatTurns >= t.value) {
+				this.executeTriggerActions(t);
+				t.triggered = true;
+			}
+		});
+		this.triggers = this.triggers.filter(t => !t.triggered);
+	},
+	executeTriggerActions: function(trigger) {
+		trigger.actions.forEach(a => {
+			if (a.type === 'console') {
+				console.log(a.value);
+			}
+		});
 	},
 	canTrack: function (mob) {
 		if (mob === OAX6.UI.player && this.isPartyMember()) {

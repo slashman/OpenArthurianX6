@@ -29,6 +29,9 @@ const NPCFactory = {
 		npc.alignment = definition.alignment || 'a';
 		npc.firstTalk = definition.firstTalk;
 		npc.intent = definition.intent;
+		if (definition.triggers) {
+			npc.triggers = definition.triggers.slice();
+		}
 		return npc;
 	}
 };
