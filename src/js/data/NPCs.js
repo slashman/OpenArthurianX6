@@ -18,6 +18,7 @@ const NPCs = [
 	{
 		id: 'shamino',
 		name: 'Shamino',
+		description: 'A Wise Man denied his Homeland.',
 		type: 'man2',
 		alignment: 'b',
 		weapon: 'crossbow',
@@ -123,6 +124,7 @@ const NPCs = [
 	{
 		id: 'asteroth',
 		name: 'Asteroth',
+		description: 'A Ghost without a Past.',
 		type: 'xbowSoldier',
 		alignment: 'a',
 		weapon: 'sword',
