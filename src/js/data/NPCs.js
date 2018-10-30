@@ -128,6 +128,18 @@ const NPCs = [
 		weapon: 'sword',
 		firstTalk: 5,
 		intent: 'seekPlayer',
+		triggers: [
+			{
+				type: 'combatTurnsOver',
+				value: 1,
+				actions: [
+					{
+						type: "console",
+						value: "triggered!"
+					}
+				]
+			}
+		],
 		dialog: [
 			{
 				key: "greeting",
@@ -265,7 +277,8 @@ const NPCs = [
 				key: "bye",
 				synonym: "perish"
 			}
-		]
+		],
+
 	},
 	{
 		id: 'kram',
