@@ -12,6 +12,7 @@ const Loader = {
 		game.load.image('messageBack', 'assets/messageBack.png')
 		game.load.image('inventory', 'assets/inventory.png')
 		game.load.image('uiVariants', 'assets/uiVariants_8x8.png')
+		game.load.image('mobDescription', 'assets/mobDescription.png')
 
 		game.load.spritesheet('player', 'assets/player.png', 16, 16);
 		game.load.spritesheet('mobs', 'assets/mobs.png', 16, 16);

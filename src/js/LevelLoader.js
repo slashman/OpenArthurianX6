@@ -112,6 +112,10 @@ const LevelLoader = {
 			mob = MobFactory.buildMob(game, mobData.id, level, mobData.x, mobData.y, 0);
 			mob.alignment = 'a';
 		}
+
+		mob.sprite.inputEnabled = true;
+		mob.sprite.events.onInputDown.add(() => { OAX6.runner.showMobInfo(mob); });
+
 		level.addMob(mob);
 	},
 	loadItem: function(game, itemData, level) {

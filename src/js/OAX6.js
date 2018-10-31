@@ -24,6 +24,7 @@ const Bus = require('./Bus');
 
 const Dialogs = require('./Dialogs');
 const MessageBox = require('./MessageBox');
+const MobDescription = require('./MobDescription');
 const Inventory = require('./Inventory');
 
 const scenarioInfo = require('./ScenarioInfo');
@@ -60,6 +61,7 @@ const OAX6 = {
 		Dialogs.init(game);
 		MessageBox.init(game);
 		Inventory.init(game);
+		MobDescription.init(game);
 		if (startingState.scene) {
 			var scene = scenarioInfo.scenes[startingState.scene];
 			UI.showScene(scene)
@@ -71,6 +73,9 @@ const OAX6 = {
 	loadLevel: function(game){
 		const startingState = scenarioInfo.startingState;
 		return LevelLoader.loadLevel(game, startingState.map);
+	},
+	showMobInfo: function(mob) {
+		MobDescription.showMob(mob);
 	}
 };
 
