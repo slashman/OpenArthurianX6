@@ -243,7 +243,7 @@ Mob.prototype = {
 
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
-			if (PlayerStateMachine.allowConversation() && this.canStartDialog && mob.dialog){
+			if (this.canStartDialog && mob.dialog){
 				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog, player: OAX6.UI.player});
 				
 				// Look at each other while talking

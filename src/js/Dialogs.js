@@ -235,6 +235,8 @@ module.exports = {
 	},
 	
 	startDialog: function(chat){
+		if (!PlayerStateMachine.allowConversation()) { return; }
+		
 		this.player = chat.player;
 		var mob = chat.mob,
 			dialog = chat.dialog;
