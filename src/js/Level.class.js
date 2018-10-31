@@ -3,6 +3,7 @@ const log = require('./Debug').log;
 const Timer = require('./Timer');
 const PF = require('pathfinding');
 const Line = require('./Line');
+const PlayerStateMachine = require('./PlayerStateMachine');
 
 function Level(){
 	this.mobs = [];	
@@ -43,6 +44,8 @@ Level.prototype = {
 		this.mobs.splice(this.mobs.indexOf(mob), 1);
 	},
 	actNext: function(){
+		if (PlayerStateMachine.isPartyDead()) { return; }
+
 		const nextActor = this.mobs[this.currentTurnCounter++];
 		if (this.currentTurnCounter >= this.mobs.length) {
 			this.currentTurnCounter = 0;
