@@ -5,6 +5,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
 const Geo = require('./Geo');
 const Line = require('./Line');
+const MessageBox = require('./MessageBox');
 const PartyStatus = require('./ui/PartyStatus');
 
 /**
@@ -190,7 +191,7 @@ Mob.prototype = {
 	getNearbyTarget: function(){
 		if (this.isHostileMob()){
 			const closerMob = this.level.getCloserMobTo(this.x, this.y, 'b')
-			if (this.canTrack(closerMob)) {
+			if (closerMob && this.canTrack(closerMob)) {
 				return closerMob;
 			} else {
 				return false;
@@ -438,6 +439,9 @@ Mob.prototype = {
 				this.level.removeMob(this);
 				this.level.addItem(corpse, this.x, this.y);
 			}
+			if (this === OAX6.UI.player || this.isPartyMember()){
+				this.checkForGameOver();
+			}
 		}
 	},
 	climb: function(dz){
@@ -477,6 +481,12 @@ Mob.prototype = {
 	addMobToParty: function(mob){
 		this.party.push(mob);
 		PartyStatus.addMob(mob);
+	},
+	checkForGameOver: function() {
+		const player = OAX6.UI.player;
+		if (player.dead && !player.party.find(p => !p.dead)) {
+			MessageBox.showMessage("GAME OVER!")
+		}
 	}
 };
 

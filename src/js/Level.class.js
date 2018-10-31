@@ -3,6 +3,7 @@ const log = require('./Debug').log;
 const Timer = require('./Timer');
 const PF = require('pathfinding');
 const Line = require('./Line');
+const PlayerStateMachine = require('./PlayerStateMachine');
 
 function Level(){
 	this.mobs = [];	
@@ -43,6 +44,8 @@ Level.prototype = {
 		this.mobs.splice(this.mobs.indexOf(mob), 1);
 	},
 	actNext: function(){
+		if (PlayerStateMachine.isPartyDead()) { return; }
+
 		const nextActor = this.mobs[this.currentTurnCounter++];
 		if (this.currentTurnCounter >= this.mobs.length) {
 			this.currentTurnCounter = 0;
@@ -120,9 +123,11 @@ Level.prototype = {
 	sortForCombat: function(playerGoesFirst){
 		this.currentTurnCounter = 0;
 		this.mobs = this.mobs.sort((a,b)=>a.speed.current - b.speed.current);
-		if (playerGoesFirst){
-			this.removeMob(OAX6.UI.player);
-			this.mobs.unshift(OAX6.UI.player);
+		
+		const player = OAX6.UI.player;
+		if (!player.dead && playerGoesFirst){
+			this.removeMob(player);
+			this.mobs.unshift(player);
 		}
 	},
 	removeItem: function(item) {

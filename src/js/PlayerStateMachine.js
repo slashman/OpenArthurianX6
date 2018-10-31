@@ -422,6 +422,12 @@ const PlayerStateMachine = {
         }
     },
 
+    isPartyDead: function() {
+        var partyDead = this.player.party.find(m=>m.hp.current>0) === undefined;
+
+        return this.player.hp.current <= 0 && partyDead;
+    },
+
     allowMobsActing() {
         switch (this.state) {
             case PlayerStateMachine.WORLD:
