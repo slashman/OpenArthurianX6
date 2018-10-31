@@ -430,6 +430,14 @@ const PlayerStateMachine = {
                 return true;
         }
         return false;
+    },
+
+    allowConversation() {
+        switch (this.state) {
+            case PlayerStateMachine.WORLD:
+                return true;
+        }
+        return false;
     }
 };
 
