@@ -4,6 +4,7 @@ const Timer = require('./Timer');
 const PF = require('pathfinding');
 const Line = require('./Line');
 const PlayerStateMachine = require('./PlayerStateMachine');
+const Constants = require('./Constants');
 
 function Level(){
 	this.mobs = [];	
@@ -103,7 +104,7 @@ Level.prototype = {
 		});
 		const gridClone = this.pfGrid.clone();
 		
-		const includeAlignments = ['c', includeMobsOfAlignment];
+		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
 		includeAlignments.forEach((alignment) => {
 			if (alignment){
 				const mobs = this.getMobsOfAlignment(alignment);

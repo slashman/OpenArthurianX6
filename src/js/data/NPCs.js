@@ -5,14 +5,14 @@ const NPCs = [
 		id: 'avatar',
 		name: 'Avatar',
 		type: 'avatar',
-		alignment: 'b',
+		alignment: 'player',
 		weapon: 'magicAxe'
 	},
 	{
 		id: 'iolo',
 		name: 'Iolo',
 		type: 'man2',
-		alignment: 'b',
+		alignment: 'player',
 		weapon: 'crossbow'
 	},
 	{
@@ -20,7 +20,7 @@ const NPCs = [
 		name: 'Shamino',
 		description: 'A Wise Man denied his Homeland.',
 		type: 'man2',
-		alignment: 'b',
+		alignment: 'player',
 		weapon: 'crossbow',
 		items: [
 			{ id: 'ironBolt', quantity: 50 }
@@ -118,7 +118,7 @@ const NPCs = [
 		id: 'dupre',
 		name: 'Dupre',
 		type: 'man2',
-		alignment: 'b',
+		alignment: 'player',
 		weapon: 'sword'
 	},
 	{
@@ -126,7 +126,7 @@ const NPCs = [
 		name: 'Asteroth',
 		description: 'A Ghost without a Past.',
 		type: 'xbowSoldier',
-		alignment: 'a',
+		alignment: 'enemy',
 		weapon: 'sword',
 		firstTalk: 5,
 		intent: 'seekPlayer',
@@ -286,7 +286,7 @@ const NPCs = [
 		id: 'kram',
 		name: 'Skeleton',
 		type: 'skeleton',
-		alignment: 'b',
+		alignment: 'player',
 		dialog: [
 			{
 				key: "greeting",

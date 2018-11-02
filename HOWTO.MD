@@ -102,7 +102,7 @@ Defined in src/js/data/NPCs.js
 - id
 - name
 - type: Points to MobTypes
-- alignment: 'b' for friendly, 'a' for enemy, 'c' for neutral. Likely to be revised
+- alignment: 'player' for friendly, 'enemy' for enemy, 'neutral' for neutral. Likely to be revised
 - weapon: Points to Items
 - firstTalk: Number, will talk to player first if he gets closer than this.
 - intent: Same options as MobTypes

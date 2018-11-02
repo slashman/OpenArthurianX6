@@ -1,5 +1,6 @@
 const ItemFactory = require('./ItemFactory');
 const MobFactory = require('./MobFactory');
+const Constants = require('./Constants');
 
 const NPCFactory = {
 	init: function(npcData){
@@ -26,7 +27,7 @@ const NPCFactory = {
 		npc.dialog = this.parseDialog(definition.dialog);
 		MobFactory.addItems(npc, definition);
 		npc.name = definition.name;
-		npc.alignment = definition.alignment || 'a';
+		npc.alignment = definition.alignment || Constants.Alignments.ENEMY;
 		npc.firstTalk = definition.firstTalk;
 		npc.intent = definition.intent;
 		if (definition.triggers) {

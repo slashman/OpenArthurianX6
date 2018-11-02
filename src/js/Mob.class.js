@@ -7,6 +7,7 @@ const Geo = require('./Geo');
 const Line = require('./Line');
 const MessageBox = require('./MessageBox');
 const PartyStatus = require('./ui/PartyStatus');
+const Constants = require('./Constants');
 
 /**
  * Represents a being living inside a world
@@ -183,21 +184,21 @@ Mob.prototype = {
 		return this.level.isLineClear(mob.x, mob.y, this.x, this.y);
 	},
 	isHostileMob: function(){
-		return this.alignment === 'a';
+		return this.alignment === Constants.Alignments.ENEMY;
 	},
 	isPartyMember: function(){
 		return OAX6.UI.player.party.indexOf(this) !== -1;
 	},
 	getNearbyTarget: function(){
 		if (this.isHostileMob()){
-			const closerMob = this.level.getCloserMobTo(this.x, this.y, 'b')
+			const closerMob = this.level.getCloserMobTo(this.x, this.y, Constants.Alignments.PLAYER)
 			if (closerMob && this.canTrack(closerMob)) {
 				return closerMob;
 			} else {
 				return false;
 			}
 		} else if (this.isPartyMember()){ // ? Is this being used now? Party members are controlled by the player
-			return this.level.getCloserMobTo(this.x, this.y, 'a');
+			return this.level.getCloserMobTo(this.x, this.y, Constants.Alignments.ENEMY);
 		} else {
 			return false;
 		}
