@@ -137,6 +137,23 @@ const Appearances = [
 				i: 16+14
 			}
 		]
+	},
+	{
+		tileset: 'portraits',
+		items: [
+			{
+				id: 'portraitAvatar',
+				i: 0
+			},
+			{
+				id: 'portraitIolo',
+				i: 1
+			},
+			{
+				id: 'portraitShamino',
+				i: 2
+			}
+		]
 	}
 ]
 

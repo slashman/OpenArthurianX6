@@ -23,6 +23,8 @@ const Loader = {
 
 		game.load.spritesheet('ui', 'assets/ui.png', 16, 16);
 
+		game.load.spritesheet('portraits', 'assets/portraits.png', 20, 20);
+
 		game.load.bitmapFont('pixeled', 'assets/font.png', 'assets/font.fnt');
 	}
 }
