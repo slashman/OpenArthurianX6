@@ -428,6 +428,22 @@ const PlayerStateMachine = {
         return this.player.hp.current <= 0 && partyDead;
     },
 
+    getPartyBoundingBox: function() {
+        const player = this.player;
+        const party = ([player]).concat(player.party);
+
+        let bbox = { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity };
+
+        party.forEach((mob) => {
+            bbox.x1 = Math.min(bbox.x1, mob.x);
+            bbox.y1 = Math.min(bbox.y1, mob.y);
+            bbox.x2 = Math.max(bbox.x2, mob.x);
+            bbox.y2 = Math.max(bbox.y2, mob.y);
+        });
+
+        return bbox;
+    },
+
     allowMobsActing() {
         switch (this.state) {
             case PlayerStateMachine.WORLD:
