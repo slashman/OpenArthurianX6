@@ -6,6 +6,8 @@ const Line = require('./Line');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const Constants = require('./Constants');
 
+const COMBAT_DISTANCE = 10;
+
 function Level(){
 	this.mobs = [];	
 	this.items = [];
@@ -51,7 +53,8 @@ Level.prototype = {
 		if (this.currentTurnCounter >= this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
-		if (!nextActor || nextActor.dead){
+		const inCombat = (PlayerStateMachine.state === PlayerStateMachine.COMBAT && this.isInCombat(nextActor));
+		if (!nextActor || nextActor.dead || !inCombat){
 			return this.actNext();
 		}
 		if (nextActor.isPartyMember() || nextActor === OAX6.UI.player) {
@@ -159,13 +162,27 @@ Level.prototype = {
 		return !this.isSolid(x+dx, y+dy);
 	},
 	isSafeAround: function(x, y, alignment){
-		return this.mobs.find(m=>m.alignment !== alignment && Geo.flatDist(x,y,m.x,m.y) < 10) === undefined;
+		return this.mobs.find(m=>m.alignment !== alignment && Geo.flatDist(x,y,m.x,m.y) < COMBAT_DISTANCE) === undefined;
 	},
 	activateAll: function(){
 		this.mobs.forEach(m=>m.activate());	
 	},
 	isLineClear: function (xa, ya, xb, yb) {
 		return !Line.checkInLine(xa, ya, xb, yb, (x, y) => this.isSolid(x, y));
+	},
+	isInCombat: function(mob) {
+		const bbox = PlayerStateMachine.getPartyBoundingBox();
+		const width = bbox.x2 - bbox.x1;
+		const height = bbox.y2 - bbox.y1;
+		const x = bbox.x1 + width / 2;
+		const y = bbox.y1 + height / 2;
+
+		const dx = Math.abs(mob.x - x) - width / 2;
+		const dy = Math.abs(mob.y - y) - height / 2;
+
+		const dist = Geo.flatDist(0, 0, dx, dy);
+
+		return (dist < COMBAT_DISTANCE);
 	}
 };
 
