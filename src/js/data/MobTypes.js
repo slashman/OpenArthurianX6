@@ -20,7 +20,8 @@ const MobTypes = [
 		damage: 15,
 		defense: 2,
 		speed: 5,
-		corpse: 'manCorpse'
+		corpse: 'manCorpse',
+		portrait: 'portraitAvatar'
 	},
 	{
 		id: 'man1',
@@ -40,7 +41,8 @@ const MobTypes = [
 		damage: 3,
 		defense: 0,
 		speed: 5,
-		corpse: 'manCorpse'
+		corpse: 'manCorpse',
+		portrait: 'portraitIolo'
 	},
 	{
 		id: 'rat',
