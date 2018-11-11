@@ -110,7 +110,6 @@ const LevelLoader = {
 			mob = NPCFactory.buildNPC(game, mobData.id, level, mobData.x, mobData.y, 0);
 		} else {
 			mob = MobFactory.buildMob(game, mobData.id, level, mobData.x, mobData.y, 0);
-			mob.alignment = 'a';
 		}
 
 		mob.sprite.inputEnabled = true;

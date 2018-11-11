@@ -1,6 +1,7 @@
 const NPCFactory = require('./NPCFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const PartyStatus = require('./ui/PartyStatus');
+const Constants = require('./Constants');
 
 const PlayerFactory = {
 	buildPlayer: function(UI, game, level, x, y, z){
@@ -9,7 +10,7 @@ const PlayerFactory = {
 		UI.player = mob;
 		mob.inventory = PlayerStateMachine.inventory;
 		mob.name = "Avatar";
-		mob.alignment = 'b';
+		mob.alignment = Constants.Alignments.PLAYER;
 		
 		UI.player = mob;
 		PlayerStateMachine.player = mob;

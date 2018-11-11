@@ -73,6 +73,7 @@ const MobTypes = [
 		speed: 2,
 		corpse: 'manCorpse',
 		intent: 'seekPlayer',
+		alignment: 'enemy',
 		weapon: 'sword'
 	},
 	{
@@ -86,6 +87,7 @@ const MobTypes = [
 		speed: 2,
 		corpse: 'manCorpse',
 		intent: 'seekPlayer',
+		alignment: 'enemy',
 		weapon: 'crossbow',
 		items: [
 			{ id: 'ironBolt', quantity: 10 }

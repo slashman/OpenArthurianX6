@@ -4,6 +4,7 @@ const Timer = require('./Timer');
 const PF = require('pathfinding');
 const Line = require('./Line');
 const PlayerStateMachine = require('./PlayerStateMachine');
+const Constants = require('./Constants');
 
 function Level(){
 	this.mobs = [];	
@@ -102,14 +103,19 @@ Level.prototype = {
     		dontCrossCorners: false
 		});
 		const gridClone = this.pfGrid.clone();
-		if (includeMobsOfAlignment){
-			const mobs = this.getMobsOfAlignment(includeMobsOfAlignment);
-			mobs.forEach(m=> {
-				if (m.x !== to.x && m.y !== to.y){
-					gridClone.setWalkableAt(m.x, m.y, false);
-				}
-			});
-		}
+		
+		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
+		includeAlignments.forEach((alignment) => {
+			if (alignment){
+				const mobs = this.getMobsOfAlignment(alignment);
+				mobs.forEach(m=> {
+					if (!(m.x === to.x && m.y === to.y)){
+						gridClone.setWalkableAt(m.x, m.y, false);
+					}
+				});
+			}
+		});
+
 		const path = finder.findPath(from.x, from.y, to.x, to.y, gridClone);
 		if (path.length == 0){
 			console.log(`Someone is trapped at ${from.x}, ${from.y})`)
