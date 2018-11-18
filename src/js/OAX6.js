@@ -63,8 +63,7 @@ const OAX6 = {
 		Inventory.init(game);
 		MobDescription.init(game);
 		if (startingState.scene) {
-			var scene = scenarioInfo.scenes[startingState.scene];
-			UI.showScene(scene)
+			UI.showScene(startingState.scene);
 		}
 		if (startingState.minuteOfDay !== undefined) {
 			SkyBox.setMinuteOfDay(startingState.minuteOfDay);

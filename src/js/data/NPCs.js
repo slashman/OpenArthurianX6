@@ -138,6 +138,10 @@ const NPCs = [
 					{
 						type: "console",
 						value: "triggered!"
+					},
+					{
+						type: "cutscene",
+						value: "gotoIolo"
 					}
 				]
 			}

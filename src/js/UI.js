@@ -17,6 +17,8 @@ const SkyBox = require('./SkyBox');
 
 const PartyStatus = require('./ui/PartyStatus');
 
+const scenarioInfo = require('./ScenarioInfo');
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
@@ -203,7 +205,8 @@ const UI = {
     }
   },
 
-  showScene(scene) {
+  showScene(sceneId) {
+    const scene = scenarioInfo.scenes[sceneId];
     this.currentScene = scene;
     this.currentSceneIndex = -1;
     PlayerStateMachine.setActionCallback(() => {

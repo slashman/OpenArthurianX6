@@ -150,6 +150,9 @@ Mob.prototype = {
 		}
 	},
 	onCombatTurn: function() {
+		if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT){
+			return;
+		}
 		console.log('recording combat turn for '+this.getDescription());
 		if (this.triggers.length === 0) {
 			return;
@@ -166,8 +169,13 @@ Mob.prototype = {
 	},
 	executeTriggerActions: function(trigger) {
 		trigger.actions.forEach(a => {
-			if (a.type === 'console') {
-				console.log(a.value);
+			switch (a.type) {
+				case 'console':
+					console.log(a.value);
+					break;
+				case 'cutscene':
+					OAX6.UI.showScene(a.value);
+					break;
 			}
 		});
 	},
