@@ -55,6 +55,16 @@ const MobTypes = [
 		corpse: 'ratCorpse'
 	},
 	{
+		id: 'cow',
+		appearance: 'cow',
+		name: 'Cow',
+		hp: 50,
+		damage: 4,
+		defense: 0,
+		speed: 2,
+		corpse: 'cowCorpse'
+	},	
+	{
 		id: 'skeleton',
 		appearance: 'skeleton',
 		name: 'Skeleton',
