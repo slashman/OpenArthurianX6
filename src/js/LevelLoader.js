@@ -24,9 +24,13 @@ const LevelLoader = {
 			level = this.createLevel(mapData);
 		}
 		player.level = level;
+		player.relocate(mapData.start.x, mapData.start.y);
 		level.addMob(player);
-		player.relocate(mapData.start.x, mapData.start.y)
-		// TODO: Add the whole party
+		player.party.forEach(function(partyMember) {
+			partyMember.level = level;
+			partyMember.relocate(mapData.start.x, mapData.start.y);
+			level.addMob(partyMember);
+		});
 	},
 
 	createLevel: function(mapData){
