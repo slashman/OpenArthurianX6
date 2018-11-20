@@ -168,18 +168,27 @@ Mob.prototype = {
 		this.triggers = this.triggers.filter(t => !t.triggered);
 	},
 	executeTriggerActions: function(trigger) {
+		let p = Promise.resolve();
 		trigger.actions.forEach(a => {
+			let promiseFunction;
 			switch (a.type) {
 				case 'console':
-					console.log(a.value);
+					promiseFunction = () => new Promise(r => {
+						console.log(a.value);
+						r();	
+					});
 					break;
 				case 'cutscene':
-					OAX6.UI.showScene(a.value);
+					promiseFunction = () => OAX6.UI.showScene(a.value);
 					break;
 				case 'openLevel':
-					OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
+					promiseFunction = () => new Promise(r => {
+						OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
+						r();
+					});
 					break;
 			}
+			p = p.then(promiseFunction);
 		});
 	},
 	canTrack: function (mob) {

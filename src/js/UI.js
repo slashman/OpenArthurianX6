@@ -209,12 +209,15 @@ const UI = {
     const scene = scenarioInfo.scenes[sceneId];
     this.currentScene = scene;
     this.currentSceneIndex = -1;
-    PlayerStateMachine.setActionCallback(() => {
+    return new Promise(outstandingPromise => {
+      this.outstandingPromise = outstandingPromise;
+      PlayerStateMachine.setActionCallback(() => {
+        this.showNextSceneFragment();
+      });
+      PlayerStateMachine.endCombat();
+      PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
       this.showNextSceneFragment();
     });
-    PlayerStateMachine.endCombat();
-    PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
-    this.showNextSceneFragment();
   },
 
   showNextSceneFragment() {
@@ -225,6 +228,9 @@ const UI = {
       Bus.emit('hideMessage');
       PlayerStateMachine.clearActionCallback();
       PlayerStateMachine.resetState();
+      if (this.outstandingPromise) {
+        this.outstandingPromise();
+      }
     }
   }
 }
