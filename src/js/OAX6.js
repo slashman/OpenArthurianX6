@@ -44,24 +44,21 @@ const OAX6 = {
 		
 		const startingState = scenarioInfo.startingState;
 
-		const player = PlayerFactory.buildPlayer(UI, game, undefined, startingState.x, startingState.y, 0);
+		const player = PlayerFactory.buildPlayer(UI, game, undefined, 0, 0, 0);
 
-		const firstLevel = this.loadLevel(game);
-
-		player.level = firstLevel;
-		
-		firstLevel.addMob(player);
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
 
 		startingState.party.forEach(function(partyMember) {
-			const npc = NPCFactory.buildNPC(game, partyMember.id, firstLevel, partyMember.x, partyMember.y, 0);
+			const npc = NPCFactory.buildNPC(game, partyMember.id, undefined, 0, 0, 0);
 			player.addMobToParty(npc);
-			firstLevel.addMob(npc);
 		});
 		Dialogs.init(game);
 		MessageBox.init(game);
 		Inventory.init(game);
 		MobDescription.init(game);
+		LevelLoader.init(game, scenarioInfo.maps);
+		LevelLoader.openLevel(startingState.map, player);
+
 		if (startingState.scene) {
 			UI.showScene(startingState.scene);
 		}
@@ -81,7 +78,8 @@ const OAX6 = {
 window.OAX6 = {
 	runner: OAX6,
 	UI: UI,
-	Timer: Timer
+	Timer: Timer,
+	LevelLoader
 };
 
 module.exports = OAX6;

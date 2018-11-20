@@ -142,6 +142,10 @@ const NPCs = [
 					{
 						type: "cutscene",
 						value: "gotoIolo"
+					},
+					{
+						type: "openLevel",
+						value: "iolos"
 					}
 				]
 			}

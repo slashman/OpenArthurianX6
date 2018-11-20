@@ -176,6 +176,9 @@ Mob.prototype = {
 				case 'cutscene':
 					OAX6.UI.showScene(a.value);
 					break;
+				case 'openLevel':
+					OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
+					break;
 			}
 		});
 	},
@@ -281,6 +284,15 @@ Mob.prototype = {
 		this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
 		this.reportAction("Move");
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
+	},
+	/*
+	 * Relocates the mob without a tween, for example when the level loads
+	 */
+	relocate (x, y) {
+		this.x = x;
+		this.y = y;
+		this.sprite.x = this.x * 16;
+		this.sprite.y = this.y * 16;
 	},
 	addItem: function(item) {
     if (item.def.stackLimit) {

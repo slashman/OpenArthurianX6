@@ -4,20 +4,45 @@ const MobFactory = require('./MobFactory');
 const ItemFactory = require('./ItemFactory');
 
 const LevelLoader = {
-	loadLevel: function(game, mapId){
+	init(game, maps) {
+		this.__levels = {};
+		this.__maps = {};
+		maps.forEach(m => this.__maps[m.name] = m);
+		this.game = game;
+	},
+
+	openLevel(mapId, player) {
+		console.log(`Loading level ${mapId}`);
+		const mapData = this.__maps[mapId];
+		if (!mapData) {
+			throw new Error(`Map ${mapId} not loaded`);
+		}
+		let level;
+		if (this.__levels[mapId]) {
+			level = this.loadLevel(mapData);
+		} else {
+			level = this.createLevel(mapData);
+		}
+		player.level = level;
+		level.addMob(player);
+		player.relocate(mapData.start.x, mapData.start.y)
+		// TODO: Add the whole party
+	},
+
+	createLevel: function(mapData){
 		const level = new Level();
-		const tiledMap = this.loadTiledMap(game, mapId);
+		const tiledMap = this.loadTiledMap(mapData.name);
 		const mobsData = tiledMap.mobs;
 		const itemsData = tiledMap.items;
 
 		level.setSolidMask(tiledMap.solidMask);
-		mobsData.forEach((mobData) => this.loadMob(game, mobData, level));
-		itemsData.forEach((itemData) => this.loadItem(game, itemData, level));
+		mobsData.forEach((mobData) => this.loadMob(mobData, level));
+		itemsData.forEach((itemData) => this.loadItem(itemData, level));
 		
 		return level;
 	},
-	loadTiledMap: function(game, mapId){
-		var map = game.add.tilemap(mapId);
+	loadTiledMap: function(mapId){
+		var map = this.game.add.tilemap(mapId);
 		map.addTilesetImage('terrain', 'terrain');
 		map.addTilesetImage('items', 'items');
 		map.addTilesetImage('monsters', 'monsters');
@@ -26,8 +51,7 @@ const LevelLoader = {
 		map.createLayer('Buildings', false, false, OAX6.UI.mapLayer);
 		map.createLayer('Objects', false, false, OAX6.UI.mapLayer);
 		terrainLayer.resizeWorld();
-		game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
-
+		this.game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
 		return {
 			mobs: this.loadTiledMapMobs(map),
 			items: this.loadTiledMapItems(map),
@@ -99,12 +123,12 @@ const LevelLoader = {
 
 		return solidMask;
 	},
-	loadMob: function(game, mobData, level){
+	loadMob: function(mobData, level){
 		let mob = null;
 		if (mobData.type === 'npc'){
-			mob = NPCFactory.buildNPC(game, mobData.id, level, mobData.x, mobData.y, 0);
+			mob = NPCFactory.buildNPC(this.game, mobData.id, level, mobData.x, mobData.y, 0);
 		} else {
-			mob = MobFactory.buildMob(game, mobData.id, level, mobData.x, mobData.y, 0);
+			mob = MobFactory.buildMob(this.game, mobData.id, level, mobData.x, mobData.y, 0);
 		}
 
 		mob.sprite.inputEnabled = true;
@@ -112,7 +136,7 @@ const LevelLoader = {
 
 		level.addMob(mob);
 	},
-	loadItem: function(game, itemData, level) {
+	loadItem: function(itemData, level) {
 		const item = ItemFactory.createItem(itemData.id, itemData.amount);
 		level.addItem(item, itemData.x, itemData.y);
 	}

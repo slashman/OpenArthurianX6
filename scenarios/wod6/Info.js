@@ -2,8 +2,6 @@ module.exports = {
   startingState: {
     minuteOfDay: 1380,
     map: 'forest1',
-    x: 80,
-    y: 34,
     party: [
     /*
       {
@@ -23,7 +21,19 @@ module.exports = {
 	maps: [
     {
       name: 'forest1',
-      filename: 'forest1.json'
+      filename: 'forest1.json',
+      start: {
+        x: 80,
+        y: 34
+      }
+    },
+    {
+      name: 'iolos',
+      filename: 'iolos-hut.json',
+      start: {
+        x: 21,
+        y: 30
+      }
     }
 	],
   scenes: {
