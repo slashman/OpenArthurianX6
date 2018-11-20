@@ -34,15 +34,26 @@ const MobTypes = [
 		corpse: 'manCorpse'
 	},
 	{
-		id: 'man2',
+		id: 'iolo',
 		appearance: 'man2',
-		name: 'Man',
+		name: 'Iolo',
 		hp: 20,
 		damage: 3,
 		defense: 0,
 		speed: 5,
 		corpse: 'manCorpse',
 		portrait: 'portraitIolo'
+	},
+	{
+		id: 'shamino',
+		appearance: 'man2',
+		name: 'Shamino',
+		hp: 20,
+		damage: 3,
+		defense: 0,
+		speed: 5,
+		corpse: 'manCorpse',
+		portrait: 'portraitShamino'
 	},
 	{
 		id: 'rat',

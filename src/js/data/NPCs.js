@@ -11,7 +11,7 @@ const NPCs = [
 	{
 		id: 'iolo',
 		name: 'Iolo',
-		type: 'man2',
+		type: 'iolo',
 		alignment: 'player',
 		weapon: 'crossbow'
 	},
@@ -19,7 +19,7 @@ const NPCs = [
 		id: 'shamino',
 		name: 'Shamino',
 		description: 'A Wise Man denied his Homeland.',
-		type: 'man2',
+		type: 'shamino',
 		alignment: 'player',
 		weapon: 'crossbow',
 		items: [
