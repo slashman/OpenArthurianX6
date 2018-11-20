@@ -30,45 +30,41 @@ const LevelLoader = {
 
 		return {
 			mobs: this.loadTiledMapMobs(map),
-			items: this.loadTiledMapItems(),
+			items: this.loadTiledMapItems(map),
 			solidMask: this.loadTiledMapSolidMask(map)
 		};
 	},
-	loadTiledMapItems: function() {
-		return [
-			{
-				id: 'fish',
-				amount: 1,
-				x: 15,
-				y: 14
-			},
-      {
-        id: 'ironBolt',
-        amount: 8,
-        x: 18,
-        y: 15
-      },
-			{
-				id: 'ironBolt',
-				amount: 6,
-				x: 16,
-				y: 15
-			},
-      {
-        id: 'ironBolt',
-        amount: 1,
-        x: 14,
-        y: 15
-      },
-      {
-        id: 'ironBolt',
-        amount: 9,
-        x: 12,
-        y: 15
-      }
-		];
+	loadTiledMapItems: function(map) {
+		const layerIndex = map.getLayerIndex('Items');
+		if (layerIndex === null) {
+			return [];
+		}
+		const w = map.width;
+		const h = map.height;
+		const data = [];
+		for (let x = 0; x < w; x++) {
+			for (let y = 0; y < h; y++) {
+				const tile = map.getTile(x, y, 'Items');
+				if (tile !== null) {
+					const mobType = tile.properties.type || 'mob';
+					const itemId = tile.properties.id;
+					const amount = tile.properties.amount || 1;
+					data.push({
+						id: itemId,
+						amount,
+						x: x,
+						y: y
+					});
+				}
+			}
+		}
+		return data;
 	},
 	loadTiledMapMobs: function(map) {
+		const layerIndex = map.getLayerIndex('Mobs');
+		if (layerIndex === null) {
+			return [];
+		}
 		const w = map.width;
 		const h = map.height;
 		const mobData = [];
@@ -76,7 +72,6 @@ const LevelLoader = {
 			for (let y = 0; y < h; y++) {
 				const tile = map.getTile(x, y, 'Mobs');
 				if (tile !== null) {
-					console.log(tile.properties);
 					const mobType = tile.properties.type || 'mob';
 					const mobTypeId = tile.properties.id;
 					mobData.push({
