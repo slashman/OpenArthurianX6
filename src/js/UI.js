@@ -212,6 +212,7 @@ const UI = {
     PlayerStateMachine.setActionCallback(() => {
       this.showNextSceneFragment();
     });
+    PlayerStateMachine.endCombat();
     PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
     this.showNextSceneFragment();
   },

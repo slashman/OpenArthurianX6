@@ -330,10 +330,7 @@ const PlayerStateMachine = {
                 case PlayerStateMachine.COMBAT:
                 	// End combat if no enemies nearby
                 	if (this.player.level.isSafeAround(this.player.x, this.player.y, this.player.alignment)){
-                		this.switchState(PlayerStateMachine.WORLD);
-                		this.player.level.activateAll();
-                		OAX6.UI.activeMob = this.player;
-                		this.enableAction();
+                        this.endCombat();
                 		OAX6.UI.showMessage("Combat is over!");
                 	} else {
                 		this.player.level.actNext(); // TODO: Change for this.currentLevel
@@ -369,6 +366,21 @@ const PlayerStateMachine = {
         this.switchState(PlayerStateMachine.COMBAT);
         this.player.level.sortForCombat(this.playerGoesFirst);
         this.player.level.actNext();
+    },
+
+    /*
+     * Whenever combat ends, we need to make sure the actors are back
+     * into the "real time" mode and the UI is given back to the player
+     * to control.
+     */
+    endCombat: function () {
+        if (this.state !== PlayerStateMachine.COMBAT){
+            return;
+        }
+        this.switchState(PlayerStateMachine.WORLD);
+        this.player.level.activateAll();
+        OAX6.UI.activeMob = this.player;
+        this.enableAction();
     },
 
     updateInventoryDirection: function(dir) {

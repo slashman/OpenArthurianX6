@@ -48,12 +48,17 @@ Level.prototype = {
 	},
 	actNext: function(){
 		if (PlayerStateMachine.isPartyDead()) { return; }
+		if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT) {
+			// There was a state transition and the level is no longer
+			// in charge of handling the mob actions
+			return;
+		}
 
 		const nextActor = this.mobs[this.currentTurnCounter++];
 		if (this.currentTurnCounter >= this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
-		const inCombat = (PlayerStateMachine.state === PlayerStateMachine.COMBAT && this.isInCombat(nextActor));
+		const inCombat = this.isInCombat(nextActor);
 		if (!nextActor || nextActor.dead || !inCombat){
 			return this.actNext();
 		}
