@@ -125,7 +125,7 @@ const NPCs = [
 		id: 'asteroth',
 		name: 'Asteroth',
 		description: 'A Ghost without a Past.',
-		type: 'xbowSoldier',
+		type: 'asteroth',
 		alignment: 'enemy',
 		weapon: 'sword',
 		firstTalk: 5,
@@ -133,7 +133,7 @@ const NPCs = [
 		triggers: [
 			{
 				type: 'combatTurnsOver',
-				value: 1,
+				value: 5,
 				actions: [
 					{
 						type: "console",

@@ -104,6 +104,23 @@ const MobTypes = [
 		items: [
 			{ id: 'ironBolt', quantity: 10 }
 		]
+	},
+	{
+		id: 'asteroth',
+		appearance: 'soldier',
+		name: 'Asteroth',
+		description: 'Lord of Empath Abbey.',
+		hp: 500,
+		damage: 5,
+		defense: 20,
+		speed: 2,
+		corpse: 'manCorpse',
+		intent: 'seekPlayer',
+		alignment: 'enemy',
+		weapon: 'crossbow',
+		items: [
+			{ id: 'ironBolt', quantity: 10 }
+		]
 	}
 ]
 
