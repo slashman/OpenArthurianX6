@@ -43,11 +43,14 @@ module.exports = {
       'But something is wrong. Instead of the sense of elation expected upon returning here after all these years, you are overcome with a foreboding sense of wrongness.'
     ],
     gotoIolo: [
-      'Shamino is shot by a magic bolt by Lord Asteroth and is taken out of combat.',
-      'Out of nowhere, Iolo appears along with a band of resistance members',
-      'He shots Lord Asteroth with his crossbow and forces the soldiers to flee.',
-      'Then they disband leaving the party alone.',
-      'Iolo says they must seek refuge on his hut to the west.'
+      'Using his forefinger, Lord Asteroth traces a pattern in the air. An ebony black arrow solidifies before him and hangs suspended for a moment.',
+      'Then, with a flick of his hand, he casts the glowing bolt at Shamino.',
+      'The arrow strikes him full in the chest!',
+      'Dropping his sword, he sinks into the ground, lines of pain, and something worse, etched into his face.',
+      'Without warning, the amulet, tighly gripped into your hand, emits a bright blue glow that quickly envolves and swallows Asteroth and his party.',
+      'Within a second, they are gone.',
+      '"We will find aid at Iolo\'s, it is but a short walk to the east" Shamino mutters.',
+      'With a grim determination, you help Shamino to his feet and half-carry him out of the clearing and eastward into the forest.'
     ]
   }
 }
