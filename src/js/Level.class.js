@@ -57,8 +57,8 @@ Level.prototype = {
 		if (this.currentTurnCounter >= this.mobs.length) {
 			this.currentTurnCounter = 0;
 		}
-		const inCombat = this.isInCombat(nextActor);
-		if (!nextActor || nextActor.dead || !inCombat){
+
+		if (!nextActor || nextActor.dead || !this.isInCombat(nextActor)){
 			return this.actNext();
 		}
 		if (nextActor.isPartyMember() || nextActor === OAX6.UI.player) {
@@ -167,9 +167,12 @@ Level.prototype = {
 	},
 	isSafeAround: function(x, y, alignment){
 		const dangerousMob = this.mobs.find((m) => {
-			return m.alignment !== Constants.Alignments.NEUTRAL &&
-				m.alignment !== alignment &&
-				 Geo.flatDist(x,y,m.x,m.y) < COMBAT_DISTANCE;
+			return (m.hasBeenAttacked && m.alignment !== alignment) ||
+				(
+					m.alignment !== Constants.Alignments.NEUTRAL &&
+					m.alignment !== alignment &&
+					Geo.flatDist(x,y,m.x,m.y) < COMBAT_DISTANCE
+				);
 			});
 		return !dangerousMob;
 	},
@@ -180,6 +183,9 @@ Level.prototype = {
 		return !Line.checkInLine(xa, ya, xb, yb, (x, y) => this.isSolid(x, y));
 	},
 	isInCombat: function(mob) {
+		if (mob.hasBeenAttacked) {
+			return true;
+		}
 		const bbox = PlayerStateMachine.getPartyBoundingBox();
 		const width = bbox.x2 - bbox.x1;
 		const height = bbox.y2 - bbox.y1;
