@@ -75,15 +75,31 @@ Mob.prototype = {
 			}
 		}
 		if (subIntent === 'seekPlayer') {
-			if (this.canTrack(player)) {
-				if (this.isHostileMob()) {
-					this.intent = 'combat';
+			if (this.isHostileMob()) {
+				if (this.canTrack(player)) {
+					subIntent = 'combat';
+				} else {
+					subIntent = 'waitCommand';
 				}
 			} else {
-				subIntent = 'waitCommand';
+				// We are not a party member, but we may be friendly, in which case there might be more important
+				// ways of helping the player than just seeking him...				
+				if (PlayerStateMachine.state === PlayerStateMachine.COMBAT) {
+					const nearbyTarget = this.getNearbyTarget();
+					if (nearbyTarget) {
+						subIntent = 'combat';
+					} else if (this.canTrack(player)) {
+						subIntent = 'seekPlayer';
+					} else {
+						subIntent = 'waitCommand';
+					}
+				} else if (this.canTrack(player)) {
+					subIntent = 'seekPlayer';
+				} else {
+					subIntent = 'waitCommand';
+				}
 			}
 		}
-		
 		if (subIntent === 'waitCommand') {
 			this.reportAction("Stand by");
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
@@ -153,7 +169,6 @@ Mob.prototype = {
 		if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT){
 			return;
 		}
-		console.log('recording combat turn for '+this.getDescription());
 		if (this.triggers.length === 0) {
 			return;
 		}
@@ -210,15 +225,10 @@ Mob.prototype = {
 		return OAX6.UI.player.party.indexOf(this) !== -1;
 	},
 	getNearbyTarget: function(){
-		if (this.isHostileMob()){
-			const closerMob = this.level.getCloserMobTo(this.x, this.y, Constants.Alignments.PLAYER)
-			if (closerMob && this.canTrack(closerMob)) {
-				return closerMob;
-			} else {
-				return false;
-			}
-		} else if (this.isPartyMember()){ // ? Is this being used now? Party members are controlled by the player
-			return this.level.getCloserMobTo(this.x, this.y, Constants.Alignments.ENEMY);
+		const targetAlignment = this.isHostileMob() ? Constants.Alignments.PLAYER : Constants.Alignments.ENEMY;
+		const closerMob = this.level.getCloserMobTo(this.x, this.y, targetAlignment);
+		if (closerMob && this.canTrack(closerMob)) {
+			return closerMob;
 		} else {
 			return false;
 		}
