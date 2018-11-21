@@ -379,9 +379,7 @@ Mob.prototype = {
       // Here we must check in advance if this attack will trigger the combat mode!
       // We cannot wait til the projectile animation is over!
       var mob = this.level.getMobAt(x, y);
-      if (mob
-      	&& (mob === OAX6.UI.player || mob.isPartyMember()) 
-      	&& PlayerStateMachine.state === PlayerStateMachine.WORLD) {
+      if (mob && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
 				PlayerStateMachine.startCombat(true);
 			}
       return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
@@ -432,10 +430,8 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
-		if (mob === OAX6.UI.player || mob.isPartyMember()){
-			if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
-				PlayerStateMachine.startCombat(true);
-			}
+		if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
+			PlayerStateMachine.startCombat(true);
 		}
 		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
