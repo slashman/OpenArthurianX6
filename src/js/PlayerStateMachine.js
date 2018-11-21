@@ -341,7 +341,7 @@ const PlayerStateMachine = {
     },
 
     startCombat: function(ensurePlayerFirst){
-    	OAX6.UI.modeLabel.text = "Combat";
+    	OAX6.UI.modeLabel.text = 'Combat';
         this.actionEnabled = false;
         this.playerGoesFirst = ensurePlayerFirst || Random.chance(50);
         this.switchState(PlayerStateMachine.COMBAT_SYNC);
@@ -377,6 +377,7 @@ const PlayerStateMachine = {
         if (this.state !== PlayerStateMachine.COMBAT){
             return;
         }
+        OAX6.UI.modeLabel.text = 'Exploration';
         this.switchState(PlayerStateMachine.WORLD);
         this.player.level.activateAll();
         OAX6.UI.activeMob = this.player;
