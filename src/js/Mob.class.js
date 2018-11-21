@@ -333,8 +333,8 @@ Mob.prototype = {
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy);
-    const pickedQuantity = item.quantity;
 		if (item) {
+			const pickedQuantity = item.quantity;
 			this.addItem(item);
 			this.level.removeItem(item);
       if (item.quantity === 1) {
@@ -491,7 +491,7 @@ Mob.prototype = {
 		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT || this === OAX6.UI.player){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
 		} else if (OAX6.UI.player == this){ 
-			if (PlayerStateMachine.state === PlayerStateMachine.GET){
+			if (PlayerStateMachine.state === PlayerStateMachine.TARGETTING){
 				OAX6.UI.showMessage(action);
 			}
 		}

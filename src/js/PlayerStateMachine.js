@@ -11,7 +11,7 @@ const PlayerStateMachine = {
     DIALOG      : 2,
     COMBAT      : 3,
     COMBAT_SYNC : 4,
-    GET         : 5,
+    TARGETTING  : 5,
     INVENTORY   : 6,
     MESSAGE_BOX : 7,
 
@@ -214,7 +214,7 @@ const PlayerStateMachine = {
         // Select a direction
         const activeMob = OAX6.UI.activeMob || this.player;
     	return new Promise((resolve)=>{
-            this.switchState(PlayerStateMachine.GET);
+            this.switchState(PlayerStateMachine.TARGETTING);
     		this.actionEnabled = false;
     		activeMob.reportAction("Get - Where?");
     		OAX6.UI.hideMarker();
@@ -242,6 +242,7 @@ const PlayerStateMachine = {
     rangedAttackCommand: function(){
     	const activeMob = OAX6.UI.activeMob || this.player;
     	return new Promise((resolve)=>{
+            this.switchState(PlayerStateMachine.TARGETTING);
     		this.actionEnabled = false;
     		activeMob.reportAction("Attack - Where?");
     		OAX6.UI.hideMarker();
@@ -251,9 +252,9 @@ const PlayerStateMachine = {
     		};
     		OAX6.UI.showIcon(4, cursor.x, cursor.y);
 			this.setDirectionCallback((dir, cancelled) => {
-        if (cancelled) {
-          return;
-        }
+                if (cancelled) {
+                    return;
+                }
 				cursor.x += dir.x;
 				cursor.y += dir.y;
 				//TODO: Limit based on mob's range
@@ -263,20 +264,22 @@ const PlayerStateMachine = {
 				this.clearDirectionCallback();
 				this.clearActionCallback();
 				OAX6.UI.hideIcon();
-        if (cancelled) {
-          resolve(null);
-        }
+                if (cancelled) {
+                    resolve(null);
+                }
 				resolve(cursor);
 			});
 		}).then(position => {
       if (position !== null) {
         return activeMob.attackToPosition(position.x, position.y).then(done => {
           if (!done) {
+            this.resetState();
             this.actionEnabled = true;
             OAX6.UI.hideIcon();
           };
         });
       } else {
+        this.resetState();
         this.actionEnabled = true;
         OAX6.UI.hideIcon();
         this.player.reportAction("Canceled");
