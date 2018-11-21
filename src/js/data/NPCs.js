@@ -13,7 +13,78 @@ const NPCs = [
 		name: 'Iolo',
 		type: 'iolo',
 		alignment: 'player',
-		weapon: 'crossbow'
+		weapon: 'crossbow',
+				dialog: [
+			{
+				key: "greeting",
+				variants: [
+					{
+						condition: {
+							flag: "firstIoloConversation",
+							value: false
+						},
+						dialog: [
+							{
+								type: "event",
+								text: "The door jerks open to reveal the familiar form of Iolo standing framed within the doorway. Reaching out to help Shamino, Iolo turns to you with a grimace."
+							},
+							"My friend, thou art a sight for sore eyes!",
+							"I see that Shamino, as usual, has been unable to stay out of trouble.",
+							{
+								type: "event",
+								text: "His casual remarks cannot mask his deep concern as he helps Shamino to a bed and carefully tends to his wound."
+							},
+							{
+								type: "event",
+								text: "After seeing to Shamino, Iolo fills two mugs with a foaming broth and beckons you to a coarse wooden table next to the warm hearth."
+							},
+							"'Tis good to see thee after these many long years, my friend.",
+							"It seems thy [summoning] didst not go unnoticed. From the looks of Shamino's wound I'd say thou dost now know of the new regents of Virtue."
+						]
+					},
+					{
+						dialog: "Yes my friend?"
+					}
+				]
+			},
+			{
+				key: "name",
+				dialog: "Why are you asking me that? has the [summoning] caused you any memory issues?"
+			},
+			{
+				key: "join",
+				dialog: [
+					"Yes, please join me! The Milestone II awaits us!"
+				]
+			},
+			{
+				key: "bye",
+				variants: [
+					{
+						condition: {
+							flag: "firstIoloConversation",
+							value: false
+						},
+						dialog: [
+							"Let's go!",
+							{ type: "joinParty" },
+							{ type: "setFlag", flagName: "firstIoloConversation" },
+							{ type: "endConversation" }
+						]
+					},
+					{
+						dialog: [
+							"Goodbye!",
+							{ type: "endConversation" }
+						]
+					}
+				]
+			},
+			{
+				key: "unknown",
+				dialog: "WHAT!"
+			}
+		]
 	},
 	{
 		id: 'shamino',
