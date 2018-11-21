@@ -183,13 +183,16 @@ const PlayerStateMachine = {
             activeMob.reportAction("Attack - Where?");
             OAX6.UI.hideMarker();
             OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
-            this.setDirectionCallback((dir) => {
+            this.setDirectionCallback((dir, cancelled) => {
                 OAX6.UI.hideIcon();
-                activeMob.reportAction("Attack - "+Geo.getDirectionName(dir));
                 this.clearDirectionCallback();
+                if (cancelled) {
+                    return resolve(null);
+                }
+                activeMob.reportAction("Attack - "+Geo.getDirectionName(dir));
                 Timer.delay(500).then(()=>resolve(dir));
             });
-        }).then(dir=>{
+        }).then(dir => {
             if (dir !== null) {
                 return activeMob.attackOnDirection(dir.x, dir.y);
             } else {
@@ -210,10 +213,10 @@ const PlayerStateMachine = {
             activeMob.reportAction("Get - Where?");
             OAX6.UI.hideMarker();
             OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
-            this.setDirectionCallback((dir, canceled) => {
+            this.setDirectionCallback((dir, cancelled) => {
                 OAX6.UI.hideIcon();
                 this.clearDirectionCallback();
-                if (canceled) {
+                if (cancelled) {
                     return resolve(null);
                 }
                 activeMob.reportAction("Get - "+Geo.getDirectionName(dir));
@@ -379,10 +382,15 @@ const PlayerStateMachine = {
         this.enableAction();
     },
 
-    updateInventoryDirection: function(dir) {
-      if (dir !== null) {
-        Inventory.moveCursor(dir.x, dir.y);
-      }
+    updateInventoryDirection: function(dir, cancelled) {
+        if (cancelled) {
+            Inventory.close();
+            PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+            this.clearDirectionCallback();
+        }
+        if (dir !== null) {
+            Inventory.moveCursor(dir.x, dir.y);
+        }
     },
 
     dropItem: function() {
@@ -399,15 +407,20 @@ const PlayerStateMachine = {
             OAX6.UI.hideMarker();
             OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
             this.clearDirectionCallback();
-            this.setDirectionCallback((dir) => {
+            this.setDirectionCallback((dir, cancelled) => {
                 OAX6.UI.hideIcon();
-                activeMob.reportAction("Drop - "+Geo.getDirectionName(dir));
                 this.clearDirectionCallback();
+                if (cancelled) {
+                    return resolve(null);
+                }
+                activeMob.reportAction("Drop - "+Geo.getDirectionName(dir));
                 Timer.delay(500).then(()=>resolve(dir));
             });
         }).then((dir) => {
-            activeMob.dropOnDirection(dir.x, dir.y, item);
-            Inventory.updateInventory();
+            if (dir !== null) {
+                activeMob.dropOnDirection(dir.x, dir.y, item);
+                Inventory.updateInventory();
+            }
             this.setDirectionCallback(this.updateInventoryDirection.bind(this));
         });
     },
