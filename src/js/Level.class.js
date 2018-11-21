@@ -41,7 +41,6 @@ Level.prototype = {
 	},
 	addMob: function(mob){
 		this.mobs.push(mob);
-		mob.activate();
 	},
 	removeMob: function(mob){
 		this.mobs.splice(this.mobs.indexOf(mob), 1);

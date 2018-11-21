@@ -31,6 +31,7 @@ const LevelLoader = {
 			partyMember.relocate(mapData.start.x, mapData.start.y);
 			level.addMob(partyMember);
 		});
+		level.activateAll();
 	},
 
 	createLevel: function(mapData){
