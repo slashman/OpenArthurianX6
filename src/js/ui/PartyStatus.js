@@ -22,7 +22,6 @@ const PartyStatus = {
 
         this.party.push({
             mob: mob,
-            // TODO: Add here the portrait of the character instead of the regular appareance tile
             sprite: game.add.sprite(x, y, appearance.tileset, appearance.i, this.layer),
             healthBack: this.createHealthBar(x, y + 20, 0x330000),
             health: this.createHealthBar(x, y + 20, 0xff0000),

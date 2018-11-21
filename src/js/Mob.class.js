@@ -472,6 +472,9 @@ Mob.prototype = {
 			if (this === OAX6.UI.player || this.isPartyMember()){
 				this.checkForGameOver();
 			}
+			if (this.isPartyMember()) {
+				OAX6.UI.player.removeFromParty(this);
+			}
 		}
 	},
 	climb: function(dz){
@@ -512,10 +515,14 @@ Mob.prototype = {
 		this.party.push(mob);
 		PartyStatus.addMob(mob);
 	},
+	removeFromParty: function(mob){
+		this.party.splice(this.party.indexOf(mob), 1);
+		PartyStatus.removeMob(mob);
+	},
 	checkForGameOver: function() {
 		const player = OAX6.UI.player;
 		if (player.dead && !player.party.find(p => !p.dead)) {
-			MessageBox.showMessage("GAME OVER!")
+			MessageBox.showMessage("GAME OVER!");
 		}
 	}
 };
