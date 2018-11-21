@@ -167,7 +167,12 @@ Level.prototype = {
 		return !this.isSolid(x+dx, y+dy);
 	},
 	isSafeAround: function(x, y, alignment){
-		return this.mobs.find(m=>m.alignment !== alignment && Geo.flatDist(x,y,m.x,m.y) < COMBAT_DISTANCE) === undefined;
+		const dangerousMob = this.mobs.find((m) => {
+			return m.alignment !== Constants.Alignments.NEUTRAL &&
+				m.alignment !== alignment &&
+				 Geo.flatDist(x,y,m.x,m.y) < COMBAT_DISTANCE;
+			});
+		return !dangerousMob;
 	},
 	activateAll: function(){
 		this.mobs.forEach(m=>m.activate());	
