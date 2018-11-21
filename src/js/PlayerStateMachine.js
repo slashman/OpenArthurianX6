@@ -235,7 +235,7 @@ const PlayerStateMachine = {
                 return activeMob.getOnDirection(dir.x, dir.y);
             }
 		}).then(()=>{
-            this.switchState(PlayerStateMachine.WORLD);
+            this.resetState();
             this.actionEnabled = true;
         });
     },
