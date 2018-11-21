@@ -179,6 +179,7 @@ const PlayerStateMachine = {
         const activeMob = OAX6.UI.activeMob || this.player;
         return new Promise((resolve)=>{
             this.actionEnabled = false;
+            this.switchState(PlayerStateMachine.TARGETTING);
             activeMob.reportAction("Attack - Where?");
             OAX6.UI.hideMarker();
             OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
@@ -194,6 +195,9 @@ const PlayerStateMachine = {
             } else {
                 // ??? Is flow controlled?
             }
+        }).then(()=>{
+            this.resetState();
+            this.actionEnabled = true;
         });
     },
 
