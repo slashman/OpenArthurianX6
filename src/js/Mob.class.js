@@ -74,31 +74,13 @@ Mob.prototype = {
 				}
 			}
 		}
-		if (subIntent === 'seekPlayer') {
-			if (this.isHostileMob()) {
-				if (this.canTrack(player)) {
-					subIntent = 'combat';
-				} else {
-					subIntent = 'waitCommand';
-				}
-			} else {
-				// We are not a party member, but we may be friendly, in which case there might be more important
-				// ways of helping the player than just seeking him...				
-				if (PlayerStateMachine.state === PlayerStateMachine.COMBAT) {
-					const nearbyTarget = this.getNearbyTarget();
-					if (nearbyTarget) {
-						subIntent = 'combat';
-					} else if (this.canTrack(player)) {
-						subIntent = 'seekPlayer';
-					} else {
-						subIntent = 'waitCommand';
-					}
-				} else if (this.canTrack(player)) {
-					subIntent = 'seekPlayer';
-				} else {
-					subIntent = 'waitCommand';
-				}
-			}
+		// Surviving is the most important, so always look for enemies first
+		// Note that neutral enemies will by default have no target
+		const nearbyTarget = this.getNearbyTarget();
+		if (nearbyTarget) {
+			subIntent = 'combat';
+		} else if (subIntent === 'seekPlayer' && !this.canTrack(player)) {
+			subIntent = 'waitCommand';
 		}
 		if (subIntent === 'waitCommand') {
 			this.reportAction("Stand by");
@@ -225,6 +207,11 @@ Mob.prototype = {
 		return OAX6.UI.player.party.indexOf(this) !== -1;
 	},
 	getNearbyTarget: function(){
+		if (this.alignment === Constants.Alignments.NEUTRAL) {
+			// TODO: If was attacked, target the offender
+			// TODO: Wild animals may attack randomly
+			return false;
+		}
 		const targetAlignment = this.isHostileMob() ? Constants.Alignments.PLAYER : Constants.Alignments.ENEMY;
 		const closerMob = this.level.getCloserMobTo(this.x, this.y, targetAlignment);
 		if (closerMob && this.canTrack(closerMob)) {
