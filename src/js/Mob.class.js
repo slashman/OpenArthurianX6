@@ -78,14 +78,15 @@ Mob.prototype = {
 					subIntent = 'seekPlayer';
 				}
 			}
-		}
-		// Surviving is the most important, so always look for enemies first
-		// Note that neutral enemies will by default have no target
-		const nearbyTarget = this.getNearbyTarget();
-		if (nearbyTarget) {
-			subIntent = 'combat';
-		} else if (subIntent === 'seekPlayer' && !this.canTrack(player)) {
-			subIntent = 'waitCommand';
+		} else {
+			// Surviving is the most important, so always look for enemies first
+			// Note that neutral enemies will by default have no target
+			const nearbyTarget = this.getNearbyTarget();
+			if (nearbyTarget) {
+				subIntent = 'combat';
+			} else if (subIntent === 'seekPlayer' && !this.canTrack(player)) {
+				subIntent = 'waitCommand';
+			}
 		}
 		if (subIntent === 'waitCommand') {
 			this.reportAction("Stand by");
