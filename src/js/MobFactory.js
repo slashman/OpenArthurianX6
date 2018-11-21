@@ -35,7 +35,7 @@ const MobFactory = {
 		this.addItems(mob, definition);
 		
 		mob.speed = new Stat(definition.speed)
-		mob.intent = definition.intent;
+		mob.intent = definition.intent || 'wander';
 		return mob;
 	},
 	addItems(mob, definition) {
