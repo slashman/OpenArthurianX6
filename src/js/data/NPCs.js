@@ -82,7 +82,7 @@ const NPCs = [
 			},
 			{
 				key: "unknown",
-				dialog: "WHAT!"
+				dialog: "That I dost not know about."
 			}
 		]
 	},
