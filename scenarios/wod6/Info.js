@@ -31,8 +31,8 @@ module.exports = {
       name: 'iolos',
       filename: 'iolos-hut.json',
       start: {
-        x: 21,
-        y: 30
+        x: 44,
+        y: 49
       }
     }
 	],
