@@ -198,7 +198,7 @@ const NPCs = [
 		type: 'asteroth',
 		alignment: 'enemy',
 		weapon: 'sword',
-		firstTalk: 5,
+		firstTalk: 10,
 		intent: 'seekPlayer',
 		triggers: [
 			{
@@ -309,6 +309,7 @@ const NPCs = [
 								type: "event",
 								text: "In a flash, Shamino draws his sword and runs towards the soldiers.",
 							},
+							{ type: "setHostile" },
 							{
 								type: "endConversation"
 							}
@@ -327,12 +328,14 @@ const NPCs = [
 						dialog: [
 							"I knew it... the Avatar, the paladin of virtue, would never side with vicious rebels...",
 							"Your deceit will be punished with death!",
+							{ type: "setHostile" },
 							{ type: "endConversation" }
 						]
 					},
 					{
 						dialog: [
 							"You were warned, now die!",
+							{ type: "setHostile" },
 							{ type: "endConversation" }
 						]
 					}

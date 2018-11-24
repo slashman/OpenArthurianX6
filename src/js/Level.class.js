@@ -198,6 +198,15 @@ Level.prototype = {
 		const dist = Geo.flatDist(0, 0, dx, dy);
 
 		return (dist < COMBAT_DISTANCE);
+	},
+	// Changes the intent of all enemy mobs with 'waitCommand' intent to 'seekPlayer'
+	activateHostile() {
+		const mobs = this.getMobsOfAlignment(Constants.Alignments.ENEMY);
+		mobs.forEach(m=> {
+			if (m.intent === 'waitCommand') {
+				m.intent = 'seekPlayer';
+			}
+		});
 	}
 };
 

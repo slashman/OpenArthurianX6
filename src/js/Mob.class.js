@@ -52,16 +52,15 @@ Mob.prototype = {
 			this.reportAction("Stand by");
 			return Timer.delay(1000);
 		}
-		// If mob is too far from player and hasn't been attacked, it mustn't act
-		if (!this.level.isInCombat(this)) {
-			return Timer.delay(1000);	
-		}
-
 		// Regardless of any further checks, check if wants to talk first
 		if (this.dialog && this.firstTalk && Geo.flatDist(player.x, player.y, this.x, this.y) < this.firstTalk){
 			Bus.emit('startDialog', {mob: this, dialog: this.dialog, player: OAX6.UI.player});
 			this.firstTalk = 0;
 			return Promise.resolve();
+		}
+		// If mob is too far from player and hasn't been attacked, it mustn't act
+		if (!this.level.isInCombat(this)) {
+			return Timer.delay(1000);	
 		}
 		let subIntent = this.intent; // While we have a general intent, it may change for this action
 		if (this.isPartyMember()){
@@ -216,6 +215,9 @@ Mob.prototype = {
 		if (this.alignment === Constants.Alignments.NEUTRAL) {
 			// TODO: If was attacked, target the offender
 			// TODO: Wild animals may attack randomly
+			return false;
+		}
+		if (this.intent === 'waitCommand') {
 			return false;
 		}
 		const targetAlignment = this.isHostileMob() ? Constants.Alignments.PLAYER : Constants.Alignments.ENEMY;

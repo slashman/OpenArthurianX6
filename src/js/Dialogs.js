@@ -180,6 +180,9 @@ module.exports = {
 						this.endDialog();
 						this.playerInput.visible = false;
 						break;
+					case 'setHostile':
+						this.player.level.activateHostile();
+						break;
 				}
 				this.playerInput.visible = true;
 				if (this.messageQueue.length > 0) {

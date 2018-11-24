@@ -95,7 +95,7 @@ const MobTypes = [
 		defense: 3,
 		speed: 2,
 		corpse: 'manCorpse',
-		intent: 'seekPlayer',
+		intent: 'waitCommand',
 		alignment: 'enemy',
 		weapon: 'sword'
 	},
@@ -109,7 +109,7 @@ const MobTypes = [
 		defense: 3,
 		speed: 2,
 		corpse: 'manCorpse',
-		intent: 'seekPlayer',
+		intent: 'waitCommand',
 		alignment: 'enemy',
 		weapon: 'crossbow',
 		items: [
@@ -126,7 +126,7 @@ const MobTypes = [
 		defense: 20,
 		speed: 2,
 		corpse: 'manCorpse',
-		intent: 'seekPlayer',
+		intent: 'waitCommand',
 		alignment: 'enemy',
 		weapon: 'crossbow',
 		items: [
