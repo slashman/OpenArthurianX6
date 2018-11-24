@@ -48,7 +48,7 @@ const MobTypes = [
 		id: 'shamino',
 		appearance: 'man2',
 		name: 'Shamino',
-		hp: 20,
+		hp: 200,
 		damage: 3,
 		defense: 0,
 		speed: 5,
