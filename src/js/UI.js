@@ -32,8 +32,8 @@ const UI = {
 		//this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 		this.game.renderer.renderSession.roundPixels = true;  
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
-		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
-		this.game.scale.setUserScale(2, 2);
+		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;  
+		//this.game.scale.setUserScale(2, 2);
 		this.nextMove = 0;
     Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
