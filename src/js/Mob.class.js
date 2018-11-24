@@ -481,7 +481,7 @@ Mob.prototype = {
 
 	},
 	reportAction: function(action){
-		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT || this === OAX6.UI.player){
+		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
 		} else if (OAX6.UI.player == this){ 
 			if (PlayerStateMachine.state === PlayerStateMachine.TARGETTING){
