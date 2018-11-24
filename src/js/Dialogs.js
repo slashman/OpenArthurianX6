@@ -281,6 +281,9 @@ module.exports = {
 		this.blinkOut = true;
 	},
 	sendInput: function(line) {
+		if (line.trim() === '') {
+			line = 'bye';
+		}
 		var dialog = this.chat.dialog[line.toLowerCase()];
 		if (dialog && dialog.synonym) {
 			dialog = this.chat.dialog[dialog.synonym];
