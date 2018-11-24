@@ -117,8 +117,7 @@ const NPCs = [
 								type: "event",
 								text: "Strongly grasping your hand, he exclaims:"
 							},
-							"We were afraid the [summoning] would fail! Tis' nigh impossible to use any magic without invoking intervention from [Blackthorn].",
-							"This is a very long message, I really jsut want to make it go overboard and see if the more prompt continues working as expected. Actually it seems like it needs to be really really long, I don't know what else to say, my mind is blank. This is a very long message, I really jsut want to make it go overboard and see if the more prompt continues working as expected. Actually it seems like it needs to be really really long, I don't know what else to say, my mind is blank."
+							"We were afraid the [summoning] would fail! Tis' nigh impossible to use any magic without invoking intervention from [Blackthorn]."
 						]
 					},
 					{
