@@ -1,3 +1,5 @@
+const AppearanceFactory = require('./AppearanceFactory');
+
 module.exports = {
   init: function(game) {
     this.game = game;
@@ -35,10 +37,20 @@ module.exports = {
   },
 
   showMob: function(mob) {
-    const definitions = mob.npcDefinition || mob.definition;
+    const appearance = (AppearanceFactory.getAppearance(mob.definition.appearance));
 
-    this.sprite.key = mob.sprite.key;
-    this.sprite.frame = mob.sprite.frame;
+    let key = appearance.tileset;
+    let frame = appearance.d[0];
+
+    if (mob.definition && mob.definition.portrait) {
+      const portrait = AppearanceFactory.getAppearance(mob.definition.portrait);
+      key = portrait.tileset;
+      frame = portrait.i;
+    }
+
+    this.sprite.loadTexture(key, frame, true);
+
+    const definitions = mob.npcDefinition || mob.definition;
 
     this.name.text = definitions.name;
 
