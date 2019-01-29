@@ -4,21 +4,15 @@ const PartyStatus = require('./ui/PartyStatus');
 const Constants = require('./Constants');
 
 const PlayerFactory = {
-	buildPlayer: function(UI, game, level, x, y, z){
+	buildPlayer: function(game, level, x, y, z){
 		const mob = NPCFactory.buildNPC(game, "avatar", level, x, y, x);
 		mob.canStartDialog = true;
-		UI.player = mob;
 		mob.inventory = PlayerStateMachine.inventory;
 		mob.name = "Avatar";
 		mob.alignment = Constants.Alignments.PLAYER;
-		
-		UI.player = mob;
 		PlayerStateMachine.player = mob;
-
 		PartyStatus.addMob(mob);
-
 		game.camera.follow(mob.sprite);
-
 		return mob;
 	}
 }

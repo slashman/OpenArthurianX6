@@ -4,6 +4,7 @@ const Geo = require('./Geo');
 const Random = require('./Random');
 const Inventory = require('./Inventory');
 const ItemFactory = require('./ItemFactory');
+const Storage = require('./Storage');
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -232,6 +233,23 @@ const PlayerStateMachine = {
         });
     },
 
+    /**
+     * Saves the game
+     */
+    saveCommand() {
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return new Promise((resolve)=>{
+            this.switchState(PlayerStateMachine.NOTHING);
+            this.actionEnabled = false;
+            activeMob.reportAction("Saving Game");
+            return Storage.saveGame(this.player);
+        }).then(dir=>{
+            activeMob.reportAction("Saved");
+            this.resetState();
+            this.actionEnabled = true;
+        });
+    },
+
     rangedAttackCommand: function(){
         const activeMob = OAX6.UI.activeMob || this.player;
         return new Promise((resolve)=>{
@@ -312,6 +330,8 @@ const PlayerStateMachine = {
                     return this.rangedAttackCommand();
                 } else if (keyCode === Phaser.KeyCode.G){
                     return this.getCommand();
+                } else if (keyCode === Phaser.KeyCode.S){
+                    return this.saveCommand();
                 }
             }
 

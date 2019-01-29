@@ -19,7 +19,7 @@ const LevelLoader = {
 		}
 		let level;
 		if (this.__levels[mapId]) {
-			level = this.loadLevel(mapData);
+			level = this.loadLevel(mapData); // TODO: Implement
 		} else {
 			level = this.createLevel(mapData);
 		}
@@ -32,6 +32,22 @@ const LevelLoader = {
 			level.addMob(partyMember);
 		});
 		level.activateAll();
+	},
+
+	/**
+	 * Loads a previously existing level
+	 * Map and solidMask are loaded from tiled,
+	 * Mobs and items are loaded from persistence
+	 */
+	loadLevel: function (level) {
+		const mapData = this.levelData[level.mapId];
+		const tiledMap = this.loadTiledMap(mapData.name);
+		level.setSolidMask(tiledMap.solidMask);
+		const mobsData = mapData.mobs;
+		const itemsData = mapData.items;
+		mobsData.forEach((mobData) => this.loadMob(mobData, level));
+		itemsData.forEach((itemData) => this.loadItem(itemData, level));
+		return level;
 	},
 
 	createLevel: function(mapData){
@@ -144,6 +160,12 @@ const LevelLoader = {
 	loadItem: function(itemData, level) {
 		const item = ItemFactory.createItem(itemData.id, itemData.amount);
 		level.addItem(item, itemData.x, itemData.y);
+	},
+	/**
+	 * Initializes the data for the different levels from a savegame
+	 */
+	setLevelsData: function (levelData) {
+		this.__levels = levelData;
 	}
 };
 

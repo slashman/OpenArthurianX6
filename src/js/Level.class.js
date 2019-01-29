@@ -1,3 +1,5 @@
+const circular = require('circular-functions');
+
 const Geo = require('./Geo');
 const log = require('./Debug').log;
 const Timer = require('./Timer');
@@ -13,7 +15,16 @@ function Level(){
 	this.items = [];
 	this.solidMask = null;
 	this.currentTurnCounter = 0;
+	this._c = circular.register('Level');
 }
+
+circular.registerClass('Level', Level, {
+	transients: {
+		solidMask: true,
+		pfGrid: true
+	}
+});
+
 
 Level.prototype = {
 	isSolid: function(x, y){
@@ -207,6 +218,11 @@ Level.prototype = {
 				m.intent = 'seekPlayer';
 			}
 		});
+	},
+	// Readies the level for the player to use it
+	activate() {
+		this.setSolidMask(this.solidMask); // Initializes the pfGrid
+		this.items.forEach(item => OAX6.UI.addItemSprite(item, item.x, item.y));
 	}
 };
 

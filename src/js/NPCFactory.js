@@ -1,3 +1,5 @@
+const circular = require('circular-functions');
+
 const ItemFactory = require('./ItemFactory');
 const MobFactory = require('./MobFactory');
 const Constants = require('./Constants');
@@ -7,6 +9,7 @@ const NPCFactory = {
 		this.npcMap = [];
 		for (var npc of npcData){
 			this.npcMap[npc.id] = npc;
+			npc._c = circular.setSafe();
 		}
 	},
 	parseDialog: function(dialog) {
@@ -17,7 +20,7 @@ const NPCFactory = {
 		for (var i=0,option;option=dialog[i];i++) {
 			ret[option.key] = option;
 		}
-
+		ret._c = circular.setSafe();
 		return ret;
 	},
 	buildNPC: function(game, id, level, x, y, z){
@@ -32,6 +35,7 @@ const NPCFactory = {
 		npc.intent = definition.intent;
 		if (definition.triggers) {
 			npc.triggers = definition.triggers.slice();
+			npc.triggers.forEach(t => t._c = circular.setSafe());
 		}
 		return npc;
 	}

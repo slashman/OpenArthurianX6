@@ -1,9 +1,14 @@
 "use strict";
 
+const circular = require('circular-functions');
+
 function Stat(max){
 	this.max = max;
 	this.current = max;
+  this._c = circular.register('Stat');
 }
+
+circular.registerClass('Stat', Stat);
 
 module.exports = Stat;
 

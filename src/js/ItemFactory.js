@@ -1,3 +1,5 @@
+const circular = require('circular-functions');
+
 const Stat = require('./Stat.class');
 const AppearanceFactory = require('./AppearanceFactory');
 const Item = require('./Item.class');
@@ -6,7 +8,9 @@ const ItemFactory = {
 	init: function(itemData){
 		this.itemsMap = [];
 		this.itemData = itemData;
-		itemData.forEach(item=>this.itemsMap[item.id] = item);
+		itemData.forEach(item=> {
+      this.itemsMap[item.id] = item;
+    });
 	},
 	setGame: function(game){
 		this.game = game;
@@ -32,7 +36,6 @@ const ItemFactory = {
 		item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		item.sprite.visible = false;
 		item.appearance = appearance;
-    item.def = def;
 		return item;
 	}
 };

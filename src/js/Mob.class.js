@@ -1,3 +1,5 @@
+const circular = require('circular-functions');
+
 const Bus = require('./Bus');
 const Random = require('./Random');
 const Timer = require('./Timer');
@@ -28,9 +30,17 @@ function Mob(level, x, y, z){
 	this.party = [];
 	this.inventory = [];
 	this.flags = {};
+	this.flags._c = circular.setSafe();
 	this.triggers = [];
 	this.combatTurns = 0;
+	this._c = circular.register('Mob');
 }
+
+circular.registerClass('Mob', Mob, {
+	transients: {
+		sprite: true
+	}
+});
 
 Mob.prototype = {
 	/**	
@@ -309,14 +319,14 @@ Mob.prototype = {
 		this.sprite.y = this.y * 16;
 	},
 	addItem: function(item) {
-    if (item.def.stackLimit) {
+    if (item.stackLimit) {
       const existingItem = this.inventory.find(i => i.id === item.id);
       if (existingItem) {
-        if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
+        if (existingItem.quantity + item.quantity <= existingItem.stackLimit) {
           existingItem.quantity += item.quantity;
         } else {
-          item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
-          existingItem.quantity = existingItem.def.stackLimit;
+          item.quantity = (existingItem.quantity + item.quantity) % existingItem.stackLimit;
+          existingItem.quantity = existingItem.stackLimit;
           this.inventory.push(item);
         }
       } else {
