@@ -4,6 +4,7 @@ const Items = [
 	{
 		id: 'fish',
 		appearance: 'fish',
+		description: 'Common and small, but tastes great friend, raw, or in a stew. A chef\'s best friend.',
 		name: 'Fish'
 	},
 	{

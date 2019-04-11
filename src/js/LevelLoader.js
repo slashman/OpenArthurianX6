@@ -3,6 +3,7 @@ const NPCFactory = require('./NPCFactory');
 const MobFactory = require('./MobFactory');
 const ItemFactory = require('./ItemFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
+const MobDescription = require('./MobDescription');
 
 const LevelLoader = {
 	init(game, maps) {
@@ -160,13 +161,24 @@ const LevelLoader = {
 		}
 
 		mob.sprite.inputEnabled = true;
-		mob.sprite.events.onInputDown.add(() => { OAX6.runner.showMobInfo(mob); });
+		mob.sprite.events.onInputDown.add(() => { 
+			if (this.game.input.activePointer.rightButton.isDown) {
+				MobDescription.showMob(mob); 
+			}
+		});
 
 		level.addMob(mob);
 	},
 	loadItem: function(itemData, level) {
 		const item = ItemFactory.createItem(itemData.id, itemData.amount);
 		level.addItem(item, itemData.x, itemData.y);
+
+		item.sprite.inputEnabled = true;
+		item.sprite.events.onInputDown.add(() => { 
+			if (this.game.input.activePointer.rightButton.isDown) {
+				MobDescription.showItem(item); 
+			}
+		});
 	},
 	loadDoor: function(doorData, level) {
 		const door = ItemFactory.createDoor(doorData.id);
@@ -175,7 +187,11 @@ const LevelLoader = {
 		level.setSolid(doorData.x, doorData.y, true);
 
 		door.sprite.inputEnabled = true;
-		door.sprite.events.onInputDown.add(() => { door.openDoor(PlayerStateMachine.player, level); });
+		door.sprite.events.onInputDown.add(() => { 
+			if (this.game.input.activePointer.leftButton.isDown) {
+				door.openDoor(PlayerStateMachine.player, level); 
+			}
+		});
 	},
 	/**
 	 * Initializes the data for the different levels from a savegame

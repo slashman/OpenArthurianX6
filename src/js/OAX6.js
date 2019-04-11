@@ -53,6 +53,10 @@ const OAX6 = {
 		} else {
 			this.newGame(game);
 		}
+
+		game.canvas.oncontextmenu = function (e) {
+			e.preventDefault();
+		};
 	},
 	newGame: function(game) {
 		const startingState = scenarioInfo.startingState;
@@ -80,14 +84,11 @@ const OAX6 = {
 		LevelLoader.setLevelsData(loadedGame.levels);
 		player.level.activate();
 		SkyBox.setMinuteOfDay(loadedGame.minuteOfDay);
-	},
+	}
 	/*loadLevel: function(game){
 		const startingState = scenarioInfo.startingState;
 		return LevelLoader.loadLevel(game, startingState.map);
 	},*/
-	showMobInfo: function(mob) {
-		MobDescription.showMob(mob);
-	}
 };
 
 window.OAX6 = {

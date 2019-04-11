@@ -57,5 +57,19 @@ module.exports = {
     this.description.text = definitions.description || '';
 
     this.descriptionUI.visible = true;
+  },
+
+  showItem(item) {
+    const appearance = (AppearanceFactory.getAppearance(item.appearance.id));
+
+    let key = appearance.tileset;
+    let frame = appearance.i;
+
+    this.sprite.loadTexture(key, frame, true);
+
+    this.name.text = item.name;
+    this.description.text = item.description || '';
+
+    this.descriptionUI.visible = true;
   }
 }
