@@ -41,6 +41,7 @@ const UI = {
 		this.mapLayer = this.game.add.group();
 		this.floorLayer = this.game.add.group();
 		this.mobsLayer = this.game.add.group();
+		this.doorsLayer = this.game.add.group();
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
