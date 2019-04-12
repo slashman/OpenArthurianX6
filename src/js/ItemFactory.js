@@ -39,13 +39,14 @@ const ItemFactory = {
 		item.appearance = appearance;
 		return item;
 	},
-	createDoor: function(id){
+	createDoor: function(id, level){
 		const def = this.itemsMap[id];
 		const appearance = AppearanceFactory.getAppearance(def.appearance);
 		const item = Object.assign(new Door(), def);
     item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		item.sprite.visible = false;
 		item.appearance = appearance;
+		item.level = level;
 		return item;
 	}
 };

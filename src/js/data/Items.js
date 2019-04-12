@@ -110,6 +110,12 @@ const Items = [
 		appearance: 'doorVR1',
 		name: 'Door',
 		linked: { x: 0, y: 1 }
+	},
+	{
+		id: 'goldKey',
+		appearance: 'goldKey',
+		description: 'Golden key to open a specific door',
+		name: 'Gold key'
 	}
 ]
 

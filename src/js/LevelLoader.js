@@ -3,6 +3,7 @@ const NPCFactory = require('./NPCFactory');
 const MobFactory = require('./MobFactory');
 const ItemFactory = require('./ItemFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
+const Inventory = require('./Inventory');
 const MobDescription = require('./MobDescription');
 
 const LevelLoader = {
@@ -64,7 +65,7 @@ const LevelLoader = {
 		level.setSolidMask(tiledMap.solidMask);
 		mobsData.forEach((mobData) => this.loadMob(mobData, level));
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
-		doorsData.forEach((doorData) => this.loadDoor(doorData, level));
+		doorsData.forEach((doorData) => this.loadDoor(tiledMap.map, doorData, level));
 
 		return level;
 	},
@@ -81,9 +82,10 @@ const LevelLoader = {
 		terrainLayer.resizeWorld();
 		this.game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
 		return {
+			map: map,
 			mobs: this.loadTiledMapMobs(map),
 			items: this.loadTiledMapItems(map, 'Items'),
-			doors: this.loadTiledMapItems(map, 'Doors'),
+			doors: map.objects.Doors,
 			solidMask: this.loadTiledMapSolidMask(map)
 		};
 	},
@@ -180,16 +182,18 @@ const LevelLoader = {
 			}
 		});
 	},
-	loadDoor: function(doorData, level) {
-		const door = ItemFactory.createDoor(doorData.id);
-		
-		level.addDoor(door, doorData.x, doorData.y);
-		level.setSolid(doorData.x, doorData.y, true);
+	loadDoor: function(map, doorData, level) {
+		const door = ItemFactory.createDoor(doorData.properties.id, level);
+
+		door.lock = doorData.properties.lock;
+
+		level.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1);
+		level.setSolid(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, true);
 
 		door.sprite.inputEnabled = true;
 		door.sprite.events.onInputDown.add(() => { 
 			if (this.game.input.activePointer.leftButton.isDown) {
-				door.openDoor(PlayerStateMachine.player, level); 
+				PlayerStateMachine.openDoor(door);
 			}
 		});
 	},

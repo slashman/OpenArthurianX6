@@ -48,6 +48,8 @@ const OAX6 = {
 		MobDescription.init(game);
 		LevelLoader.init(game, scenarioInfo.maps);
 
+		this.playerStateMachine = PlayerStateMachine;
+
 		if (Storage.saveGameExists()) {
 			this.loadGame(game);
 		} else {
