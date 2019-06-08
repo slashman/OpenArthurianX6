@@ -14,7 +14,6 @@ const AppearanceFactory = {
 			this.appearancesMap[itemsData.id] = Object.assign({tileset: tilesetData.tileset}, itemsData);
 			this.appearancesMap[itemsData.id]._c = circular.setSafe();
 		}
-
 	},
 	getAppearance: function(id){
 		return this.appearancesMap[id];

@@ -17,6 +17,7 @@ const Loader = {
 		game.load.spritesheet('player', 'assets/player.png', 16, 16);
 		game.load.spritesheet('mobs', 'assets/mobs.png', 16, 16);
 		game.load.spritesheet('items', 'assets/items.png', 16, 16);
+		game.load.spritesheet('terrain', 'assets/terrain.png', 16, 16);
 
 		game.load.spritesheet('celestialBodies', 'assets/celestialBodies.png', 32, 32);
 		game.load.spritesheet('skies', 'assets/skies.png', 96, 42);

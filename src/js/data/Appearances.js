@@ -151,6 +151,59 @@ const Appearances = [
 		]
 	},
 	{
+		tileset: 'terrain',
+		items: [
+			{
+				id: 'doorOpenHL1',
+				switchId: 'doorHL1',
+				solid: true,
+				i: 18
+			},
+			{
+				id: 'doorOpenHR1',
+				switchId: 'doorHR1',
+				solid: false,
+				i: 19
+			},
+			{
+				id: 'doorHL1',
+				switchId: 'doorOpenHL1',
+				solid: true,
+				i: 33+18
+			},
+			{
+				id: 'doorHR1',
+				switchId: 'doorOpenHR1',
+				solid: true,
+				i: 33+19
+			},
+			{
+				id: 'doorOpenVL1',
+				switchId: 'doorVL1',
+				solid: false,
+				i: 33+20
+			},
+			{
+				id: 'doorOpenVR1',
+				switchId: 'doorVR1',
+				solid: true,
+				i: 20
+			},
+			{
+				id: 'doorVL1',
+				switchId: 'doorOpenVL1',
+				solid: true,
+				i: 33+21
+			},
+			{
+				id: 'doorVR1',
+				switchId: 'doorOpenVR1',
+				solid: true,
+				i: 21
+			}
+		]
+	},
+	{
 		tileset: 'portraits',
 		items: [
 			{

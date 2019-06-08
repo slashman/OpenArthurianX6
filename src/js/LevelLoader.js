@@ -2,6 +2,7 @@ const Level = require('./Level.class');
 const NPCFactory = require('./NPCFactory');
 const MobFactory = require('./MobFactory');
 const ItemFactory = require('./ItemFactory');
+const PlayerStateMachine = require('./PlayerStateMachine');
 
 const LevelLoader = {
 	init(game, maps) {
@@ -45,8 +46,10 @@ const LevelLoader = {
 		level.setSolidMask(tiledMap.solidMask);
 		const mobsData = mapData.mobs;
 		const itemsData = mapData.items;
+		const doorsData = mapData.doors;
 		mobsData.forEach((mobData) => this.loadMob(mobData, level));
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
+		doorsData.forEach((doorData) => this.loadDoor(doorData, level));
 		return level;
 	},
 
@@ -55,11 +58,13 @@ const LevelLoader = {
 		const tiledMap = this.loadTiledMap(mapData.name);
 		const mobsData = tiledMap.mobs;
 		const itemsData = tiledMap.items;
+		const doorsData = tiledMap.doors;
 
 		level.setSolidMask(tiledMap.solidMask);
 		mobsData.forEach((mobData) => this.loadMob(mobData, level));
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
-		
+		doorsData.forEach((doorData) => this.loadDoor(doorData, level));
+
 		return level;
 	},
 	loadTiledMap: function(mapId){
@@ -71,16 +76,18 @@ const LevelLoader = {
 		map.createLayer('Vegetation', false, false, OAX6.UI.mapLayer);
 		map.createLayer('Buildings', false, false, OAX6.UI.mapLayer);
 		map.createLayer('Objects', false, false, OAX6.UI.mapLayer);
+		//map.createLayer('Doors', false, false, OAX6.UI.doorsLayer);
 		terrainLayer.resizeWorld();
 		this.game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
 		return {
 			mobs: this.loadTiledMapMobs(map),
-			items: this.loadTiledMapItems(map),
+			items: this.loadTiledMapItems(map, 'Items'),
+			doors: this.loadTiledMapItems(map, 'Doors'),
 			solidMask: this.loadTiledMapSolidMask(map)
 		};
 	},
-	loadTiledMapItems: function(map) {
-		const layerIndex = map.getLayerIndex('Items');
+	loadTiledMapItems: function(map, layerId) {
+		const layerIndex = map.getLayerIndex(layerId);
 		if (layerIndex === null) {
 			return [];
 		}
@@ -89,7 +96,7 @@ const LevelLoader = {
 		const data = [];
 		for (let x = 0; x < w; x++) {
 			for (let y = 0; y < h; y++) {
-				const tile = map.getTile(x, y, 'Items');
+				const tile = map.getTile(x, y, layerId);
 				if (tile !== null) {
 					const mobType = tile.properties.type || 'mob';
 					const itemId = tile.properties.id;
@@ -160,6 +167,15 @@ const LevelLoader = {
 	loadItem: function(itemData, level) {
 		const item = ItemFactory.createItem(itemData.id, itemData.amount);
 		level.addItem(item, itemData.x, itemData.y);
+	},
+	loadDoor: function(doorData, level) {
+		const door = ItemFactory.createDoor(doorData.id);
+		
+		level.addDoor(door, doorData.x, doorData.y);
+		level.setSolid(doorData.x, doorData.y, true);
+
+		door.sprite.inputEnabled = true;
+		door.sprite.events.onInputDown.add(() => { door.openDoor(PlayerStateMachine.player, level); });
 	},
 	/**
 	 * Initializes the data for the different levels from a savegame

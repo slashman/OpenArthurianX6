@@ -85,6 +85,30 @@ const Items = [
 		id: 'bones',
 		appearance: 'bones',
 		name: 'Bones'
+	},
+	{
+		id: 'doorHL1',
+		appearance: 'doorHL1',
+		name: 'Door',
+		linked: { x: 1, y: 0 }
+	},
+	{
+		id: 'doorHR1',
+		appearance: 'doorHR1',
+		name: 'Door',
+		linked: { x: -1, y: 0 }
+	},
+	{
+		id: 'doorVL1',
+		appearance: 'doorVL1',
+		name: 'Door',
+		linked: { x: 0, y: -1 }
+	},
+	{
+		id: 'doorVR1',
+		appearance: 'doorVR1',
+		name: 'Door',
+		linked: { x: 0, y: 1 }
 	}
 ]
 

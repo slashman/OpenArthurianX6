@@ -3,6 +3,7 @@ const circular = require('circular-functions');
 const Stat = require('./Stat.class');
 const AppearanceFactory = require('./AppearanceFactory');
 const Item = require('./Item.class');
+const Door = require('./Door.class');
 
 const ItemFactory = {
 	init: function(itemData){
@@ -34,6 +35,15 @@ const ItemFactory = {
 			item.damage = new Stat(item.damage);
 		}
 		item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
+		item.sprite.visible = false;
+		item.appearance = appearance;
+		return item;
+	},
+	createDoor: function(id){
+		const def = this.itemsMap[id];
+		const appearance = AppearanceFactory.getAppearance(def.appearance);
+		const item = Object.assign(new Door(), def);
+    item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		item.sprite.visible = false;
 		item.appearance = appearance;
 		return item;

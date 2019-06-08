@@ -1,7 +1,7 @@
 module.exports = {
   startingState: {
     minuteOfDay: 1380,
-    map: 'forest1',
+    map: 'iolos',
     party: [
     /*
       {
@@ -31,8 +31,8 @@ module.exports = {
       name: 'iolos',
       filename: 'iolos-hut.json',
       start: {
-        x: 44,
-        y: 49
+        x: 34,
+        y: 27
       }
     }
 	],

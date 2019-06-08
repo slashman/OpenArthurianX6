@@ -13,6 +13,7 @@ const COMBAT_DISTANCE = 10;
 function Level(){
 	this.mobs = [];	
 	this.items = [];
+	this.doors = [];
 	this.solidMask = null;
 	this.currentTurnCounter = 0;
 	this._c = circular.register('Level');
@@ -32,6 +33,9 @@ Level.prototype = {
 			return true;
 		}
 		return false;
+	},
+	setSolid: function(x, y, solid) {
+		this.solidMask[x][y] = solid;
 	},
 	getMobAt: function(x, y){
 		// TODO: Replace for this.mobs.find
@@ -114,6 +118,11 @@ Level.prototype = {
 		OAX6.UI.addItemSprite(item, x, y);
 		this.items.push(item);
 	},
+	addDoor: function(door, x, y) {
+		OAX6.UI.addItemSprite(door, x, y);
+		OAX6.UI.doorsLayer.add(door.sprite); // Override group
+		this.doors.push(door);
+	},
 	findPathTo: function(to, from, includeMobsOfAlignment){
 		//TODO: Single finder object?
 		const finder = new PF.AStarFinder({
@@ -162,6 +171,15 @@ Level.prototype = {
 		for (var i=0,item; item=this.items[i]; i++) {
 			if (item.x == x && item.y == y) {
 				return item;
+			}
+		}
+
+		return null;
+	},
+	getDoorAt: function(x, y) {
+		for (var i=0,door; door=this.doors[i]; i++) {
+			if (door.x == x && door.y == y) {
+				return door;
 			}
 		}
 
