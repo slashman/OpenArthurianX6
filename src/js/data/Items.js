@@ -27,11 +27,11 @@ const Items = [
 	{
 		id: 'magicAxe',
 		appearance: 'magicAxe',
-    flyAppearance: 'magicAxe',
+		flyAppearance: 'magicAxe',
 		name: 'Magic Axe',
-    throwable: true,
+		throwable: true,
 		range: 5,
-    flyType: 'rotate',
+		flyType: 'rotate',
 		damage: 400
 	},
 	{
@@ -39,18 +39,18 @@ const Items = [
 		appearance: 'crossbow',
 		name: 'Crossbow',
 		range: 8,
-    usesProjectileType: 'ironBolt', //TODO: Groups of ammo types
-    flyType: 'straight',
+		usesProjectileType: 'ironBolt', //TODO: Groups of ammo types
+		flyType: 'straight',
 		damage: 5
 	},
-  {
-    id: 'ironBolt',
-    appearance: 'ironBolt',
-    flyAppearance: 'ironBolt_p',
-    name: 'Iron Bolt',
-    damage: 5,
-    stackLimit: 10
-  },
+	{
+		id: 'ironBolt',
+		appearance: 'ironBolt',
+		flyAppearance: 'ironBolt_p',
+		name: 'Iron Bolt',
+		damage: 5,
+		stackLimit: 10
+	},
 	{
 		id: 'boomerang',
 		appearance: 'boomerang',
