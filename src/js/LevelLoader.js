@@ -51,7 +51,9 @@ const LevelLoader = {
 		const doorsData = mapData.doors;
 		mobsData.forEach((mobData) => this.loadMob(mobData, level));
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
-		doorsData.forEach((doorData) => this.loadDoor(doorData, level));
+		if (doorsData) {
+			doorsData.forEach((doorData) => this.loadDoor(doorData, level));
+		} 
 		return level;
 	},
 
@@ -65,8 +67,9 @@ const LevelLoader = {
 		level.setSolidMask(tiledMap.solidMask);
 		mobsData.forEach((mobData) => this.loadMob(mobData, level));
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
-		doorsData.forEach((doorData) => this.loadDoor(tiledMap.map, doorData, level));
-
+		if (doorsData) {
+			doorsData.forEach((doorData) => this.loadDoor(tiledMap.map, doorData, level));
+		}
 		return level;
 	},
 	loadTiledMap: function(mapId){
