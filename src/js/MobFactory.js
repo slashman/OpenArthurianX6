@@ -1,5 +1,3 @@
-const circular = require('circular-functions');
-
 const Mob = require('./Mob.class');
 const AppearanceFactory = require('./AppearanceFactory');
 const ItemFactory = require('./ItemFactory');
@@ -11,11 +9,11 @@ const MobFactory = {
 		this.mobTypeData = mobTypeData;
 		this.mobTypeMap = [];
 		for (var mobType of mobTypeData){
-			mobType._c = circular.setSafe();
 			this.mobTypeMap[mobType.id] = mobType;
 		}
 	},
 	getMobTypeByTileId(tileIndex) {
+		// TODO: Remove this when we are using objects instead of tiles for mobs.
 		return this.mobTypeData.find(t => t.tileIndex === tileIndex);
 	},
 	buildMob: function(game, typeId, level, x, y, z){

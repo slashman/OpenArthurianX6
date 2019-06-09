@@ -96,8 +96,19 @@ const NPCs = [
 		items: [
 			{ id: 'ironBolt', quantity: 50 }
 		],
-		firstTalk: 5,
 		intent: 'seekPlayer',
+		triggers: [
+			{
+				id: 'firstTalk',
+				type: 'playerDistance',
+				value: 5,
+				actions: [
+					{ 
+						type: "talk"
+					}
+				]
+			}
+		],
 		dialog: [
 			{
 				key: "greeting",
@@ -198,10 +209,20 @@ const NPCs = [
 		type: 'asteroth',
 		alignment: 'enemy',
 		weapon: 'sword',
-		firstTalk: 10,
 		intent: 'seekPlayer',
 		triggers: [
 			{
+				id: 'firstTalk',
+				type: 'playerDistance',
+				value: 10,
+				actions: [
+					{
+						type: "talk"
+					}
+				]
+			},
+			{
+				id: 'gotoIolo',
 				type: 'combatTurnsOver',
 				value: 5,
 				actions: [

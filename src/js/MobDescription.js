@@ -50,25 +50,25 @@ module.exports = {
 
     this.sprite.loadTexture(key, frame, true);
 
-    const definitions = mob.npcDefinition || mob.definition;
+    const definition = mob.npcDefinition || mob.definition;
 
-    this.name.text = definitions.name;
+    this.name.text = definition.name;
 
-    this.description.text = definitions.description || '';
+    this.description.text = definition.description || '';
 
     this.descriptionUI.visible = true;
   },
 
   showItem(item) {
-    const appearance = (AppearanceFactory.getAppearance(item.appearance.id));
+    const appearance = (AppearanceFactory.getAppearance(item.def.appearance.id));
 
     let key = appearance.tileset;
     let frame = appearance.i;
 
     this.sprite.loadTexture(key, frame, true);
 
-    this.name.text = item.name;
-    this.description.text = item.description || '';
+    this.name.text = item.def.name;
+    this.description.text = item.def.description || '';
 
     this.descriptionUI.visible = true;
   }

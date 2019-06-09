@@ -10,8 +10,8 @@ const ItemFactory = {
 		this.itemsMap = [];
 		this.itemData = itemData;
 		itemData.forEach(item=> {
-      this.itemsMap[item.id] = item;
-    });
+			this.itemsMap[item.id] = item;
+		});
 	},
 	setGame: function(game){
 		this.game = game;
@@ -21,33 +21,38 @@ const ItemFactory = {
 	},
 	createItem: function(id, quantity){
 		const def = this.itemsMap[id];
-		const appearance = AppearanceFactory.getAppearance(def.appearance);
-		const item = Object.assign(new Item(), def);
-    if (quantity !== undefined) {
-      item.quantity = quantity;
-    } else {
-      item.quantity = 1;
-    }
-    if (def.flyAppearance) {
-      item.flyAppearance = AppearanceFactory.getAppearance(def.flyAppearance);
-    }
-		if (item.damage){
-			item.damage = new Stat(item.damage);
+		const item = new Item();
+		if (quantity !== undefined) {
+			item.quantity = quantity;
+		} else {
+			item.quantity = 1;
 		}
+		if (def.damage){
+			item.damage = new Stat(def.damage);
+		}
+		item.def = Object.assign({}, def);
+		item.defid = def.id;
+		const appearance = AppearanceFactory.getAppearance(def.appearance);
 		item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		item.sprite.visible = false;
-		item.appearance = appearance;
+		item.def.appearance = appearance;
+		if (def.flyAppearance) {
+			item.def.flyAppearance = AppearanceFactory.getAppearance(def.flyAppearance);
+		}
 		return item;
 	},
+	// TODO: Move this somewhere else, the Door class has nothing to do with Item. Move the definitions too?
 	createDoor: function(id, level){
 		const def = this.itemsMap[id];
+		const door = new Door();
+		door.def = Object.assign({}, def);
 		const appearance = AppearanceFactory.getAppearance(def.appearance);
-		const item = Object.assign(new Door(), def);
-    item.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
-		item.sprite.visible = false;
-		item.appearance = appearance;
-		item.level = level;
-		return item;
+		door.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
+		door.sprite.visible = false;
+		door.def.appearance = appearance;
+		door.level = level;
+		door.open = def.appearance.solid;
+		return door;
 	}
 };
 module.exports = ItemFactory;

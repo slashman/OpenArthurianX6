@@ -7,13 +7,14 @@ function Item(){
 
 circular.registerClass('Item', Item, {
   transients: {
-    sprite: true
+    sprite: true,
+    def: true
   }
 });
 
 Item.prototype = {
   playProjectileAnimation(projectile, fromX, fromY, toX, toY) {
-    return OAX6.UI.playProjectileAnimation(this.flyType, projectile.flyAppearance, fromX, fromY, toX, toY);
+    return OAX6.UI.playProjectileAnimation(this.def.flyType, projectile.def.flyAppearance, fromX, fromY, toX, toY);
   }
 }
 

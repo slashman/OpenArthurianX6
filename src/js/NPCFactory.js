@@ -1,5 +1,3 @@
-const circular = require('circular-functions');
-
 const ItemFactory = require('./ItemFactory');
 const MobFactory = require('./MobFactory');
 const Constants = require('./Constants');
@@ -9,7 +7,6 @@ const NPCFactory = {
 		this.npcMap = [];
 		for (var npc of npcData){
 			this.npcMap[npc.id] = npc;
-			npc._c = circular.setSafe();
 		}
 	},
 	parseDialog: function(dialog) {
@@ -20,23 +17,21 @@ const NPCFactory = {
 		for (var i=0,option;option=dialog[i];i++) {
 			ret[option.key] = option;
 		}
-		ret._c = circular.setSafe();
 		return ret;
 	},
+	/**
+	 * Builds a Mob with extended NPC data
+	 */
 	buildNPC: function(game, id, level, x, y, z){
 		const definition = this.npcMap[id];
 		const npc = MobFactory.buildMob(game, definition.type, level, x, y, z);
-		npc.npcDefinition = definition;
-		npc.dialog = this.parseDialog(definition.dialog);
+		npc.npcDefinition = Object.assign({}, definition);
+		npc.npcDefinition.dialog = this.parseDialog(definition.dialog);
+		// Note that we only assign things to the npc that can change, everything else remains in the NPC definition
 		MobFactory.addItems(npc, definition);
-		npc.name = definition.name;
+		npc.name = definition.name; // Added to the Mob, since the name might change maybe
 		npc.alignment = definition.alignment || Constants.Alignments.ENEMY;
-		npc.firstTalk = definition.firstTalk;
 		npc.intent = definition.intent;
-		if (definition.triggers) {
-			npc.triggers = definition.triggers.slice();
-			npc.triggers.forEach(t => t._c = circular.setSafe());
-		}
 		return npc;
 	}
 };

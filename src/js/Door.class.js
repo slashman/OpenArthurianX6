@@ -9,33 +9,35 @@ function Door(){
 
 circular.registerClass('Door', Door, {
   transients: {
-    sprite: true
+    sprite: true,
+    def: true
   }
 });
 
 Door.prototype = {
   openDoor(mob) {
     const level = this.level;
-    const linkedDir = this.linked;
+    const linkedDir = this.def.linked;
     const sisterDoor = level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y);
 
     if (!this.inRange(mob) || !sisterDoor.inRange(mob)) { return; }
     if (this.isLocked()) { return; }
 
     this.switchSprite(); 
-    level.setSolid(this.x, this.y, this.appearance.solid);
+    this.open = !this.open;
+    level.setSolid(this.x, this.y, !this.open);
 
     if (sisterDoor != null) {
       sisterDoor.switchSprite();
-      level.setSolid(sisterDoor.x, sisterDoor.y, sisterDoor.appearance.solid);
+      level.setSolid(sisterDoor.x, sisterDoor.y, !this.open);
     }
   }, 
 
   unlock(key) {
-    if (key != null && key.id == this.lock) {
+    if (key != null && key.defid == this.lock) {
       this.lock = null;
       
-      const linkedDir = this.linked;
+      const linkedDir = this.def.linked;
       const sisterDoor = this.level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y);
       if (sisterDoor != null) {
         sisterDoor.unlock(key);
@@ -61,9 +63,8 @@ Door.prototype = {
   },
 
   switchSprite() {
-    const appearance = AppearanceFactory.getAppearance(this.appearance.switchId);
+    const appearance = AppearanceFactory.getAppearance(this.def.appearance.switchId);
     this.sprite.frame = appearance.i;
-    this.appearance = appearance;
   }
 }
 

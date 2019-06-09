@@ -31,14 +31,15 @@ function Mob(level, x, y, z){
 	this.inventory = [];
 	this.flags = {};
 	this.flags._c = circular.setSafe();
-	this.triggers = [];
 	this.combatTurns = 0;
 	this._c = circular.register('Mob');
 }
 
 circular.registerClass('Mob', Mob, {
 	transients: {
-		sprite: true
+		sprite: true,
+		definition: true,
+		npcDefinition: true
 	}
 });
 
@@ -49,8 +50,7 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		const player = OAX6.UI.player;
-		if (this === player){
+		if (this === OAX6.UI.player){
 			// Enable action
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 				PlayerStateMachine.actionEnabled = true;
@@ -62,12 +62,30 @@ Mob.prototype = {
 			this.reportAction("Stand by");
 			return Timer.delay(1000);
 		}
-		// Regardless of any further checks, check if wants to talk first
-		if (this.dialog && this.firstTalk && Geo.flatDist(player.x, player.y, this.x, this.y) < this.firstTalk){
-			Bus.emit('startDialog', {mob: this, dialog: this.dialog, player: OAX6.UI.player});
-			this.firstTalk = 0;
+		return this.__executeAI().then(() => this.__checkTriggers());
+	},
+	__checkTriggers() {
+		const player = OAX6.UI.player;
+		const promises = [];
+		if (this.npcDefinition && this.npcDefinition.triggers) {
+			const playerDistanceTriggers = this.__getActiveTriggersByType('playerDistance');
+			playerDistanceTriggers.forEach(t => {
+				if (Geo.flatDist(player.x, player.y, this.x, this.y) < t.value) {
+					promises.push(this.executeTriggerActions(t));
+				}
+			});
+		}
+		if (promises.length) {
+			return Promise.all(promises);
+		} else {
 			return Promise.resolve();
 		}
+	},
+	__getActiveTriggersByType(triggerType) {
+		return this.npcDefinition.triggers.filter(t => t.type === triggerType && !this.flags['trigger_' + t.id]);
+	},
+	__executeAI() {
+		const player = OAX6.UI.player;
 		// If mob is too far from player and hasn't been attacked, it mustn't act
 		if (!this.level.isInCombat(this)) {
 			return Timer.delay(1000);	
@@ -137,8 +155,8 @@ Mob.prototype = {
 			}
 		} else {
 			if (this.weapon && 
-				this.weapon.range && 
-				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.range &&
+				this.weapon.def.range && 
+				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.def.range &&
 				this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y)
 				) {
 				return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
@@ -166,18 +184,17 @@ Mob.prototype = {
 		if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT){
 			return;
 		}
-		if (this.triggers.length === 0) {
+		// combatTurnsOver triggers
+		if (!this.npcDefinition) {
 			return;
 		}
 		this.combatTurns++;
-		const combatTurnsOverTriggers = this.triggers.filter(t => t.type === 'combatTurnsOver');
+		const combatTurnsOverTriggers = this.__getActiveTriggersByType('combatTurnsOver');
 		combatTurnsOverTriggers.forEach(t => {
 			if (this.combatTurns >= t.value) {
 				this.executeTriggerActions(t);
-				t.triggered = true;
 			}
 		});
-		this.triggers = this.triggers.filter(t => !t.triggered);
 	},
 	executeTriggerActions: function(trigger) {
 		let p = Promise.resolve();
@@ -199,9 +216,14 @@ Mob.prototype = {
 						r();
 					});
 					break;
+				case 'talk':
+					Bus.emit('startDialog', {mob: this, dialog: this.npcDefinition.dialog, player: OAX6.UI.player});
+					break;
 			}
 			p = p.then(promiseFunction);
 		});
+		this.flags['trigger_' + trigger.id] = true;
+		return p;
 	},
 	canTrack: function (mob) {
 		if (mob === OAX6.UI.player && this.isPartyMember()) {
@@ -280,8 +302,8 @@ Mob.prototype = {
 
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
 		if (mob){
-			if (this.canStartDialog && mob.dialog){
-				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog, player: OAX6.UI.player});
+			if (this.canStartDialog && mob.npcDefinition.dialog){
+				Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
 				
 				// Look at each other while talking
 				this.lookAt(dx, dy);
@@ -319,14 +341,14 @@ Mob.prototype = {
 		this.sprite.y = this.y * 16;
 	},
 	addItem: function(item) {
-    if (item.stackLimit) {
-      const existingItem = this.inventory.find(i => i.id === item.id);
+    if (item.def.stackLimit) {
+      const existingItem = this.inventory.find(i => i.defid === item.defid);
       if (existingItem) {
-        if (existingItem.quantity + item.quantity <= existingItem.stackLimit) {
+        if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
           existingItem.quantity += item.quantity;
         } else {
-          item.quantity = (existingItem.quantity + item.quantity) % existingItem.stackLimit;
-          existingItem.quantity = existingItem.stackLimit;
+          item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
+          existingItem.quantity = existingItem.def.stackLimit;
           this.inventory.push(item);
         }
       } else {
@@ -343,9 +365,9 @@ Mob.prototype = {
 			this.addItem(item);
 			this.level.removeItem(item);
       if (item.quantity === 1) {
-        this.reportAction("Got a " + item.name);  
+        this.reportAction("Got a " + item.def.name);  
       } else {
-        this.reportAction("Got " + pickedQuantity + " " + item.name);  
+        this.reportAction("Got " + pickedQuantity + " " + item.def.name);  
       }
 			
 		} else {
@@ -366,7 +388,7 @@ Mob.prototype = {
 	},
 	attackToPosition: function(x, y){
 		const weapon = this.weapon;
-		const range = weapon ? (weapon.range || 1) : 1;
+		const range = weapon ? (weapon.def.range || 1) : 1;
 		const dist = Geo.flatDist(this.x, this.y, x, y);
 		if (dist > range){
 			this.reportAction("Attack - Out of range!");
@@ -389,7 +411,7 @@ Mob.prototype = {
       if (ammo.quantity && ammo.quantity > 1) {
         ammo.quantity--;
       } else {
-        this.inventory.splice(this.inventory.findIndex(i => i.id === ammo.id), 1);
+        this.inventory.splice(this.inventory.findIndex(i => i.defid === ammo.defid), 1);
       }
       if (ammo === this.weapon) {
         this.weapon = undefined;
@@ -401,7 +423,7 @@ Mob.prototype = {
 				PlayerStateMachine.startCombat(true);
 			}
       return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
-        if (ammo.throwable) {
+        if (ammo.def.throwable) {
           this.level.addItem(ammo, x, y);
         }
         return this._attackPosition(x, y);
@@ -416,9 +438,9 @@ Mob.prototype = {
 		}
 	},
   getAmmunitionFor: function(weapon) {
-    const ammoType = weapon.usesProjectileType;
+    const ammoType = weapon.def.usesProjectileType;
     if (ammoType) {
-      const onInventory = this.inventory.find(i => i.id === ammoType);
+      const onInventory = this.inventory.find(i => i.defid === ammoType);
       return onInventory;
     } else {
       // No ammo, throw the weapon!
@@ -512,7 +534,7 @@ Mob.prototype = {
 			desc = this.definition.name;
 		}
 		if (this.weapon){
-			desc += " armed with "+this.weapon.name;
+			desc += " armed with "+this.weapon.def.name;
 		}
 		return desc;
 	},
