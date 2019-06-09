@@ -46,12 +46,14 @@ const ItemFactory = {
 		const def = this.itemsMap[id];
 		const door = new Door();
 		door.def = Object.assign({}, def);
-		const appearance = AppearanceFactory.getAppearance(def.appearance);
-		door.sprite = this.game.add.sprite(0, 0, appearance.tileset, appearance.i);
+		const openAppearance = AppearanceFactory.getAppearance(def.openAppearance);
+		const closedAppearance = AppearanceFactory.getAppearance(def.closedAppearance);
+		door.def.openAppearance = openAppearance;
+		door.def.closedAppearance = closedAppearance;
+		door.sprite = this.game.add.sprite(0, 0, openAppearance.tileset, closedAppearance.i);
 		door.sprite.visible = false;
-		door.def.appearance = appearance;
 		door.level = level;
-		door.open = def.appearance.solid;
+		door.open = false; // Closed by default
 		return door;
 	}
 };

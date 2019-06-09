@@ -89,25 +89,29 @@ const Items = [
 	},
 	{
 		id: 'doorHL1',
-		appearance: 'doorHL1',
+		closedAppearance: 'doorHL1',
+		openAppearance: 'doorOpenHL1',
 		name: 'Door',
 		linked: { x: 1, y: 0 }
 	},
 	{
 		id: 'doorHR1',
-		appearance: 'doorHR1',
+		closedAppearance: 'doorHR1',
+		openAppearance: 'doorOpenHR1',
 		name: 'Door',
 		linked: { x: -1, y: 0 }
 	},
 	{
 		id: 'doorVL1',
-		appearance: 'doorVL1',
+		closedAppearance: 'doorVL1',
+		openAppearance: 'doorOpenVL1',
 		name: 'Door',
 		linked: { x: 0, y: -1 }
 	},
 	{
 		id: 'doorVR1',
-		appearance: 'doorVR1',
+		closedAppearance: 'doorVR1',
+		openAppearance: 'doorOpenVR1',
 		name: 'Door',
 		linked: { x: 0, y: 1 }
 	},

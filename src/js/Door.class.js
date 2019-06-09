@@ -23,11 +23,13 @@ Door.prototype = {
     if (!this.inRange(mob) || !sisterDoor.inRange(mob)) { return; }
     if (this.isLocked()) { return; }
 
-    this.switchSprite(); 
     this.open = !this.open;
+    this.switchSprite(); 
+    
     level.setSolid(this.x, this.y, !this.open);
 
     if (sisterDoor != null) {
+      sisterDoor.open = !sisterDoor.open;
       sisterDoor.switchSprite();
       level.setSolid(sisterDoor.x, sisterDoor.y, !this.open);
     }
@@ -63,7 +65,7 @@ Door.prototype = {
   },
 
   switchSprite() {
-    const appearance = AppearanceFactory.getAppearance(this.def.appearance.switchId);
+    const appearance = this.open ? this.def.openAppearance : this.def.closedAppearance;
     this.sprite.frame = appearance.i;
   }
 }
