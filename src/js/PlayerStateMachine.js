@@ -26,6 +26,10 @@ const PlayerStateMachine = {
 
         PlayerStateMachine.inventory = [];
 
+        this.cursorSprite = this.game.add.sprite(0, 0, 'ui');
+        this.cursorSprite.visible = false;
+        OAX6.UI.UILayer.add(this.cursorSprite);
+
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
         this.inputDialogCallback = null; // Call a function when pressing enter instead of allowing normal input
@@ -39,6 +43,13 @@ const PlayerStateMachine = {
         this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
+    },
+    setCursor: function(tileset, frame) {
+        this.cursorSprite.loadTexture(tileset, frame);
+        this.cursorSprite.visible = true;
+    },
+    updateCursorPosition: function() {
+        this.cursorSprite.position.set(this.game.input.activePointer.x, this.game.input.activePointer.y);
     },
     listenDirections: function(){
         if (this.directionCallback){
@@ -448,6 +459,8 @@ const PlayerStateMachine = {
     update: function() {
         if (!this.actionEnabled) { return; }
 
+        this.updateCursorPosition();
+
         switch (this.state) {
             case PlayerStateMachine.WORLD:
             case PlayerStateMachine.COMBAT:
@@ -501,6 +514,28 @@ const PlayerStateMachine = {
                 return true;
         }
         return false;
+    },
+
+    openDoor(door) {
+        if (!door.inRange(this.player)) {
+            OAX6.UI.showMessage("Too far");
+            return;
+        }
+
+        if (door.isLocked()) {
+            if (Inventory.useItemOn) {
+                if (!door.unlock(Inventory.useItemOn)) {
+                    OAX6.UI.showMessage("Wrong key!");
+                    return;
+                }
+            } else {
+                OAX6.UI.showMessage("The door is locked!");
+                return;
+            }
+        }
+
+        door.openDoor(this.player, this.player.level); 
+        Inventory.useCursorItem();
     }
 };
 

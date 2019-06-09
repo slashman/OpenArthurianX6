@@ -29,6 +29,11 @@ module.exports = {
             this.inventoryGroup.add(invSlot);
             this.inventoryGroup.add(quantityLabel);
 
+            invSlot.inputEnabled = true;
+            ((index) => {
+                invSlot.events.onInputDown.add(() => { this.onInputDown(index); });
+            })(i);
+
             if (x == this.COLUMNS) {
                 x = 0;
                 y += 1;
@@ -45,7 +50,44 @@ module.exports = {
 
         this.UI.UILayer.add(this.inventoryGroup);
 
+        this.useItemOn = null;
+
         this.close();
+    },
+
+    onInputDown: function(index) {
+        if (!this.game.input.activePointer.leftButton.isDown) { return; }
+
+        const player = OAX6.UI.player,
+            inventory = player.inventory;
+
+        if (!inventory[index]) { return; }
+
+        OAX6.UI.showMessage("Use " + inventory[index].name + " on ...");
+
+        const PSM = OAX6.runner.playerStateMachine;
+        const appearance = inventory[index].appearance;
+        PSM.setCursor(appearance.tileset, appearance.i);
+
+        this.useItemOn = inventory[index];
+
+        this.close();
+    },
+
+    useCursorItem: function() {
+        if (!this.useItemOn) { return; }
+
+        const player = OAX6.UI.player,
+            inventory = player.inventory,
+            index = inventory.indexOf(this.useItemOn),
+            PSM = OAX6.runner.playerStateMachine;
+
+            OAX6.UI.showMessage(inventory[index].name + " used");
+
+        inventory[index] = null;
+        this.useItemOn = null;
+        PSM.setCursor(null, null);
+        PSM.switchState(OAX6.runner.playerStateMachine.WORLD);
     },
 
     moveCursor: function(x, y) {

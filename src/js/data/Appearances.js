@@ -151,6 +151,15 @@ const Appearances = [
 		]
 	},
 	{
+		tileset: 'items',
+		items: [
+			{
+				id: 'goldKey',
+				i: 16*9+10
+			}
+		]
+	},
+	{
 		tileset: 'terrain',
 		items: [
 			{
