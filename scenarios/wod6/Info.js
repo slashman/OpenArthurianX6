@@ -1,7 +1,7 @@
 module.exports = {
   startingState: {
     minuteOfDay: 1380,
-    map: 'iolos',
+    map: 'forest1',
     party: [
     /*
       {
