@@ -22,12 +22,12 @@ const LevelLoader = {
 		}
 		let level;
 		if (this.__levels[mapId]) {
-			level = this.loadLevel(mapData); // TODO: Implement
+			level = this.__levels[mapId]; // TODO: Verify this works
 		} else {
 			level = this.createLevel(mapData);
 		}
 		player.level = level;
-		player.relocate(mapData.start.x, mapData.start.y);
+		player.relocate(mapData.start.x, mapData.start.y); // Might need to store last player location on level, or gateway based on current level
 		level.addMob(player);
 		player.party.forEach(function(partyMember) {
 			partyMember.level = level;
@@ -37,28 +37,9 @@ const LevelLoader = {
 		level.activateAll();
 	},
 
-	/**
-	 * Loads a previously existing level
-	 * Map and solidMask are loaded from tiled,
-	 * Mobs and items are loaded from persistence
-	 */
-	loadLevel: function (level) {
-		const mapData = this.levelData[level.mapId];
-		const tiledMap = this.loadTiledMap(mapData.name);
-		level.setSolidMask(tiledMap.solidMask);
-		const mobsData = mapData.mobs;
-		const itemsData = mapData.items;
-		const doorsData = mapData.doors;
-		mobsData.forEach((mobData) => this.loadMob(mobData, level));
-		itemsData.forEach((itemData) => this.loadItem(itemData, level));
-		if (doorsData) {
-			doorsData.forEach((doorData) => this.loadDoor(doorData, level));
-		} 
-		return level;
-	},
-
 	createLevel: function(mapData){
 		const level = new Level();
+		level.mapId = mapData.name;
 		const tiledMap = this.loadTiledMap(mapData.name);
 		const mobsData = tiledMap.mobs;
 		const itemsData = tiledMap.items;
@@ -164,26 +145,11 @@ const LevelLoader = {
 		} else {
 			mob = MobFactory.buildMob(this.game, mobData.id, level, mobData.x, mobData.y, 0);
 		}
-
-		mob.sprite.inputEnabled = true;
-		mob.sprite.events.onInputDown.add(() => { 
-			if (this.game.input.activePointer.rightButton.isDown) {
-				MobDescription.showMob(mob); 
-			}
-		});
-
 		level.addMob(mob);
 	},
 	loadItem: function(itemData, level) {
 		const item = ItemFactory.createItem(itemData.id, itemData.amount);
 		level.addItem(item, itemData.x, itemData.y);
-
-		item.sprite.inputEnabled = true;
-		item.sprite.events.onInputDown.add(() => { 
-			if (this.game.input.activePointer.rightButton.isDown) {
-				MobDescription.showItem(item); 
-			}
-		});
 	},
 	loadDoor: function(map, doorData, level) {
 		const door = ItemFactory.createDoor(doorData.properties.id, level);
@@ -192,19 +158,23 @@ const LevelLoader = {
 
 		level.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1);
 		level.setSolid(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, true);
-
-		door.sprite.inputEnabled = true;
-		door.sprite.events.onInputDown.add(() => { 
-			if (this.game.input.activePointer.leftButton.isDown) {
-				PlayerStateMachine.openDoor(door);
-			}
-		});
 	},
 	/**
 	 * Initializes the data for the different levels from a savegame
 	 */
 	setLevelsData: function (levelData) {
 		this.__levels = levelData;
+	},
+	restoreLevel: function (level) {
+		const tiledMap = this.loadTiledMap(level.mapId, level);
+		level.setSolidMask(tiledMap.solidMask);
+		level.doors.forEach((door) => {
+			OAX6.UI.addItemSprite(door, door.x, door.y);
+			OAX6.UI.doorsLayer.add(door.sprite); // Override group
+			level.setSolid(door.x, door.y, true);
+		});
+		level.activate();
+		level.activateAll();
 	}
 };
 

@@ -40,6 +40,13 @@ circular.registerClass('Mob', Mob, {
 		sprite: true,
 		definition: true,
 		npcDefinition: true
+	},
+	reviver(mob, data) {
+		mob.definition = OAX6.MobFactory.getDefinition(mob.defid);
+		if (mob.npcDefid) {
+			mob.npcDefinition = OAX6.NPCFactory.getDefinition(mob.npcDefid);
+		}
+		mob.sprite = OAX6.MobFactory.getSprite(data.phaserGame, mob.definition, mob.x, mob.y);
 	}
 });
 

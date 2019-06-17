@@ -3,6 +3,7 @@ const AppearanceFactory = require('./AppearanceFactory');
 const ItemFactory = require('./ItemFactory');
 const Stat = require('./Stat.class');
 const Constants = require('./Constants');
+const MobDescription = require('./MobDescription');
 
 const MobFactory = {
 	init: function(mobTypeData){
@@ -22,13 +23,9 @@ const MobFactory = {
 		if (!definition) {
 			throw new Error('Invalid definition: [' + typeId + ']')
 		}
+		mob.defid = typeId;
 		mob.definition = definition;
-		const appearance = AppearanceFactory.getAppearance(definition.appearance);
-		mob.sprite = game.add.sprite(x*16, y*16, appearance.tileset, appearance.d[1], OAX6.UI.mobsLayer);
-		mob.sprite.animations.add('walk_s', appearance.d, 4);
-		mob.sprite.animations.add('walk_n', appearance.u, 4);
-		mob.sprite.animations.add('walk_e', appearance.r, 4);
-		mob.sprite.animations.add('walk_w', appearance.l, 4);
+		mob.sprite = this.getSprite(game, definition, x, y);
 		mob.hp = new Stat(definition.hp);
 		mob.damage = new Stat(definition.damage);
 		mob.defense = new Stat(definition.defense);
@@ -56,6 +53,28 @@ const MobFactory = {
 				mob.addItem(ItemFactory.createItem(id, quantity));
 			})
 		}
+	},
+	getDefinition (defid) {
+		const definition = this.mobTypeMap[defid];
+		if (!definition) {
+			throw new Error('Invalid definition: [' + defid + ']')
+		}
+		return definition;
+	},
+	getSprite (game, definition, x, y) {
+		const appearance = AppearanceFactory.getAppearance(definition.appearance);
+		const sprite = game.add.sprite(x * 16, y * 16, appearance.tileset, appearance.d[1], OAX6.UI.mobsLayer);
+		sprite.animations.add('walk_s', appearance.d, 4);
+		sprite.animations.add('walk_n', appearance.u, 4);
+		sprite.animations.add('walk_e', appearance.r, 4);
+		sprite.animations.add('walk_w', appearance.l, 4);
+		sprite.inputEnabled = true;
+		sprite.events.onInputDown.add(() => { 
+			if (game.input.activePointer.rightButton.isDown) {
+				MobDescription.showMob(mob); 
+			}
+		});
+		return sprite;
 	}
 };
 

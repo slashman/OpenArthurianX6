@@ -79,25 +79,29 @@ const OAX6 = {
 		}
 	},
 	loadGame: function(game) {
-		const loadedGame = Storage.loadGame();
-		const player = loadedGame.player;
+		const player = Storage.loadGame(game);
+		PlayerStateMachine.player = player;
+		game.camera.follow(player.sprite);
 		UI.player = player;
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
-		LevelLoader.setLevelsData(loadedGame.levels);
-		player.level.activate();
-		SkyBox.setMinuteOfDay(loadedGame.minuteOfDay);
+		/*LevelLoader.setLevelsData({
+			[player.level.mapId]: player.level
+		});*/
+		LevelLoader.restoreLevel(player.level);
+		UI.restoreComponentState();
 	}
-	/*loadLevel: function(game){
-		const startingState = scenarioInfo.startingState;
-		return LevelLoader.loadLevel(game, startingState.map);
-	},*/
 };
 
 window.OAX6 = {
 	runner: OAX6,
 	UI: UI,
 	Timer: Timer,
-	LevelLoader
+	LevelLoader,
+	NPCFactory,
+	MobFactory,
+	ItemFactory,
+	AppearanceFactory,
+	PlayerStateMachine
 };
 
 module.exports = OAX6;

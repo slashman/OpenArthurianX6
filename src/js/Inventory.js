@@ -66,7 +66,7 @@ module.exports = {
         OAX6.UI.showMessage("Use " + inventory[index].def.name + " on ...");
 
         const PSM = OAX6.runner.playerStateMachine;
-        const appearance = inventory[index].def.appearance;
+        const appearance = OAX6.AppearanceFactory.getAppearance(inventory[index].def.appearance);
         PSM.setCursor(appearance.tileset, appearance.i);
 
         this.useItemOn = inventory[index];
@@ -134,7 +134,7 @@ module.exports = {
 
         for (var i=start;i<end;i++) {
             if (inventory[i]) {
-                var appearance = inventory[i].def.appearance;
+                var appearance = OAX6.AppearanceFactory.getAppearance(inventory[i].def.appearance);
                 this.invSlots[i-start].loadTexture(appearance.tileset, appearance.i);
                 if (inventory[i].quantity !== undefined && inventory[i].quantity > 1){
                   this.quantityLabels[i-start].visible = true;

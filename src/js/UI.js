@@ -233,7 +233,13 @@ const UI = {
         this.outstandingPromise();
       }
     }
+  },
+  restoreComponentState() {
+  	PartyStatus.addMob(this.player);
+  	this.player.party.forEach(m => PartyStatus.addMob(m));
+	SkyBox.setMinuteOfDay(60);
   }
+  	
 }
 
 module.exports = UI;

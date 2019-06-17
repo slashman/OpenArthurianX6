@@ -249,13 +249,14 @@ const PlayerStateMachine = {
      */
     saveCommand() {
         const activeMob = OAX6.UI.activeMob || this.player;
-        return new Promise((resolve)=>{
+        return Promise.resolve()
+        .then(()=>{
             this.switchState(PlayerStateMachine.NOTHING);
             this.actionEnabled = false;
-            activeMob.reportAction("Saving Game");
+            OAX6.UI.showMessage("Saving Game...");
             return Storage.saveGame(this.player);
-        }).then(dir=>{
-            activeMob.reportAction("Saved");
+        }).then(()=>{
+            OAX6.UI.showMessage("Game Saved.");
             this.resetState();
             this.actionEnabled = true;
         });

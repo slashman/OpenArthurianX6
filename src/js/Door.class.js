@@ -11,6 +11,10 @@ circular.registerClass('Door', Door, {
   transients: {
     sprite: true,
     def: true
+  },
+  reviver: function(door, data) {
+    door.def = OAX6.ItemFactory.getDefinition(door.defid);
+    door.sprite = OAX6.ItemFactory.getDoorSprite(data.phaserGame, door);
   }
 });
 
@@ -65,7 +69,7 @@ Door.prototype = {
   },
 
   switchSprite() {
-    const appearance = this.open ? this.def.openAppearance : this.def.closedAppearance;
+    const appearance = OAX6.AppearanceFactory.getAppearance(this.open ? this.def.openAppearance : this.def.closedAppearance);
     this.sprite.frame = appearance.i;
   }
 }
