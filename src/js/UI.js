@@ -19,6 +19,8 @@ const PartyStatus = require('./ui/PartyStatus');
 
 const scenarioInfo = require('./ScenarioInfo');
 
+const STRETCH = true;
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
@@ -29,11 +31,15 @@ const UI = {
 	},
 	init: function(){
     Timer.init(this.game);
-		//this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    	if (STRETCH) {
+    		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    	} else {
+    		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+    		this.game.scale.setUserScale(2, 2);
+    	}
+		
 		this.game.renderer.renderSession.roundPixels = true;  
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
-		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;  
-		//this.game.scale.setUserScale(2, 2);
 		this.nextMove = 0;
     Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
