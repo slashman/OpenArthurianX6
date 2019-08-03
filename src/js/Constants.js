@@ -9,5 +9,7 @@ module.exports = {
     NEUTRAL: 'neutral',
     ENEMY: 'enemy',
     PLAYER: 'player'
-  }
+  },
+
+  FOV_RADIUS: 15
 }

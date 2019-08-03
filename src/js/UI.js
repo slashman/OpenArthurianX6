@@ -10,7 +10,8 @@ const Geo = require('./Geo');
 const TILE_WIDTH = 16;
 const TILE_HEIGHT = 16;
 
-const FlyType = require('./Constants').FlyType;
+const Constants = require('./Constants');
+const FlyType = Constants.FlyType;
 
 const Bus = require('./Bus');
 const SkyBox = require('./SkyBox');
@@ -19,7 +20,7 @@ const PartyStatus = require('./ui/PartyStatus');
 
 const scenarioInfo = require('./ScenarioInfo');
 
-const STRETCH = true;
+const STRETCH = false;
 
 const UI = {
 	launch: function(then){
@@ -30,18 +31,19 @@ const UI = {
 		Loader.load(this.game);
 	},
 	init: function(){
-    Timer.init(this.game);
-    	if (STRETCH) {
-    		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    	} else {
-    		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
-    		this.game.scale.setUserScale(2, 2);
-    	}
+		Timer.init(this.game);
+		if (STRETCH) {
+			this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		} else {
+			this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+			this.game.scale.setUserScale(2, 2);
+		}
 		
 		this.game.renderer.renderSession.roundPixels = true;  
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
+
 		this.nextMove = 0;
-    Bus.listen('nextMessage', () => this.showNextSceneFragment());
+		Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
 	create: function(){
 		this.mapLayer = this.game.add.group();
@@ -54,6 +56,22 @@ const UI = {
 		this.modeLabel = this.game.add.bitmapText(this.game.width - 48, 60, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
 
+		this.fovMask = [];
+		this.fovBlocks = [];
+		this.fovBlockLayer = this.game.add.group(this.UILayer);
+		const maskWidth = (Constants.FOV_RADIUS * 2 + 1) * TILE_WIDTH;
+		const maskHeight = (Constants.FOV_RADIUS * 2 + 1) * TILE_HEIGHT;
+		this.fovBlockLayer.x = (400 / 2 - 16) - maskWidth / 2;
+		this.fovBlockLayer.y = (300 / 2 - 16) - maskHeight / 2;
+		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
+			this.fovMask[x] = [];
+			this.fovBlocks[x] = [];
+			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) {
+				this.fovMask[x][y] = false;
+				this.fovBlocks[x][y] = this.game.add.sprite(x * TILE_WIDTH, y * TILE_HEIGHT, 'ui', 8, this.fovBlockLayer);
+			}
+		}
+
 		this.modeLabel.anchor.set(0.5);
 
 		SkyBox.init(this.game, this.UILayer);
@@ -65,13 +83,57 @@ const UI = {
 		this.marker.visible = false;
 		this.floatingIcon = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.floatingIcon.visible = false;
-    this.floatingIcon.anchor.setTo(0.5);
+		this.floatingIcon.anchor.setTo(0.5);
 		
 		this.start();
 	},
 	update: function(){
 		PlayerStateMachine.update();
 		PartyStatus.update();
+	},
+	updateFOV: function() {
+		/*
+		 * This function uses simple raycasting, 
+		 * use something better for longer ranges
+		 * or increased performance
+		 */
+		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++)
+			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) 
+				this.fovMask[x][y] = false;
+				var step = Math.PI * 2.0 / 1080;
+				for (var a = 0; a < Math.PI * 2; a += step)
+					this.shootRay(a);
+	
+		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
+			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) {
+				if (x == Constants.FOV_RADIUS + 1 && y == Constants.FOV_RADIUS + 1) {
+					this.fovBlocks[x][y].visible = false;
+				} else {
+					this.fovBlocks[x][y].visible = !this.fovMask[x][y];
+				}
+			}
+		}
+	},
+	shootRay: function (a) {
+		var step = 0.3333;
+		var maxdist = this.player.sightRange < Constants.FOV_RADIUS ? this.player.sightRange : Constants.FOV_RADIUS;
+		maxdist /= step;
+		var dx = Math.cos(a) * step;
+		var dy = -Math.sin(a) * step;
+		var xx = this.player.x, yy = this.player.y;
+		for (var i = 0; i < maxdist; ++i) {
+			var testx = Math.round(xx);
+			var testy = Math.round(yy);
+			try { 
+				this.fovMask[testx - this.player.x + Constants.FOV_RADIUS + 1][testy - this.player.y + Constants.FOV_RADIUS + 1] = true;
+				if (this.player.level.isOpaque(testx, testy))
+					return;
+			} catch(err) {
+				// Catch OOB
+				return; 
+			}
+			xx += dx; yy += dy;
+		}
 	},
 	start: function(){
 		this.scrollingEnabled = true;
@@ -244,6 +306,13 @@ const UI = {
   	PartyStatus.addMob(this.player);
   	this.player.party.forEach(m => PartyStatus.addMob(m));
 	SkyBox.setMinuteOfDay(60);
+  },
+  tweenFOVMask(dx, dy, delay) {
+	return this.executeTween(this.fovBlockLayer, { x: this.fovBlockLayer.x - dx * TILE_WIDTH, y: this.fovBlockLayer.y - dy * TILE_HEIGHT }, delay)
+		.then(() => {
+			this.fovBlockLayer.x = this.fovBlockLayer.x + dx * TILE_WIDTH;
+			this.fovBlockLayer.y = this.fovBlockLayer.y + dy * TILE_WIDTH;
+		});
   }
   	
 }

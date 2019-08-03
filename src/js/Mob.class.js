@@ -32,6 +32,7 @@ function Mob(level, x, y, z){
 	this.flags = {};
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;
+	this.sightRange = 15;
 	this._c = circular.register('Mob');
 }
 
@@ -332,10 +333,13 @@ Mob.prototype = {
 		// Position changes before the tween to "reserve" the spot
 		this.x += dx;
 		this.y += dy;
-
+		if (this === OAX6.UI.player){
+			OAX6.UI.tweenFOVMask(dx, dy, OAX6.UI.WALK_DELAY);
+		}
 		var dir = OAX6.UI.selectDir(dx, dy);
 		this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
 		this.reportAction("Move");
+		
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
 	/*

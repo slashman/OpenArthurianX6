@@ -102,7 +102,7 @@ const PlayerStateMachine = {
             OAX6.UI.hideMarker(); 
             this.actionEnabled = false;
             const activeMob = OAX6.UI.activeMob || this.player;
-            return activeMob.moveTo(varx, vary);
+            return activeMob.moveTo(varx, vary).then(() => OAX6.UI.updateFOV());
         } else {
             return false;
         }

@@ -45,7 +45,8 @@ const LevelLoader = {
 		const itemsData = tiledMap.items;
 		const doorsData = tiledMap.doors;
 
-		level.setSolidMask(tiledMap.solidMask);
+		level.setSolidMask(tiledMap.masks.solidMask);
+		level.setOpaqueMask(tiledMap.masks.opaqueMask);
 		mobsData.forEach((mobData) => this.loadMob(mobData, level));
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
 		if (doorsData) {
@@ -64,13 +65,13 @@ const LevelLoader = {
 		map.createLayer('Objects', false, false, OAX6.UI.mapLayer);
 		//map.createLayer('Doors', false, false, OAX6.UI.doorsLayer);
 		terrainLayer.resizeWorld();
-		this.game.camera.deadzone = new Phaser.Rectangle(192, 144, 0, 0);
+		this.game.camera.deadzone = new Phaser.Rectangle(400 / 2 - 8, 300 / 2 - 8, 0, 0);
 		return {
 			map: map,
 			mobs: this.loadTiledMapMobs(map),
 			items: this.loadTiledMapItems(map, 'Items'),
 			doors: map.objects.Doors,
-			solidMask: this.loadTiledMapSolidMask(map)
+			masks: this.loadTiledMasks(map)
 		};
 	},
 	loadTiledMapItems: function(map, layerId) {
@@ -124,19 +125,22 @@ const LevelLoader = {
 		}
 		return mobData;
 	},
-	loadTiledMapSolidMask: function(map) {
+	loadTiledMasks: function(map) {
 		let w = map.width,
 			h = map.height,
-			solidMask = [];
+			solidMask = [],
+			opaqueMask = [];
 
 		for (let x=0;x<w;x++) {
 			solidMask[x] = [];
+			opaqueMask[x] = [];
 			for (let y=0;y<h;y++) {
 				solidMask[x][y] = map.hasTile(x, y, "SolidTiles");
+				opaqueMask[x][y] = map.hasTile(x, y, "OpaqueTiles");
 			}
 		}
 
-		return solidMask;
+		return { solidMask, opaqueMask };
 	},
 	loadMob: function(mobData, level){
 		let mob = null;
@@ -167,7 +171,8 @@ const LevelLoader = {
 	},
 	restoreLevel: function (level) {
 		const tiledMap = this.loadTiledMap(level.mapId, level);
-		level.setSolidMask(tiledMap.solidMask);
+		level.setSolidMask(tiledMap.masks.solidMask);
+		level.setOpaqueMask(tiledMap.masks.opaqueMask);
 		level.doors.forEach((door) => {
 			OAX6.UI.addItemSprite(door, door.x, door.y);
 			OAX6.UI.doorsLayer.add(door.sprite); // Override group

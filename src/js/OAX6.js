@@ -70,6 +70,7 @@ const OAX6 = {
 			player.addMobToParty(npc);
 		});
 		LevelLoader.openLevel(startingState.map, player);
+		UI.updateFOV();
 
 		if (startingState.scene) {
 			UI.showScene(startingState.scene);
@@ -88,6 +89,7 @@ const OAX6 = {
 			[player.level.mapId]: player.level
 		});*/
 		LevelLoader.restoreLevel(player.level);
+		UI.updateFOV();
 		UI.restoreComponentState();
 	}
 };

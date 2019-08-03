@@ -15,6 +15,7 @@ function Level(){
 	this.items = [];
 	this.doors = [];
 	this.solidMask = null;
+	this.opaqueMask = null;
 	this.currentTurnCounter = 0;
 	this._c = circular.register('Level');
 }
@@ -22,6 +23,7 @@ function Level(){
 circular.registerClass('Level', Level, {
 	transients: {
 		solidMask: true,
+		opaqueMask: true,
 		pfGrid: true
 	}
 });
@@ -33,6 +35,9 @@ Level.prototype = {
 			return true;
 		}
 		return false;
+	},
+	isOpaque: function(x, y){
+		return this.opaqueMask[x][y];
 	},
 	setSolid: function(x, y, solid) {
 		this.solidMask[x][y] = solid;
@@ -48,6 +53,9 @@ Level.prototype = {
 	},
 	_transpose: function(m) {
 		return m[0].map((x,i) => m.map(x => x[i]));
+	},
+	setOpaqueMask: function(opaqueMask) {
+		this.opaqueMask = opaqueMask;
 	},
 	setSolidMask: function(solidMask) {
 		this.solidMask = solidMask;
