@@ -20,7 +20,7 @@ const PartyStatus = require('./ui/PartyStatus');
 
 const scenarioInfo = require('./ScenarioInfo');
 
-const STRETCH = false;
+const STRETCH = true;
 
 const UI = {
 	launch: function(then){
