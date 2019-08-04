@@ -50,6 +50,7 @@ const UI = {
 		this.floorLayer = this.game.add.group();
 		this.mobsLayer = this.game.add.group();
 		this.doorsLayer = this.game.add.group();
+		this.fovBlockLayer = this.game.add.group();
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
@@ -58,11 +59,7 @@ const UI = {
 
 		this.fovMask = [];
 		this.fovBlocks = [];
-		this.fovBlockLayer = this.game.add.group(this.UILayer);
-		const maskWidth = (Constants.FOV_RADIUS * 2 + 1) * TILE_WIDTH;
-		const maskHeight = (Constants.FOV_RADIUS * 2 + 1) * TILE_HEIGHT;
-		this.fovBlockLayer.x = (400 / 2 - 16) - maskWidth / 2;
-		this.fovBlockLayer.y = (300 / 2 - 16) - maskHeight / 2;
+		
 		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
 			this.fovMask[x] = [];
 			this.fovBlocks[x] = [];
@@ -113,6 +110,8 @@ const UI = {
 				}
 			}
 		}
+		this.fovBlockLayer.x = (this.player.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
+		this.fovBlockLayer.y = (this.player.y - Constants.FOV_RADIUS - 1) * TILE_HEIGHT;
 	},
 	shootRay: function (a) {
 		var step = 0.3333;
@@ -306,15 +305,7 @@ const UI = {
   	PartyStatus.addMob(this.player);
   	this.player.party.forEach(m => PartyStatus.addMob(m));
 	SkyBox.setMinuteOfDay(60);
-  },
-  tweenFOVMask(dx, dy, delay) {
-	return this.executeTween(this.fovBlockLayer, { x: this.fovBlockLayer.x - dx * TILE_WIDTH, y: this.fovBlockLayer.y - dy * TILE_HEIGHT }, delay)
-		.then(() => {
-			this.fovBlockLayer.x = this.fovBlockLayer.x + dx * TILE_WIDTH;
-			this.fovBlockLayer.y = this.fovBlockLayer.y + dy * TILE_WIDTH;
-		});
-  }
-  	
+  }	
 }
 
 module.exports = UI;

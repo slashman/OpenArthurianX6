@@ -334,7 +334,7 @@ Mob.prototype = {
 		this.x += dx;
 		this.y += dy;
 		if (this === OAX6.UI.player){
-			OAX6.UI.tweenFOVMask(dx, dy, OAX6.UI.WALK_DELAY);
+			OAX6.UI.updateFOV();
 		}
 		var dir = OAX6.UI.selectDir(dx, dy);
 		this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
