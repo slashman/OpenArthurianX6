@@ -12,7 +12,7 @@ circular.registerClass('Item', Item, {
   },
   reviver: function(item, data) {
   	item.def = OAX6.ItemFactory.getDefinition(item.defid);
-    item.sprite = OAX6.ItemFactory.getSprite(data.phaserGame, item.def);
+    item.sprite = OAX6.ItemFactory.getSpriteForItem(data.phaserGame, item);
     // TODO: Sprite x and y, must store them somewhere for recovery? also the group it's currently on? floor vs inventory.
   }
 });

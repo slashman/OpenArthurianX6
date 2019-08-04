@@ -34,14 +34,15 @@ const ItemFactory = {
 		}
 		item.def = Object.assign({}, def);
 		item.defid = def.id;
-		item.sprite = this.getSprite(this.game, def);
+		item.sprite = this.getSpriteForItem(this.game, item);
 		return item;
 	},
 	getDefinition: function(defid) {
 		return Object.assign({}, this.itemsMap[defid]);
 	},
-	getSprite: function(game, definition) {
-		const appearance = AppearanceFactory.getAppearance(definition.appearance);
+	getSpriteForItem: function(game, item) {
+		const { def } = item;
+		const appearance = AppearanceFactory.getAppearance(def.appearance);
 		const sprite = game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		sprite.visible = false;
 		sprite.inputEnabled = true;

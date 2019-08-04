@@ -47,7 +47,7 @@ circular.registerClass('Mob', Mob, {
 		if (mob.npcDefid) {
 			mob.npcDefinition = OAX6.NPCFactory.getDefinition(mob.npcDefid);
 		}
-		mob.sprite = OAX6.MobFactory.getSprite(data.phaserGame, mob.definition, mob.x, mob.y);
+		mob.sprite = OAX6.MobFactory.getSpriteForMob(data.phaserGame, mob);
 	}
 });
 

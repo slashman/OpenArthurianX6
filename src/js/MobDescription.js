@@ -60,7 +60,7 @@ module.exports = {
   },
 
   showItem(item) {
-    const appearance = (AppearanceFactory.getAppearance(item.def.appearance.id));
+    const appearance = AppearanceFactory.getAppearance(item.def.appearance);
 
     let key = appearance.tileset;
     let frame = appearance.i;
