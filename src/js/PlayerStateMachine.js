@@ -118,8 +118,11 @@ const PlayerStateMachine = {
         this.state = stateId;
     },
 
-    resetState: function() {
+    resetState: function(holdAction) {
         this.switchState(this.previousState);
+        if (!holdAction) {
+            this.actionEnabled = true;
+        }
     },
 
     setInputDialogCallback: function(callback, context) {
@@ -187,42 +190,49 @@ const PlayerStateMachine = {
     },
 
     attackCommand: function(){
-        // Select a direction
-        const activeMob = OAX6.UI.activeMob || this.player;
-        return new Promise((resolve)=>{
-            this.actionEnabled = false;
-            this.switchState(PlayerStateMachine.TARGETTING);
-            activeMob.reportAction("Attack - Where?");
-            OAX6.UI.hideMarker();
-            OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
-            this.setDirectionCallback((dir, cancelled) => {
-                OAX6.UI.hideIcon();
-                this.clearDirectionCallback();
-                if (cancelled) {
-                    return resolve(null);
-                }
-                activeMob.reportAction("Attack - "+Geo.getDirectionName(dir));
-                Timer.delay(500).then(()=>resolve(dir));
-            });
-        }).then(dir => {
+        return this._selectDirection('Attack').then(dir => {
             if (dir !== null) {
+                const activeMob = OAX6.UI.activeMob || this.player;
                 return activeMob.attackOnDirection(dir.x, dir.y);
             } else {
                 // ??? Is flow controlled?
             }
         }).then(()=>{
             this.resetState();
-            this.actionEnabled = true;
         });
     },
 
     getCommand: function() {
-        // Select a direction
+        return this._selectDirection('Get').then(dir => {
+            if (dir != null) {
+                const activeMob = OAX6.UI.activeMob || this.player;
+                return activeMob.getOnDirection(dir.x, dir.y);
+            }
+        }).then(()=>{
+            this.resetState();
+        });
+    },
+
+    /**
+     * Uses things in the world.
+     */
+    useCommand: function() {
+        return this._selectDirection('Use').then(dir=>{
+            if (dir != null) {
+                const activeMob = OAX6.UI.activeMob || this.player;
+                return activeMob.useOnDirection(dir.x, dir.y);
+            }
+        }).then(()=>{
+            this.resetState();
+        });
+    },
+
+    _selectDirection(verb) {
         const activeMob = OAX6.UI.activeMob || this.player;
         return new Promise((resolve)=>{
             this.switchState(PlayerStateMachine.TARGETTING);
             this.actionEnabled = false;
-            activeMob.reportAction("Get - Where?");
+            activeMob.reportAction(verb + " - Where?");
             OAX6.UI.hideMarker();
             OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
             this.setDirectionCallback((dir, cancelled) => {
@@ -231,16 +241,9 @@ const PlayerStateMachine = {
                 if (cancelled) {
                     return resolve(null);
                 }
-                activeMob.reportAction("Get - "+Geo.getDirectionName(dir));
+                activeMob.reportAction(verb + " - " + Geo.getDirectionName(dir));
                 Timer.delay(500).then(()=>resolve(dir));
             });
-        }).then(dir=>{
-            if (dir != null) {
-                return activeMob.getOnDirection(dir.x, dir.y);
-            }
-        }).then(()=>{
-            this.resetState();
-            this.actionEnabled = true;
         });
     },
 
@@ -258,7 +261,6 @@ const PlayerStateMachine = {
         }).then(()=>{
             OAX6.UI.showMessage("Game Saved.");
             this.resetState();
-            this.actionEnabled = true;
         });
     },
 
@@ -297,13 +299,11 @@ const PlayerStateMachine = {
                 return activeMob.attackToPosition(position.x, position.y).then(done => {
                     if (!done) {
                         this.resetState();
-                        this.actionEnabled = true;
                         OAX6.UI.hideIcon();
                     }
                 });
             } else {
                 this.resetState();
-                this.actionEnabled = true;
                 OAX6.UI.hideIcon();
                 this.player.reportAction("Canceled");
             }
@@ -344,6 +344,8 @@ const PlayerStateMachine = {
                     return this.getCommand();
                 } else if (keyCode === Phaser.KeyCode.S){
                     return this.saveCommand();
+                } else if (keyCode === Phaser.KeyCode.U) {
+                    return this.useCommand();
                 }
             }
 

@@ -295,7 +295,7 @@ const UI = {
     } else {
       Bus.emit('hideMessage');
       PlayerStateMachine.clearActionCallback();
-      PlayerStateMachine.resetState();
+      PlayerStateMachine.resetState(true);
       if (this.outstandingPromise) {
         this.outstandingPromise();
       }

@@ -385,6 +385,19 @@ Mob.prototype = {
 			this.reportAction("Get - Nothing there!");
 		}
 	},
+	useOnDirection(dx, dy) {
+		var door = this.level.getDoorAt(this.x + dx, this.y + dy);
+		if (door) {
+			OAX6.PlayerStateMachine.openDoor(door);
+			if (door.open) {
+				OAX6.UI.showMessage("Use - Opened door");
+			} else {
+				OAX6.UI.showMessage("Use - Closed door");
+			}
+		} else {
+			this.reportAction("Use - Nothing there!");
+		}
+	},
 	dropOnDirection: function(dx, dy, item) {
 		var x = this.x + dx,
 			y = this.y + dy;
