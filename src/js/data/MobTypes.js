@@ -118,7 +118,7 @@ const MobTypes = [
 	},
 	{
 		id: 'asteroth',
-		appearance: 'soldier',
+		appearance: 'asteroth',
 		name: 'Asteroth',
 		description: 'Lord of Empath Abbey.',
 		hp: 500,
