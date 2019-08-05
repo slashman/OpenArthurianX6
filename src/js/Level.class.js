@@ -39,8 +39,9 @@ Level.prototype = {
 	isOpaque: function(x, y){
 		return this.opaqueMask[x][y];
 	},
-	setSolid: function(x, y, solid) {
+	setSolidAndOpaque: function(x, y, solid) {
 		this.solidMask[x][y] = solid;
+		this.opaqueMask[x][y] = solid;
 	},
 	getMobAt: function(x, y){
 		// TODO: Replace for this.mobs.find

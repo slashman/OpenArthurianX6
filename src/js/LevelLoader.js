@@ -161,7 +161,7 @@ const LevelLoader = {
 		door.lock = doorData.properties.lock;
 
 		level.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1);
-		level.setSolid(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, true);
+		level.setSolidAndOpaque(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, true);
 	},
 	/**
 	 * Initializes the data for the different levels from a savegame
@@ -176,7 +176,7 @@ const LevelLoader = {
 		level.doors.forEach((door) => {
 			OAX6.UI.addItemSprite(door, door.x, door.y);
 			OAX6.UI.doorsLayer.add(door.sprite); // Override group
-			level.setSolid(door.x, door.y, true);
+			level.setSolidAndOpaque(door.x, door.y, true);
 		});
 		level.activate();
 		level.activateAll();
