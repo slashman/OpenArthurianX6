@@ -6,7 +6,10 @@ const NPCs = [
 		name: 'Avatar',
 		type: 'avatar',
 		alignment: 'player',
-		weapon: 'magicAxe'
+		weapon: 'magicAxe',
+		items: [
+			{ id: 'journalOfTheQuest', quantity: 1 }
+		],
 	},
 	{
 		id: 'iolo',
@@ -94,7 +97,8 @@ const NPCs = [
 		alignment: 'player',
 		weapon: 'crossbow',
 		items: [
-			{ id: 'ironBolt', quantity: 50 }
+			{ id: 'ironBolt', quantity: 50 },
+			{ id: 'fish', quantity: 3 }
 		],
 		intent: 'seekPlayer',
 		triggers: [

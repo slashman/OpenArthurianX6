@@ -58,8 +58,7 @@ module.exports = {
     onInputDown: function(index) {
         if (!this.game.input.activePointer.leftButton.isDown) { return; }
 
-        const player = OAX6.UI.player,
-            inventory = player.inventory;
+        const inventory = this.currentMob.inventory;
 
         if (!inventory[index]) { return; }
 
@@ -77,8 +76,7 @@ module.exports = {
     useCursorItem: function() {
         if (!this.useItemOn) { return; }
 
-        const player = OAX6.UI.player,
-            inventory = player.inventory,
+        const inventory = this.currentMob.inventory,
             index = inventory.indexOf(this.useItemOn),
             PSM = OAX6.runner.playerStateMachine;
 
@@ -92,7 +90,7 @@ module.exports = {
 
     moveCursor: function(x, y) {
         var amount = x + y * this.COLUMNS,
-            inventory = this.UI.player.inventory,
+            inventory = this.currentMob.inventory,
             scrolled = false;
 
         this.cursorSlot += amount;
@@ -126,9 +124,13 @@ module.exports = {
         this.cursor.y = y;
     },
 
-    updateInventory: function() {
-        var player = OAX6.UI.player,
-            inventory = player.inventory,
+    updateInventory: function(partyMemberIndex) {
+        const mob = partyMemberIndex == 0 ? OAX6.UI.player : OAX6.UI.player.party[partyMemberIndex - 1];
+        if (!mob) {
+            return false;
+        }
+        this.currentMob = mob;
+        var inventory = mob.inventory,
             start = this.scroll * this.COLUMNS,
             end = start+this.MAX_DISPLAY;
 
@@ -147,14 +149,16 @@ module.exports = {
                 this.quantityLabels[i-start].visible = false;
             }
         }
-
         this.moveCursor(0, 0);
+        return true;
     },
 
-    open: function() {
-        this.inventoryGroup.visible = true;
-
-        this.updateInventory();
+    open: function(partyMemberIndex) {
+        const opened = this.updateInventory(partyMemberIndex);
+        if (opened) {
+            this.inventoryGroup.visible = true;
+        }
+        return opened;
     },
 
     close: function() {

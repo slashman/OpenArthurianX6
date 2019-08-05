@@ -7,7 +7,7 @@ const PlayerFactory = {
 	buildPlayer: function(game, level, x, y, z){
 		const mob = NPCFactory.buildNPC(game, "avatar", level, x, y, x);
 		mob.canStartDialog = true;
-		mob.inventory = PlayerStateMachine.inventory;
+		PlayerStateMachine.inventory = mob.inventory;
 		mob.name = "Avatar";
 		mob.alignment = Constants.Alignments.PLAYER;
 		PlayerStateMachine.player = mob;

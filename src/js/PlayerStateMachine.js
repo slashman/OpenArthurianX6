@@ -7,6 +7,8 @@ const ItemFactory = require('./ItemFactory');
 const Storage = require('./Storage');
 const MobDescription = require('./MobDescription');
 
+const MAX_PARTY_SIZE = 3;
+
 const PlayerStateMachine = {
     NOTHING     : 0,
     WORLD       : 1,
@@ -42,7 +44,6 @@ const PlayerStateMachine = {
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
-        this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
         this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
     },
     setCursor: function(tileset, frame) {
@@ -402,19 +403,17 @@ const PlayerStateMachine = {
         return null;
     },
 
-    activateInventory: function() {
-        // TODO: Needs to define from where can open the inventory and probably a better way to access it
-        if (PlayerStateMachine.state != PlayerStateMachine.WORLD && PlayerStateMachine.state != PlayerStateMachine.INVENTORY) {
-            return;
-        }
-
+    activateInventory: function(partyMemberIndex) {
+        // TODO: Note that this will support being called with a different index
         return new Promise((resolve) => {
-            if (Inventory.isOpen()) {
-                Inventory.close();
-                PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
-                this.clearDirectionCallback();
-            } else {
-                Inventory.open();
+            const opened = Inventory.open(partyMemberIndex);
+            if (opened) {
+                this.setActionCallback((cancelled) => {
+                    this.clearActionCallback();
+                    this.clearDirectionCallback();
+                    Inventory.close();
+                    PlayerStateMachine.switchState(PlayerStateMachine.WORLD); // TODO: Reset state instead?
+                });
                 PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
                 this.setDirectionCallback(this.updateInventoryDirection.bind(this));
             }
@@ -441,6 +440,11 @@ const PlayerStateMachine = {
                     return this.useCommand();
                 } else if (keyCode === Phaser.KeyCode.L) {
                     return this.lookCommand();
+                } else if (keyCode === Phaser.KeyCode.I) {
+                    return this.activateInventory(0);
+                } else if (keyCode >= Phaser.KeyCode.ONE && keyCode <= Phaser.KeyCode.ONE + MAX_PARTY_SIZE) {
+                    const partyMemberIndex = keyCode - Phaser.KeyCode.ONE;
+                    return this.activateInventory(partyMemberIndex);
                 }
             }
 
