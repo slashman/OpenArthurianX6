@@ -63,7 +63,6 @@ const LevelLoader = {
 		map.createLayer('Vegetation', false, false, OAX6.UI.mapLayer);
 		map.createLayer('Buildings', false, false, OAX6.UI.mapLayer);
 		map.createLayer('Objects', false, false, OAX6.UI.mapLayer);
-		//map.createLayer('Doors', false, false, OAX6.UI.doorsLayer);
 		terrainLayer.resizeWorld();
 		this.game.camera.deadzone = new Phaser.Rectangle(400 / 2 - 8, 300 / 2 - 8, 0, 0);
 		return {
@@ -176,7 +175,7 @@ const LevelLoader = {
 		level.doors.forEach((door) => {
 			OAX6.UI.addItemSprite(door, door.x, door.y);
 			OAX6.UI.doorsLayer.add(door.sprite); // Override group
-			level.setSolidAndOpaque(door.x, door.y, true);
+			level.setSolidAndOpaque(door.x, door.y, !door.open);
 		});
 		level.activate();
 		level.activateAll();
