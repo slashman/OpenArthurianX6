@@ -101,14 +101,15 @@ module.exports = {
 
         PSM.switchState(OAX6.runner.playerStateMachine.FLOATING_ITEM);
 
-        this.close();
+        PSM.clearActionCallback();
+        PSM.clearDirectionCallback();
     },
 
     resetFloatingItem: function() {
         const PSM = OAX6.runner.playerStateMachine;
         this.useItemOn = null;
         PSM.setCursor(null, null);
-        PSM.switchState(OAX6.runner.playerStateMachine.WORLD);
+        PSM.activateInventory();
     },
 
     moveCursor: function(x, y) {
