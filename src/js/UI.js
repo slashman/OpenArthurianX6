@@ -313,7 +313,18 @@ const UI = {
 	SkyBox.setMinuteOfDay(60);
   },
   readBook(book) {
+  	OAX6.UI.showMessage("Reading book \"" + book.def.title + "\", press Left and Right to browse.");
   	BookPanel.show(book);
+  },
+  hideBook() {
+  	BookPanel.hide();
+  },
+  flipBook(dx) {
+  	if (dx > 0) {
+  		BookPanel.nextPages();
+  	} else {
+  		BookPanel.previousPages();
+  	}
   }
 }
 

@@ -25,12 +25,35 @@ const BookPanel = {
     show (book) {
         this.layer.visible = true;
         this.pages = this.__splitInPages(book.def.contents);
-        this.leftSide.text = this.pages[0];
-        this.rightSide.text = this.pages[1];
+        this.currentPage = 0;
+        this.__updateShownPage();
     },
 
     hide() {
         this.layer.visible = false;
+    },
+
+    nextPages () {
+        if (this.currentPage + 2 < this.pages.length) {
+            this.currentPage += 2;
+        }
+        this.__updateShownPage();
+    },
+
+    previousPages () {
+        if (this.currentPage - 2 >= 0) {
+            this.currentPage -= 2;
+        }
+        this.__updateShownPage();
+    },
+
+    __updateShownPage () {
+        this.leftSide.text = this.pages[this.currentPage];
+        if (this.pages.length > this.currentPage + 1) {
+            this.rightSide.text = this.pages[this.currentPage + 1];
+        } else {
+            this.rightSide.text = '';
+        }
     },
 
     __splitInPages (content) {

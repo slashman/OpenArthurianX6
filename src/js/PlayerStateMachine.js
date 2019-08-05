@@ -326,12 +326,24 @@ const PlayerStateMachine = {
         return this._selectPosition('Look').then(position => {
             if (position !== null) {
                 const shown = this.__lookAtPosition(position.x, position.y);
-                if (shown) {
+                if (shown == 'basic') {
                     this.setActionCallback(() => {
                         MobDescription.hide();
                         this.resetState();
                         this.clearActionCallback();
                         OAX6.UI.hideIcon();
+                    });
+                    return;
+                } else if (shown == 'book') {
+                    this.setActionCallback(() => {
+                        OAX6.UI.hideBook();
+                        this.resetState();
+                        this.clearActionCallback();
+                        this.clearDirectionCallback();
+                        OAX6.UI.hideIcon();
+                    });
+                    this.setDirectionCallback((dir) => {
+                        OAX6.UI.flipBook(dir.x);
                     });
                     return;
                 }
@@ -343,23 +355,24 @@ const PlayerStateMachine = {
 
     __lookAtPosition(x, y) {
         if (OAX6.UI.isFOVBlocked(x,y)) {
-            return false;
+            return null;
         }
         const mob = this.player.level.getMobAt(x, y);
         if (mob){
             MobDescription.showMob(mob);
-            return true;
+            return 'basic';
         }
         var item = this.player.level.getItemAt(x, y);
         if (item) {
             if (item.def.isBook) {
                 OAX6.UI.readBook(item);
+                return 'book';
             } else {
                 MobDescription.showItem(item);
+                return 'basic';
             }
-            return true;
         }
-        return false;
+        return null;
     },
 
     activateInventory: function() {
