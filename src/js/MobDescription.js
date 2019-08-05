@@ -14,14 +14,13 @@ module.exports = {
     this.description = game.add.bitmapText(53, 85, 'pixeled', '', 12);
     this.description.maxWidth = 90;
 
+    // TODO: Don't like this. Would rater add a listener to the UI when the dialog is shown.
     this.closeArea = game.add.sprite(0,0);
     this.closeArea.width = game.width;
     this.closeArea.height = game.height;
     this.closeArea.inputEnabled = true;
     this.closeArea.events.onInputDown.add(() => { 
-      if (this.descriptionUI.visible) {
-        this.descriptionUI.visible = false;
-      }
+      this.hide();
     });
 
     this.descriptionUI = game.add.group();
@@ -71,5 +70,11 @@ module.exports = {
     this.description.text = item.def.description || '';
 
     this.descriptionUI.visible = true;
+  },
+
+  hide() {
+    if (this.descriptionUI.visible) {
+      this.descriptionUI.visible = false;
+    }
   }
 }

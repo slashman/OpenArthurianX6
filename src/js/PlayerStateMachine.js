@@ -5,6 +5,7 @@ const Random = require('./Random');
 const Inventory = require('./Inventory');
 const ItemFactory = require('./ItemFactory');
 const Storage = require('./Storage');
+const MobDescription = require('./MobDescription');
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -227,6 +228,12 @@ const PlayerStateMachine = {
         });
     },
 
+    /**
+     * Utility function to set the UI in "Select direction" mode,
+     * resolves to a fiven direction, or null if the player cancelled.
+     *
+     * Other user actions make use of this to implement specific logic
+     */
     _selectDirection(verb) {
         const activeMob = OAX6.UI.activeMob || this.player;
         return new Promise((resolve)=>{
@@ -247,29 +254,12 @@ const PlayerStateMachine = {
         });
     },
 
-    /**
-     * Saves the game
-     */
-    saveCommand() {
-        const activeMob = OAX6.UI.activeMob || this.player;
-        return Promise.resolve()
-        .then(()=>{
-            this.switchState(PlayerStateMachine.NOTHING);
-            this.actionEnabled = false;
-            OAX6.UI.showMessage("Saving Game...");
-            return Storage.saveGame(this.player);
-        }).then(()=>{
-            OAX6.UI.showMessage("Game Saved.");
-            this.resetState();
-        });
-    },
-
-    rangedAttackCommand: function(){
+    _selectPosition(verb) {
         const activeMob = OAX6.UI.activeMob || this.player;
         return new Promise((resolve)=>{
             this.switchState(PlayerStateMachine.TARGETTING);
             this.actionEnabled = false;
-            activeMob.reportAction("Attack - Where?");
+            activeMob.reportAction(verb + " - Where?");
             OAX6.UI.hideMarker();
             let cursor = {
                 x: activeMob.x,
@@ -294,7 +284,29 @@ const PlayerStateMachine = {
                 }
                 resolve(cursor);
             });
-        }).then(position => {
+        });
+    },
+
+    /**
+     * Saves the game
+     */
+    saveCommand() {
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return Promise.resolve()
+        .then(()=>{
+            this.switchState(PlayerStateMachine.NOTHING);
+            this.actionEnabled = false;
+            OAX6.UI.showMessage("Saving Game...");
+            return Storage.saveGame(this.player);
+        }).then(()=>{
+            OAX6.UI.showMessage("Game Saved.");
+            this.resetState();
+        });
+    },
+
+    rangedAttackCommand: function(){
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return this._selectPosition('Attack').then(position => {
             if (position !== null) {
                 return activeMob.attackToPosition(position.x, position.y).then(done => {
                     if (!done) {
@@ -309,6 +321,43 @@ const PlayerStateMachine = {
             }
         });
     },
+
+    lookCommand(){
+        return this._selectPosition('Look').then(position => {
+            if (position !== null) {
+                const shown = this.__lookAtPosition(position.x, position.y);
+                if (shown) {
+                    this.setActionCallback(() => {
+                        MobDescription.hide();
+                        this.resetState();
+                        this.clearActionCallback();
+                        OAX6.UI.hideIcon();
+                    });
+                    return;
+                }
+            }
+            this.resetState();
+            OAX6.UI.hideIcon();
+        });
+    },
+
+    __lookAtPosition(x, y) {
+        if (OAX6.UI.isFOVBlocked(x,y)) {
+            return false;
+        }
+        const mob = this.player.level.getMobAt(x, y);
+        if (mob){
+            MobDescription.showMob(mob);
+            return true;
+        }
+        var item = this.player.level.getItemAt(x, y);
+        if (item) {
+            MobDescription.showItem(item);
+            return true;
+        }
+        return false;
+    },
+
     activateInventory: function() {
         // TODO: Needs to define from where can open the inventory and probably a better way to access it
         if (PlayerStateMachine.state != PlayerStateMachine.WORLD && PlayerStateMachine.state != PlayerStateMachine.INVENTORY) {
@@ -346,6 +395,8 @@ const PlayerStateMachine = {
                     return this.saveCommand();
                 } else if (keyCode === Phaser.KeyCode.U) {
                     return this.useCommand();
+                } else if (keyCode === Phaser.KeyCode.L) {
+                    return this.lookCommand();
                 }
             }
 

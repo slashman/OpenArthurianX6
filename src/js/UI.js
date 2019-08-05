@@ -88,6 +88,9 @@ const UI = {
 		PlayerStateMachine.update();
 		PartyStatus.update();
 	},
+	isFOVBlocked(x, y) {
+		return !this.fovMask[x - this.player.x + Constants.FOV_RADIUS + 1][y - this.player.y + Constants.FOV_RADIUS + 1];
+	},
 	updateFOV: function() {
 		/*
 		 * This function uses simple raycasting, 
@@ -97,10 +100,11 @@ const UI = {
 		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++)
 			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) 
 				this.fovMask[x][y] = false;
-				var step = Math.PI * 2.0 / 1080;
-				for (var a = 0; a < Math.PI * 2; a += step)
-					this.shootRay(a);
-	
+
+		var step = Math.PI * 2.0 / 1080;
+		for (var a = 0; a < Math.PI * 2; a += step)
+			this.shootRay(a);
+
 		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
 			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) {
 				if (x == Constants.FOV_RADIUS + 1 && y == Constants.FOV_RADIUS + 1) {
