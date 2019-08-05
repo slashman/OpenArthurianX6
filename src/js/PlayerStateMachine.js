@@ -323,35 +323,59 @@ const PlayerStateMachine = {
 
     lookCommand(){
         return this._selectPosition('Look').then(position => {
-            if (position !== null) {
-                const shown = this.__lookAtPosition(position.x, position.y);
-                if (shown == 'basic') {
-                    this.setActionCallback(() => {
-                        MobDescription.hide();
-                        this.resetState();
-                        this.clearActionCallback();
-                        OAX6.UI.hideIcon();
-                    });
-                    return;
-                } else if (shown == 'book') {
-                    this.setActionCallback(() => {
-                        OAX6.UI.hideBook();
-                        this.resetState();
-                        this.clearActionCallback();
-                        this.clearDirectionCallback();
-                        OAX6.UI.hideIcon();
-                    });
-                    this.setDirectionCallback((dir) => {
-                        if (dir && dir.x) {
-                            OAX6.UI.flipBook(dir.x);
-                        }
-                    });
-                    return;
-                }
+            if (position != null) {
+                this.__lookCommand(position, false);
+            } else {
+                this.__resetAfterLook(false);
             }
+        });
+    },
+    lookMouseCommand(position) {
+        // Only works in WORLD state
+        if (this.state !== PlayerStateMachine.WORLD) {
+            return;
+        }
+        // Only one thing can be examined at a time
+        if (this.examining) {
+            return;
+        }
+        this.actionEnabled = false;
+        this.__lookCommand(position, true);
+    },
+
+    __lookCommand(position, mouse) {
+        const shown = this.__lookAtPosition(position.x, position.y);
+        if (shown == 'basic') {
+            this.setActionCallback(() => {
+                this.clearActionCallback();
+                MobDescription.hide();
+                this.__resetAfterLook(mouse);
+            });
+        } else if (shown == 'book') {
+            this.setActionCallback(() => {
+                this.clearActionCallback();
+                this.clearDirectionCallback();
+                OAX6.UI.hideBook();
+                this.__resetAfterLook(mouse);
+            });
+            this.setDirectionCallback((dir) => {
+                if (dir && dir.x) {
+                    OAX6.UI.flipBook(dir.x);
+                }
+            });
+        } else {
+            this.__resetAfterLook(mouse);
+        }
+    },
+
+    __resetAfterLook(mouse) {
+        this.examining = false;
+        if (mouse) {
+            this.actionEnabled = true;
+        } else {
             this.resetState();
             OAX6.UI.hideIcon();
-        });
+        }
     },
 
     __lookAtPosition(x, y) {
@@ -361,10 +385,12 @@ const PlayerStateMachine = {
         const mob = this.player.level.getMobAt(x, y);
         if (mob){
             MobDescription.showMob(mob);
+            this.examining = true;
             return 'basic';
         }
         var item = this.player.level.getItemAt(x, y);
         if (item) {
+            this.examining = true;
             if (item.def.isBook) {
                 OAX6.UI.readBook(item);
                 return 'book';

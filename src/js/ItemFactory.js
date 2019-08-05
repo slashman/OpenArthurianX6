@@ -48,7 +48,7 @@ const ItemFactory = {
 		sprite.inputEnabled = true;
 		sprite.events.onInputDown.add(() => { 
 			if (game.input.activePointer.rightButton.isDown) {
-				MobDescription.showItem(item); 
+				OAX6.PlayerStateMachine.lookMouseCommand({x: item.x, y: item.y}); 
 			}
 		});
 		return sprite;

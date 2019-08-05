@@ -72,7 +72,7 @@ const MobFactory = {
 		sprite.inputEnabled = true;
 		sprite.events.onInputDown.add(() => { 
 			if (game.input.activePointer.rightButton.isDown) {
-				MobDescription.showMob(mob); 
+				OAX6.PlayerStateMachine.lookMouseCommand({x: mob.x, y: mob.y}); 
 			}
 		});
 		return sprite;
