@@ -469,6 +469,8 @@ const PlayerStateMachine = {
         if (keyCode) {
             if (keyCode === Phaser.KeyCode.D){
                 return this.dropItem();
+            } else if (keyCode === Phaser.KeyCode.U){
+                return this.useInventoryItem();
             }
         }
     },
@@ -539,6 +541,21 @@ const PlayerStateMachine = {
             if (dir !== null) {
                 Inventory.currentMob.dropOnDirection(dir.x, dir.y, item);
                 Inventory.updateInventory();
+            }
+            this.resetState();
+            this.__activateInventoryCallbacks();
+        });
+    },
+
+    useInventoryItem: function() {
+        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        if (!item) {
+            return;
+        }
+        this.clearActionCallback();
+        return this._selectDirection('Use').then(dir => {
+            if (dir !== null) {
+                Inventory.currentMob.useItemOnDirection(dir.x, dir.y, item);
             }
             this.resetState();
             this.__activateInventoryCallbacks();

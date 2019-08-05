@@ -398,6 +398,23 @@ Mob.prototype = {
 			this.reportAction("Use - Nothing there!");
 		}
 	},
+	useItemOnDirection(dx, dy, item) {
+		var door = this.level.getDoorAt(this.x + dx, this.y + dy);
+		if (door) {
+			if (door.isLocked()) {
+				if (door.unlock(item)) {
+                    OAX6.UI.showMessage("Door Unlocked");
+                    door.openDoor(this, this.level);
+                } else {
+                    OAX6.UI.showMessage("Wrong key!");
+                }
+            } else {
+                OAX6.UI.showMessage("Door is not locked");
+            }
+        } else {
+			this.reportAction("Use - Nothing there!");
+		}
+	},
 	dropOnDirection: function(dx, dy, item) {
 		var x = this.x + dx,
 			y = this.y + dy;
