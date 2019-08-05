@@ -74,7 +74,7 @@ const ItemFactory = {
 		sprite.inputEnabled = true;
 		sprite.events.onInputDown.add(() => { 
 			if (game.input.activePointer.leftButton.isDown) {
-				OAX6.PlayerStateMachine.openDoor(door);
+				OAX6.PlayerStateMachine.clickOnDoor(door);
 			}
 		});
 		return sprite;

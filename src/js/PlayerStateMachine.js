@@ -637,13 +637,20 @@ const PlayerStateMachine = {
         return false;
     },
 
-    openDoor(door) {
+    clickOnDoor(door) {
+        if (this.state !== PlayerStateMachine.WORLD){
+            return;
+        }
         if (!door.inRange(this.player)) {
             OAX6.UI.showMessage("Too far");
             return;
         }
-        this.player.useItemInPosition(door.x, door.y, Inventory.useItemOn);
-        Inventory.resetFloatingItem();
+        if (Inventory.useItemOn) {
+            this.player.useItemInPosition(door.x, door.y, Inventory.useItemOn);
+            Inventory.resetFloatingItem();
+        } else {
+            this.player.useInPosition(door.x, door.y);
+        }
     },
 
     clickOnMob(mob, leftClick, rightClick) {

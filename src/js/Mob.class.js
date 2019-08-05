@@ -386,13 +386,20 @@ Mob.prototype = {
 		}
 	},
 	useOnDirection(dx, dy) {
-		var door = this.level.getDoorAt(this.x + dx, this.y + dy);
+		return this.useInPosition(this.x + dx, this.y + dy);
+	},
+	useInPosition(x, y) {
+		var door = this.level.getDoorAt(x, y);
 		if (door) {
-			OAX6.PlayerStateMachine.openDoor(door);
-			if (door.open) {
-				OAX6.UI.showMessage("Use - Opened door");
+			if (door.isLocked()) {
+				OAX6.UI.showMessage("Locked!");
 			} else {
-				OAX6.UI.showMessage("Use - Closed door");
+				door.openDoor(this, this.level);
+				if (door.open) {
+					OAX6.UI.showMessage("Use - Opened door");
+				} else {
+					OAX6.UI.showMessage("Use - Closed door");
+				}
 			}
 		} else {
 			this.reportAction("Use - Nothing there!");
