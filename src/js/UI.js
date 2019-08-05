@@ -257,8 +257,6 @@ const UI = {
 		item.sprite.y = y * TILE_HEIGHT;
 		this.floorLayer.add(item.sprite);
 		item.sprite.visible = true;
-		console.log("item",item.sprite.x);
-		console.log("item",x);
 	},
 	removeItemSprite: function(item) {
 		this.floorLayer.remove(item.sprite);
