@@ -78,7 +78,6 @@ const PlayerStateMachine = {
         }
     },
     cancelAction: function() {
-        this.player.reportAction("Canceled");
         if (this.directionCallback) {
             this.directionCallback(null, true);
         }
@@ -343,7 +342,9 @@ const PlayerStateMachine = {
                         OAX6.UI.hideIcon();
                     });
                     this.setDirectionCallback((dir) => {
-                        OAX6.UI.flipBook(dir.x);
+                        if (dir && dir.x) {
+                            OAX6.UI.flipBook(dir.x);
+                        }
                     });
                     return;
                 }
