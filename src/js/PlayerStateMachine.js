@@ -352,7 +352,11 @@ const PlayerStateMachine = {
         }
         var item = this.player.level.getItemAt(x, y);
         if (item) {
-            MobDescription.showItem(item);
+            if (item.def.isBook) {
+                OAX6.UI.readBook(item);
+            } else {
+                MobDescription.showItem(item);
+            }
             return true;
         }
         return false;

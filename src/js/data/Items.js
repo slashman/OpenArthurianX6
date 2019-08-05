@@ -120,7 +120,16 @@ const Items = [
 		appearance: 'goldKey',
 		description: 'Golden key to open a specific door',
 		name: 'Gold key'
-	}
+	},
+	{
+		id: 'journalOfTheQuest',
+		appearance: 'blueBook',
+		isBook: true,
+		description: 'A thick book with a blue leather cover',
+		title: 'Journal of the Quest',
+		contents: '- Journal of the Quest - {br} By Iolo {br} This is a summary of the events that happened during what came to be known as the "Quest of the Avatar". {br} One day, while on a trip to Britain to resupply my fletchery, a stranger approached me asking for the Rune of Compassion. I cannot describe what compelled me to join him on his quest, I could just feel his determination to complete the Quest of the Avatar, and become a champion of virtue.',
+		name: 'Journal of The Quest'
+	},
 ]
 
 module.exports = Items;

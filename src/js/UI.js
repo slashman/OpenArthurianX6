@@ -17,10 +17,11 @@ const Bus = require('./Bus');
 const SkyBox = require('./SkyBox');
 
 const PartyStatus = require('./ui/PartyStatus');
+const BookPanel = require('./ui/BookPanel');
 
 const scenarioInfo = require('./ScenarioInfo');
 
-const STRETCH = true;
+const STRETCH = false;
 
 const UI = {
 	launch: function(then){
@@ -74,6 +75,7 @@ const UI = {
 		SkyBox.init(this.game, this.UILayer);
 
 		PartyStatus.init(this.game, this.UILayer);
+		BookPanel.init(this.game, this.UILayer);
 
 		this.marker = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.marker.animations.add('blink', [0,1], 8);
@@ -309,7 +311,10 @@ const UI = {
   	PartyStatus.addMob(this.player);
   	this.player.party.forEach(m => PartyStatus.addMob(m));
 	SkyBox.setMinuteOfDay(60);
-  }	
+  },
+  readBook(book) {
+  	BookPanel.show(book);
+  }
 }
 
 module.exports = UI;

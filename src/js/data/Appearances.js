@@ -38,10 +38,14 @@ const Appearances = [
 				id: 'boomerang',
 				i: 49
 			},
-      {
-        id: 'ironBolt',
-        i: 71
-      }
+			{
+				id: 'blueBook',
+				i: 16 * 8 + 13
+			},
+			{
+				id: 'ironBolt',
+				i: 71
+			}
 		]
 	},
   // Projectiles
