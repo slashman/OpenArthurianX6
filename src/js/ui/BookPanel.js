@@ -23,6 +23,7 @@ const BookPanel = {
     },
 
     show (book) {
+        this.book = book;
         this.layer.visible = true;
         this.pages = this.__splitInPages(book.def.contents);
         this.currentPage = 0;
@@ -30,6 +31,7 @@ const BookPanel = {
     },
 
     hide() {
+        this.book = null;
         this.layer.visible = false;
     },
 

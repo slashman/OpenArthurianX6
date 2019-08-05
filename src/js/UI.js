@@ -317,6 +317,7 @@ const UI = {
   	BookPanel.show(book);
   },
   hideBook() {
+  	OAX6.UI.showMessage("Read book \"" + BookPanel.book.def.title + "\".");
   	BookPanel.hide();
   },
   flipBook(dx) {
