@@ -70,19 +70,14 @@ module.exports = {
 
         this.useItemOn = inventory[index];
 
+        PSM.switchState(OAX6.runner.playerStateMachine.FLOATING_ITEM);
+
         this.close();
     },
 
-    useCursorItem: function() {
+    resetFloatingItem: function() {
         if (!this.useItemOn) { return; }
-
-        const inventory = this.currentMob.inventory,
-            index = inventory.indexOf(this.useItemOn),
-            PSM = OAX6.runner.playerStateMachine;
-
-            OAX6.UI.showMessage(inventory[index].def.name + " used");
-
-        inventory[index] = null;
+        const PSM = OAX6.runner.playerStateMachine;
         this.useItemOn = null;
         PSM.setCursor(null, null);
         PSM.switchState(OAX6.runner.playerStateMachine.WORLD);

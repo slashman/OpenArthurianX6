@@ -399,7 +399,10 @@ Mob.prototype = {
 		}
 	},
 	useItemOnDirection(dx, dy, item) {
-		var door = this.level.getDoorAt(this.x + dx, this.y + dy);
+		return this.useItemInPosition(this.x + dx, this.y + dy, item);
+	},
+	useItemInPosition(x, y, item) {
+		var door = this.level.getDoorAt(x, y);
 		if (door) {
 			if (door.isLocked()) {
 				if (door.unlock(item)) {

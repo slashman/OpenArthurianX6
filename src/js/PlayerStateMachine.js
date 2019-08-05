@@ -18,6 +18,7 @@ const PlayerStateMachine = {
     TARGETTING  : 5,
     INVENTORY   : 6,
     MESSAGE_BOX : 7,
+    FLOATING_ITEM : 8,
 
     init: function(game) {
         this.game = game;
@@ -641,21 +642,8 @@ const PlayerStateMachine = {
             OAX6.UI.showMessage("Too far");
             return;
         }
-
-        if (door.isLocked()) {
-            if (Inventory.useItemOn) {
-                if (!door.unlock(Inventory.useItemOn)) {
-                    OAX6.UI.showMessage("Wrong key!");
-                    return;
-                }
-            } else {
-                OAX6.UI.showMessage("The door is locked!");
-                return;
-            }
-        }
-
-        door.openDoor(this.player, this.player.level); 
-        Inventory.useCursorItem();
+        this.player.useItemInPosition(door.x, door.y, Inventory.useItemOn);
+        Inventory.resetFloatingItem();
     }
 };
 
