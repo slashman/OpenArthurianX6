@@ -1,3 +1,21 @@
+function initDraggableGroup(draggable, group) {
+    draggable.inputEnabled = true;
+    draggable.input.enableDrag();
+    draggable.origin = new Phaser.Point( draggable.x, draggable.y );
+    draggable.events.onDragUpdate.add( 
+        ﻿(obj, pointer, x, y, snapPoint, isFirstUpdate) => {
+            if ( isFirstUpdate ) {
+              group.startDragPos = new Phaser.Point( group.x, group.y )
+              draggable.startDragPos = new Phaser.Point( draggable.x, draggable.y )
+            }
+            group.x = group.startDragPos.x - draggable.origin.x + x
+            group.y = group.startDragPos.y - draggable.origin.y + y
+            draggable.x = draggable.startDragPos.x
+            draggable.y = draggable.startDragPos.y
+        }
+    );
+}
+
 module.exports = {
     init: function(game) {
         this.MAX_DISPLAY = 12;
@@ -11,6 +29,8 @@ module.exports = {
         this.inventoryGroup.y = 50;
 
         this.inventoryBackground = this.game.add.image(0, 0, "inventory");
+
+        initDraggableGroup(this.inventoryBackground, this.inventoryGroup);
         
         this.inventoryGroup.add(this.inventoryBackground);
 
@@ -31,8 +51,13 @@ module.exports = {
 
             invSlot.inputEnabled = true;
             ((index) => {
-                invSlot.events.onInputDown.add(() => { this.onInputDown(index); });
+                invSlot.events.onInputUp.add((object, pointer, isOver) => {
+                    if (this.game.time.time - pointer.timeDown < 300) {
+                        this.onItemSelected(index);
+                    }
+                });
             })(i);
+            initDraggableGroup(invSlot, this.inventoryGroup);
 
             if (x == this.COLUMNS) {
                 x = 0;
@@ -61,9 +86,7 @@ module.exports = {
         this.close();
     },
 
-    onInputDown: function(index) {
-        if (!this.game.input.activePointer.leftButton.isDown) { return; }
-
+    onItemSelected: function(index) {
         const inventory = this.currentMob.inventory;
 
         if (!inventory[index]) { return; }
@@ -82,7 +105,6 @@ module.exports = {
     },
 
     resetFloatingItem: function() {
-        if (!this.useItemOn) { return; }
         const PSM = OAX6.runner.playerStateMachine;
         this.useItemOn = null;
         PSM.setCursor(null, null);
