@@ -6,6 +6,7 @@ const NPCs = [
 		name: 'Avatar',
 		type: 'avatar',
 		alignment: 'player',
+		armor: 'chainMail',
 		weapon: 'magicAxe',
 		items: [
 			{ id: 'journalOfTheQuest', quantity: 1 }

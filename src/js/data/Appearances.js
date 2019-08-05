@@ -16,7 +16,7 @@ const Appearances = [
 		items: [
 			{
 				id: 'spear',
-				i: 12
+				i: 55
 			},
 			{
 				id: 'magicAxe',
@@ -24,15 +24,15 @@ const Appearances = [
 			},
 			{
 				id: 'crossbow',
-				i: 49
+				i: 54
 			},
 			{
 				id: 'maingauche',
-				i: 49
+				i: 50
 			},
 			{
 				id: 'sword',
-				i: 49
+				i: 48
 			},
 			{
 				id: 'boomerang',
@@ -45,7 +45,11 @@ const Appearances = [
 			{
 				id: 'ironBolt',
 				i: 71
-			}
+			},
+			{
+				id: 'chainMail',
+				i: 16 * 6 + 0
+			},
 		]
 	},
   // Projectiles

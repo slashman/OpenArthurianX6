@@ -32,6 +32,9 @@ const ItemFactory = {
 		if (def.damage){
 			item.damage = new Stat(def.damage);
 		}
+		if (def.defense){
+			item.defense = new Stat(def.defense);
+		}
 		item.def = Object.assign({}, def);
 		item.defid = def.id;
 		item.sprite = this.getSpriteForItem(this.game, item);

@@ -40,6 +40,9 @@ const MobFactory = {
 		if (definition.weapon) {
 			mob.weapon = ItemFactory.createItem(definition.weapon);
 		}
+		if (definition.armor) {
+			mob.armor = ItemFactory.createItem(definition.armor);
+		}
 		if (definition.items) {
 			definition.items.forEach(item => {
 				let id, quantity;

@@ -25,6 +25,12 @@ const Items = [
 		damage: 400
 	},
 	{
+		id: 'chainMail',
+		appearance: 'chainMail',
+		name: 'Chain Mail',
+		defense: 400
+	},
+	{
 		id: 'magicAxe',
 		appearance: 'magicAxe',
 		flyAppearance: 'magicAxe',
