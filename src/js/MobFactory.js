@@ -73,10 +73,8 @@ const MobFactory = {
 		sprite.animations.add('walk_e', appearance.r, 4);
 		sprite.animations.add('walk_w', appearance.l, 4);
 		sprite.inputEnabled = true;
-		sprite.events.onInputDown.add(() => { 
-			if (game.input.activePointer.rightButton.isDown) {
-				OAX6.PlayerStateMachine.lookMouseCommand({x: mob.x, y: mob.y}); 
-			}
+		sprite.events.onInputDown.add(() => {
+			OAX6.PlayerStateMachine.clickOnMob(mob, game.input.activePointer.leftButton.isDown, game.input.activePointer.rightButton.isDown);
 		});
 		return sprite;
 	}

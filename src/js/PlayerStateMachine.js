@@ -644,6 +644,22 @@ const PlayerStateMachine = {
         }
         this.player.useItemInPosition(door.x, door.y, Inventory.useItemOn);
         Inventory.resetFloatingItem();
+    },
+
+    clickOnMob(mob, leftClick, rightClick) {
+        if (this.state !== PlayerStateMachine.WORLD){
+            return;
+        }
+        if (rightClick) {
+            this.lookMouseCommand({x: mob.x, y: mob.y}); 
+        } else if (leftClick) {
+            if (mob == OAX6.UI.player) {
+                this.activateInventory(0);
+            } else if (mob.isPartyMember()){
+                const partyMemberIndex = OAX6.UI.player.party.indexOf(mob);
+                this.activateInventory(partyMemberIndex + 1);
+            }
+        }
     }
 };
 
