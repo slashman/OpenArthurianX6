@@ -40,6 +40,12 @@ module.exports = {
             }
         }
 
+        this.weaponSlot = this.game.add.image(21, 52, 'ui');
+        this.inventoryGroup.add(this.weaponSlot);
+        this.armorSlot = this.game.add.image(53, 20, 'ui');
+        this.inventoryGroup.add(this.armorSlot);
+
+
         this.cursor = this.game.add.image(0, 0, 'ui');
         this.cursor.frame = 6;
         this.cursorSlot = 0;
@@ -148,6 +154,20 @@ module.exports = {
                 this.invSlots[i-start].loadTexture('ui', 5);
                 this.quantityLabels[i-start].visible = false;
             }
+        }
+        if (mob.weapon) {
+            const appearance = OAX6.AppearanceFactory.getAppearance(mob.weapon.def.appearance);
+            this.weaponSlot.loadTexture(appearance.tileset, appearance.i);
+            this.weaponSlot.visible = true;
+        } else {
+            this.weaponSlot.visible = false;
+        }
+        if (mob.armor) {
+            const appearance = OAX6.AppearanceFactory.getAppearance(mob.armor.def.appearance);
+            this.armorSlot.loadTexture(appearance.tileset, appearance.i);
+            this.armorSlot.visible = true;
+        } else {
+            this.armorSlot.visible = false;
         }
         this.moveCursor(0, 0);
         return true;
