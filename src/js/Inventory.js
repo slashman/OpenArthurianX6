@@ -125,6 +125,11 @@ module.exports = {
     },
 
     updateInventory: function(partyMemberIndex) {
+        if (partyMemberIndex != undefined) {
+            this.currentPartyMemberIndex = partyMemberIndex;
+        } else {
+            partyMemberIndex = this.currentPartyMemberIndex;
+        }
         const mob = partyMemberIndex == 0 ? OAX6.UI.player : OAX6.UI.player.party[partyMemberIndex - 1];
         if (!mob) {
             return false;
@@ -163,6 +168,7 @@ module.exports = {
 
     close: function() {
         this.cursorSlot = 0;
+        this.partyMemberIndex = -1;
         this.inventoryGroup.visible = false;
     },
 

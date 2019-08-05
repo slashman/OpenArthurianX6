@@ -44,7 +44,6 @@ const PlayerStateMachine = {
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
-        this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
     },
     setCursor: function(tileset, frame) {
         this.cursorSprite.loadTexture(tileset, frame);
@@ -408,14 +407,8 @@ const PlayerStateMachine = {
         return new Promise((resolve) => {
             const opened = Inventory.open(partyMemberIndex);
             if (opened) {
-                this.setActionCallback((cancelled) => {
-                    this.clearActionCallback();
-                    this.clearDirectionCallback();
-                    Inventory.close();
-                    PlayerStateMachine.switchState(PlayerStateMachine.WORLD); // TODO: Reset state instead?
-                });
                 PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
-                this.setDirectionCallback(this.updateInventoryDirection.bind(this));
+                this.__activateInventoryCallbacks();
             }
             resolve(true);
         });
@@ -470,6 +463,16 @@ const PlayerStateMachine = {
             }
         });
     },
+
+    updateInventoryAction() {
+        const keyCode = this._inkey();
+        if (keyCode) {
+            if (keyCode === Phaser.KeyCode.D){
+                return this.dropItem();
+            }
+        }
+    },
+
 
     startCombat: function(ensurePlayerFirst){
         OAX6.UI.modeLabel.text = 'Combat';
@@ -527,35 +530,29 @@ const PlayerStateMachine = {
     },
 
     dropItem: function() {
-        if (PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
-
-        var item = PlayerStateMachine.inventory[Inventory.cursorSlot];
-        if (!item) { return; }
-
-        const activeMob = OAX6.UI.activeMob || this.player;
-        // TODO: Show the inventory of the activeMob
-
-        return new Promise((resolve) => {
-            activeMob.reportAction("Drop - Where?");
-            OAX6.UI.hideMarker();
-            OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
-            this.clearDirectionCallback();
-            this.setDirectionCallback((dir, cancelled) => {
-                OAX6.UI.hideIcon();
-                this.clearDirectionCallback();
-                if (cancelled) {
-                    return resolve(null);
-                }
-                activeMob.reportAction("Drop - "+Geo.getDirectionName(dir));
-                Timer.delay(500).then(()=>resolve(dir));
-            });
-        }).then((dir) => {
+        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        if (!item) {
+            return;
+        }
+        this.clearActionCallback();
+        return this._selectDirection('Drop').then(dir => {
             if (dir !== null) {
-                activeMob.dropOnDirection(dir.x, dir.y, item);
+                Inventory.currentMob.dropOnDirection(dir.x, dir.y, item);
                 Inventory.updateInventory();
             }
-            this.setDirectionCallback(this.updateInventoryDirection.bind(this));
+            this.resetState();
+            this.__activateInventoryCallbacks();
         });
+    },
+
+    __activateInventoryCallbacks() {
+        this.setActionCallback((cancelled) => {
+            this.clearActionCallback();
+            this.clearDirectionCallback();
+            Inventory.close();
+            PlayerStateMachine.switchState(PlayerStateMachine.WORLD); // TODO: Reset state instead?
+        });
+        this.setDirectionCallback(this.updateInventoryDirection.bind(this));
     },
 
     update: function() {
@@ -574,6 +571,10 @@ const PlayerStateMachine = {
                 break;
 
             case PlayerStateMachine.MESSAGE_BOX:
+                break;
+
+            case PlayerStateMachine.INVENTORY:
+                this.updateInventoryAction();
                 break;
         }
     },
