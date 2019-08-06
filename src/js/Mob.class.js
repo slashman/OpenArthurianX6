@@ -330,27 +330,27 @@ Mob.prototype = {
 		}
 
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		let blockedByMob = false;
+		const specialMovementRules = (this === OAX6.UI.player || OAX6.UI.activeMob === this) && PlayerStateMachine.state === PlayerStateMachine.WORLD;
 		if (mob){
-			if (this.canStartDialog && mob.npcDefinition.dialog){
-				Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
-				
-				// Look at each other while talking
-				this.lookAt(dx, dy);
-				mob.lookAt(-dx, -dy);
-				this.reportAction("Move - Talk");
-				return Timer.delay(500);
-			} else if (this === OAX6.UI.player || OAX6.UI.activeMob === this){
-				if (mob.isPartyMember() && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
-					console.log("Pass thru");
-				} else {
-					this.reportAction("Move - Blocked");
+			blockedByMob = true;
+			if (specialMovementRules) {
+				if (mob.isPartyMember()) {
+					// blockedByMob = false; TODO: Activate when there's a separate Talk command
+				} else if (this.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
+					Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
+					// Look at each other while talking
+					this.lookAt(dx, dy);
+					mob.lookAt(-dx, -dy);
+					this.reportAction("Move - Talk");
 					return Timer.delay(500);
 				}
-			} else {
-				this.reportAction("Move - Blocked");
-				return Timer.delay(500);
 			}
 		} 
+		if (blockedByMob) {
+			this.reportAction("Move - Blocked");
+			return Timer.delay(specialMovementRules ? 50 : 500);
+		}
 		// Position changes before the tween to "reserve" the spot
 		this.x += dx;
 		this.y += dy;
