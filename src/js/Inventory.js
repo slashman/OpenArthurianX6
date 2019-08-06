@@ -1,19 +1,17 @@
 function initDraggableGroup(draggable, group) {
     draggable.inputEnabled = true;
     draggable.input.enableDrag();
-    draggable.origin = new Phaser.Point( draggable.x, draggable.y );
-    draggable.events.onDragUpdate.add( 
-        ﻿(obj, pointer, x, y, snapPoint, isFirstUpdate) => {
-            if ( isFirstUpdate ) {
-              group.startDragPos = new Phaser.Point( group.x, group.y )
-              draggable.startDragPos = new Phaser.Point( draggable.x, draggable.y )
-            }
-            group.x = group.startDragPos.x - draggable.origin.x + x
-            group.y = group.startDragPos.y - draggable.origin.y + y
-            draggable.x = draggable.startDragPos.x
-            draggable.y = draggable.startDragPos.y
+    draggable.origin = new Phaser.Point(draggable.x, draggable.y);
+    draggable.events.onDragUpdate.add((obj, pointer, x, y, snapPoint, isFirstUpdate) => {
+        if (isFirstUpdate){
+            group.startDragPos = new Phaser.Point(group.x, group.y);
+            draggable.startDragPos = new Phaser.Point(draggable.x, draggable.y);
         }
-    );
+        group.x = group.startDragPos.x - draggable.origin.x + x;
+        group.y = group.startDragPos.y - draggable.origin.y + y;
+        draggable.x = draggable.startDragPos.x;
+        draggable.y = draggable.startDragPos.y;
+    });
 }
 
 module.exports = {
