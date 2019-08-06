@@ -240,11 +240,15 @@ const NPCs = [
 						value: "gotoIolo"
 					},
 					{
-						type: "endCombat"
-					},
-					{
 						type: "openLevel",
 						value: "iolos"
+					},
+					{
+						type: "endCombat" // Careful to do this before openLevel!
+					},
+					{
+						type: "showMessage",
+						value: "You approach a small cabin in the forest."
 					}
 				]
 			}

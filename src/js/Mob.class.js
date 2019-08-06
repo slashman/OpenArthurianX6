@@ -147,6 +147,9 @@ Mob.prototype = {
 		}
 	},
 	combatAction: function () {
+		if (this.dead){
+			return Promise.resolve();
+		}
 		const nearbyTarget = this.getNearbyTarget();
 		if (!nearbyTarget){
 			if (Random.chance(50)){
@@ -226,7 +229,9 @@ Mob.prototype = {
 						break;
 					case 'openLevel':
 						promiseFunction = () => new Promise(r => {
+							const oldLevel = OAX6.UI.player.level;
 							OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
+							oldLevel.destroy();
 							OAX6.UI.updateFOV();
 							r();
 						});
@@ -237,6 +242,9 @@ Mob.prototype = {
 					case 'talk':
 						// TODO: Chain this to the promise
 						Bus.emit('startDialog', {mob: this, dialog: this.npcDefinition.dialog, player: OAX6.UI.player});
+						break;
+					case 'showMessage':
+						promiseFunction = () => OAX6.UI.showMessage(a.value);
 						break;
 				}
 				p = p.then(promiseFunction);

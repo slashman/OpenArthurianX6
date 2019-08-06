@@ -70,6 +70,10 @@ Level.prototype = {
 		this.mobs.splice(this.mobs.indexOf(mob), 1);
 	},
 	actNext: function(){
+		if (this.destroyed) {
+			// This level is no longer active, so stop processing the queue
+			return;
+		}
 		if (PlayerStateMachine.isPartyDead()) { return; }
 		if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT) {
 			// There was a state transition and the level is no longer
@@ -250,6 +254,21 @@ Level.prototype = {
 	activate() {
 		this.setSolidMask(this.solidMask); // Initializes the pfGrid
 		this.items.forEach(item => OAX6.UI.addItemSprite(item, item.x, item.y));
+	},
+	destroy() {
+		// Silently kill all mobs except player party.
+		this.mobs.forEach(m => {
+			if (!(m.isPartyMember() || this === OAX6.UI.player)) {
+				m.dead = true;
+			}
+		});
+		this.destroyed = true;
+		this.mobs = null;	
+		this.items = null;
+		this.doors = null;
+		this.solidMask = null;
+		this.opaqueMask = null;
+		this.currentTurnCounter = 0;
 	}
 };
 
