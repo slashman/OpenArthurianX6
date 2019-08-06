@@ -175,7 +175,7 @@ const LevelLoader = {
 		level.doors.forEach((door) => {
 			OAX6.UI.addItemSprite(door, door.x, door.y);
 			OAX6.UI.doorsLayer.add(door.sprite); // Override group
-			level.setSolidAndOpaque(door.x, door.y, !door.open);
+			door.updateSolidAndOpaque();
 		});
 		level.activate();
 		level.activateAll();

@@ -97,6 +97,7 @@ const Items = [
 		id: 'doorHL1',
 		closedAppearance: 'doorHL1',
 		openAppearance: 'doorOpenHL1',
+		fixed: true,
 		name: 'Door',
 		linked: { x: 1, y: 0 }
 	},
@@ -118,6 +119,7 @@ const Items = [
 		id: 'doorVR1',
 		closedAppearance: 'doorVR1',
 		openAppearance: 'doorOpenVR1',
+		fixed: true,
 		name: 'Door',
 		linked: { x: 0, y: 1 }
 	},

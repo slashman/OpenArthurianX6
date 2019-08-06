@@ -30,15 +30,21 @@ Door.prototype = {
     this.open = !this.open;
     this.switchSprite(); 
     
-    level.setSolidAndOpaque(this.x, this.y, !this.open);
+    this.updateSolidAndOpaque();
 
     if (sisterDoor != null) {
       sisterDoor.open = !sisterDoor.open;
       sisterDoor.switchSprite();
-      level.setSolidAndOpaque(sisterDoor.x, sisterDoor.y, !this.open);
+      sisterDoor.updateSolidAndOpaque();
     }
     OAX6.UI.updateFOV();
   }, 
+
+  updateSolidAndOpaque(){
+    if (!this.def.fixed) {
+      this.level.setSolidAndOpaque(this.x, this.y, !this.open);
+    }
+  },
 
   unlock(key) {
     if (key != null && key.defid == this.lock) {
