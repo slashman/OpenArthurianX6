@@ -669,6 +669,18 @@ const PlayerStateMachine = {
                 this.activateInventory(partyMemberIndex + 1);
             }
         }
+    },
+
+    activateFloatingItem() {
+        this.switchState(PlayerStateMachine.FLOATING_ITEM);
+        this.clearActionCallback();
+        this.clearDirectionCallback();
+        this.setActionCallback((cancelled) => {
+            if (cancelled) {
+                this.clearActionCallback();
+                Inventory.resetFloatingItem();
+            }
+        });
     }
 };
 

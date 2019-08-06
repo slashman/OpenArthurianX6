@@ -96,11 +96,7 @@ module.exports = {
         PSM.setCursor(appearance.tileset, appearance.i);
 
         this.useItemOn = inventory[index];
-
-        PSM.switchState(OAX6.runner.playerStateMachine.FLOATING_ITEM);
-
-        PSM.clearActionCallback();
-        PSM.clearDirectionCallback();
+        PSM.activateFloatingItem();
     },
 
     resetFloatingItem: function() {
