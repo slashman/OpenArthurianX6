@@ -141,7 +141,7 @@ Mob.prototype = {
 			}
 			return this.moveTo(dx, dy);
 		} else if (subIntent === 'combat') {
-			return this.combatAction().then(() => this.onCombatTurn());
+			return this.onCombatTurn().then(() => this.combatAction());
 		} else {
 			return Timer.delay(1000);
 		}
@@ -189,49 +189,62 @@ Mob.prototype = {
 		}
 	},
 	onCombatTurn: function() {
-		if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT){
-			return;
-		}
-		// combatTurnsOver triggers
-		if (!this.npcDefinition) {
-			return;
-		}
-		this.combatTurns++;
-		const combatTurnsOverTriggers = this.__getActiveTriggersByType('combatTurnsOver');
-		combatTurnsOverTriggers.forEach(t => {
-			if (this.combatTurns >= t.value) {
-				this.executeTriggerActions(t);
+		return Promise.resolve().then(() => {
+			if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT){
+				return;
 			}
+			// combatTurnsOver triggers
+			if (!this.npcDefinition) {
+				return;
+			}
+			let promise = Promise.resolve();
+			this.combatTurns++;
+			const combatTurnsOverTriggers = this.__getActiveTriggersByType('combatTurnsOver');
+			combatTurnsOverTriggers.forEach(t => {
+				if (this.combatTurns >= t.value) {
+					promise = promise.then(() => this.executeTriggerActions(t));
+				}
+			});
+			return promise;
 		});
 	},
 	executeTriggerActions: function(trigger) {
-		let p = Promise.resolve();
-		trigger.actions.forEach(a => {
-			let promiseFunction;
-			switch (a.type) {
-				case 'console':
-					promiseFunction = () => new Promise(r => {
-						console.log(a.value);
-						r();	
-					});
-					break;
-				case 'cutscene':
-					promiseFunction = () => OAX6.UI.showScene(a.value);
-					break;
-				case 'openLevel':
-					promiseFunction = () => new Promise(r => {
-						OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
-						r();
-					});
-					break;
-				case 'talk':
-					Bus.emit('startDialog', {mob: this, dialog: this.npcDefinition.dialog, player: OAX6.UI.player});
-					break;
-			}
-			p = p.then(promiseFunction);
+		return Promise.resolve().then(() => {
+			let p = Promise.resolve();
+			trigger.actions.forEach(a => {
+				let promiseFunction;
+				switch (a.type) {
+					case 'console':
+						// TODO: Chain this to the promise, must be a function returning a promise, not a promise.
+						promiseFunction = new Promise(r => {
+							console.log(a.value);
+							r();	
+						});
+						break;
+					case 'cutscene':
+						promiseFunction = () => OAX6.UI.showScene(a.value);
+						break;
+					case 'openLevel':
+						promiseFunction = () => new Promise(r => {
+							OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
+							OAX6.UI.updateFOV();
+							r();
+						});
+						break;
+					case 'endCombat':
+						promiseFunction = () => PlayerStateMachine.endCombat();
+						break;
+					case 'talk':
+						// TODO: Chain this to the promise
+						Bus.emit('startDialog', {mob: this, dialog: this.npcDefinition.dialog, player: OAX6.UI.player});
+						break;
+				}
+				p = p.then(promiseFunction);
+				
+			});
+			this.flags['trigger_' + trigger.id] = true;
+			return p;
 		});
-		this.flags['trigger_' + trigger.id] = true;
-		return p;
 	},
 	canTrack: function (mob) {
 		if (mob === OAX6.UI.player && this.isPartyMember()) {

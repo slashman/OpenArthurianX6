@@ -229,7 +229,7 @@ const NPCs = [
 			{
 				id: 'gotoIolo',
 				type: 'combatTurnsOver',
-				value: 5,
+				value: 2,
 				actions: [
 					{
 						type: "console",
@@ -238,6 +238,9 @@ const NPCs = [
 					{
 						type: "cutscene",
 						value: "gotoIolo"
+					},
+					{
+						type: "endCombat"
 					},
 					{
 						type: "openLevel",
