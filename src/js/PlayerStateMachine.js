@@ -19,6 +19,7 @@ const PlayerStateMachine = {
     INVENTORY   : 6,
     MESSAGE_BOX : 7,
     FLOATING_ITEM : 8,
+    LOOK_BOX    : 9,
 
     init: function(game) {
         this.game = game;
@@ -325,6 +326,8 @@ const PlayerStateMachine = {
     lookCommand(){
         return this._selectPosition('Look').then(position => {
             if (position != null) {
+                this.resetState(true);
+                PlayerStateMachine.switchState(PlayerStateMachine.LOOK_BOX);
                 this.__lookCommand(position, false);
             } else {
                 this.__resetAfterLook(false);
@@ -341,23 +344,24 @@ const PlayerStateMachine = {
             return;
         }
         this.actionEnabled = false;
+        PlayerStateMachine.switchState(PlayerStateMachine.LOOK_BOX);
         this.__lookCommand(position, true);
     },
 
-    __lookCommand(position, mouse) {
+    __lookCommand(position) {
         const shown = this.__lookAtPosition(position.x, position.y);
         if (shown == 'basic') {
             this.setActionCallback(() => {
                 this.clearActionCallback();
                 MobDescription.hide();
-                this.__resetAfterLook(mouse);
+                this.__resetAfterLook();
             });
         } else if (shown == 'book') {
             this.setActionCallback(() => {
                 this.clearActionCallback();
                 this.clearDirectionCallback();
                 OAX6.UI.hideBook();
-                this.__resetAfterLook(mouse);
+                this.__resetAfterLook();
             });
             this.setDirectionCallback((dir) => {
                 if (dir && dir.x) {
@@ -365,18 +369,14 @@ const PlayerStateMachine = {
                 }
             });
         } else {
-            this.__resetAfterLook(mouse);
+            this.__resetAfterLook();
         }
     },
 
-    __resetAfterLook(mouse) {
+    __resetAfterLook() {
         this.examining = false;
-        if (mouse) {
-            this.actionEnabled = true;
-        } else {
-            this.resetState();
-            OAX6.UI.hideIcon();
-        }
+        this.resetState();
+        OAX6.UI.hideIcon();
     },
 
     __lookAtPosition(x, y) {
