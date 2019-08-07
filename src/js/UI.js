@@ -47,10 +47,19 @@ const UI = {
 		Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
 	create: function(){
-		this.mapLayer = this.game.add.group();
-		this.floorLayer = this.game.add.group();
-		this.mobsLayer = this.game.add.group();
-		this.doorsLayer = this.game.add.group();
+		this.worldLayer = this.game.add.group();
+		this.floorLayers = [];
+		for (let i = 0; i < 3; i++) {
+			const baseGroup = this.game.add.group(this.worldLayer);
+			this.floorLayers[i] = {
+				baseGroup,
+				mapLayer: this.game.add.group(baseGroup),
+				floorLayer: this.game.add.group(baseGroup),
+				mobsLayer: this.game.add.group(baseGroup),
+				doorsLayer: this.game.add.group(baseGroup),
+			}
+		}
+
 		this.fovBlockLayer = this.game.add.group();
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
@@ -118,6 +127,11 @@ const UI = {
 		}
 		this.fovBlockLayer.x = (this.player.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
 		this.fovBlockLayer.y = (this.player.y - Constants.FOV_RADIUS - 1) * TILE_HEIGHT;
+
+		// Make sure we are displaying the correct storie
+		for (let i = 0; i < 3; i++) {
+			this.floorLayers[i].baseGroup.visible = this.player.z >= i;
+		}
 	},
 	shootRay: function (a) {
 		var step = 0.3333;
@@ -131,7 +145,7 @@ const UI = {
 			var testy = Math.round(yy);
 			try { 
 				this.fovMask[testx - this.player.x + Constants.FOV_RADIUS + 1][testy - this.player.y + Constants.FOV_RADIUS + 1] = true;
-				if (this.player.level.isOpaque(testx, testy))
+				if (this.player.level.isOpaque(testx, testy, this.player.z))
 					return;
 			} catch(err) {
 				// Catch OOB
@@ -250,16 +264,17 @@ const UI = {
     });
   },
 
-	addItemSprite: function(item, x, y){
+	addItemSprite: function(item, x, y, z){
 		item.x = x;
 		item.y = y;
+		item.z = z;
 		item.sprite.x = x * TILE_WIDTH;
 		item.sprite.y = y * TILE_HEIGHT;
-		this.floorLayer.add(item.sprite);
+		this.floorLayers[z].floorLayer.add(item.sprite);
 		item.sprite.visible = true;
 	},
 	removeItemSprite: function(item) {
-		this.floorLayer.remove(item.sprite);
+		this.floorLayers[item.z].floorLayer.remove(item.sprite);
 		item.sprite.visible = false;
 	},
 

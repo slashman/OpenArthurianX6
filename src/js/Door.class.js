@@ -42,7 +42,7 @@ Door.prototype = {
 
   updateSolidAndOpaque(){
     if (!this.def.fixed) {
-      this.level.setSolidAndOpaque(this.x, this.y, !this.open);
+      this.level.setSolidAndOpaque(this.x, this.y, this.z, !this.open);
     }
   },
 

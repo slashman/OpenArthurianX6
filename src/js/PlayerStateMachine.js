@@ -305,6 +305,18 @@ const PlayerStateMachine = {
         });
     },
 
+    /**
+     * Temporary command to go up in z index
+     */
+    yankCommand() {
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return Promise.resolve()
+        .then(()=>{
+            activeMob.yank();
+            return Timer.delay(500);
+        });
+    },
+
     rangedAttackCommand: function(){
         const activeMob = OAX6.UI.activeMob || this.player;
         return this._selectPosition('Attack').then(position => {
@@ -383,13 +395,13 @@ const PlayerStateMachine = {
         if (OAX6.UI.isFOVBlocked(x,y)) {
             return null;
         }
-        const mob = this.player.level.getMobAt(x, y);
+        const mob = this.player.level.getMobAt(x, y, this.player.z);
         if (mob){
             MobDescription.showMob(mob);
             this.examining = true;
             return 'basic';
         }
-        var item = this.player.level.getItemAt(x, y);
+        var item = this.player.level.getItemAt(x, y, this.player.z);
         if (item) {
             this.examining = true;
             if (item.def.isBook) {
@@ -430,6 +442,8 @@ const PlayerStateMachine = {
                     return this.getCommand();
                 } else if (keyCode === Phaser.KeyCode.S){
                     return this.saveCommand();
+                } else if (keyCode === Phaser.KeyCode.Y){
+                    return this.yankCommand(); // Temporary, for testing
                 } else if (keyCode === Phaser.KeyCode.U) {
                     return this.useCommand();
                 } else if (keyCode === Phaser.KeyCode.L) {

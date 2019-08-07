@@ -65,9 +65,9 @@ const MobFactory = {
 		return definition;
 	},
 	getSpriteForMob (game, mob) {
-		const { definition, x, y } = mob;
+		const { definition, x, y, z } = mob;
 		const appearance = AppearanceFactory.getAppearance(definition.appearance);
-		const sprite = game.add.sprite(x * 16, y * 16, appearance.tileset, appearance.d[1], OAX6.UI.mobsLayer);
+		const sprite = game.add.sprite(x * 16, y * 16, appearance.tileset, appearance.d[1], OAX6.UI.floorLayers[z].mobsLayer);
 		sprite.animations.add('walk_s', appearance.d, 4);
 		sprite.animations.add('walk_n', appearance.u, 4);
 		sprite.animations.add('walk_e', appearance.r, 4);

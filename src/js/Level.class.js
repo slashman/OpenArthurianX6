@@ -14,39 +14,40 @@ function Level(){
 	this.mobs = [];	
 	this.items = [];
 	this.doors = [];
-	this.solidMask = null;
-	this.opaqueMask = null;
+	this.solidMasks = null;
+	this.opaqueMasks = null;
+	this.pfGrids = [];
 	this.currentTurnCounter = 0;
 	this._c = circular.register('Level');
 }
 
 circular.registerClass('Level', Level, {
 	transients: {
-		solidMask: true,
-		opaqueMask: true,
-		pfGrid: true
+		solidMasks: true,
+		opaqueMasks: true,
+		pfGrids: true
 	}
 });
 
 
 Level.prototype = {
-	isSolid: function(x, y){
-		if (this.solidMask[x][y]) {
+	isSolid: function(x, y, z){
+		if (this.solidMasks[z][x][y]) {
 			return true;
 		}
 		return false;
 	},
-	isOpaque: function(x, y){
-		return this.opaqueMask[x][y];
+	isOpaque: function(x, y, z){
+		return this.opaqueMasks[z][x][y];
 	},
-	setSolidAndOpaque: function(x, y, solid) {
-		this.solidMask[x][y] = solid;
-		this.opaqueMask[x][y] = solid;
+	setSolidAndOpaque: function(x, y, z, solid) {
+		this.solidMasks[z][x][y] = solid;
+		this.opaqueMasks[z][x][y] = solid;
 	},
-	getMobAt: function(x, y){
+	getMobAt: function(x, y, z){
 		// TODO: Replace for this.mobs.find
 		for (var i=0,mob;mob=this.mobs[i];i++) {
-			if (mob.x == x && mob.y == y) {
+			if (mob.x == x && mob.y == y && mob.z == z) {
 				return this.mobs[i];
 			}
 		}
@@ -55,13 +56,16 @@ Level.prototype = {
 	_transpose: function(m) {
 		return m[0].map((x,i) => m.map(x => x[i]));
 	},
-	setOpaqueMask: function(opaqueMask) {
-		this.opaqueMask = opaqueMask;
+	setOpaqueMasks: function(opaqueMasks) {
+		this.opaqueMasks = opaqueMasks;
 	},
-	setSolidMask: function(solidMask) {
-		this.solidMask = solidMask;
-		const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
-		this.pfGrid = new PF.Grid(pfMask);
+	setSolidMasks: function(solidMasks) {
+		this.solidMasks = solidMasks;
+		solidMasks.forEach((solidMask, i) => {
+			const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
+			this.pfGrids[i] = new PF.Grid(pfMask);
+		})
+		
 	},
 	addMob: function(mob){
 		this.mobs.push(mob);
@@ -119,30 +123,30 @@ Level.prototype = {
 	getMobsOfAlignment: function(alignment){
 		return this.mobs.filter(m=>m.alignment === alignment);
 	},
-	getCloserMobTo: function(x, y, alignment){
-		const mobs = this.mobs.filter(m=>m.alignment === alignment);
+	getCloserMobTo: function(x, y, z, alignment){
+		const mobs = this.mobs.filter(m => m.alignment === alignment && m.z == z);
 		if (mobs.length > 0){
 			const sorted = mobs.sort((a,b)=>Geo.flatDist(x,y,a.x,a.y)-Geo.flatDist(x,y,b.x,b.y));
 			return sorted[0];
 		}
 		return false;
 	},
-	addItem: function(item, x, y) {
-		OAX6.UI.addItemSprite(item, x, y);
+	addItem: function(item, x, y, z) {
+		OAX6.UI.addItemSprite(item, x, y, z);
 		this.items.push(item);
 	},
-	addDoor: function(door, x, y) {
-		OAX6.UI.addItemSprite(door, x, y);
-		OAX6.UI.doorsLayer.add(door.sprite); // Override group
+	addDoor: function(door, x, y, z) {
+		OAX6.UI.addItemSprite(door, x, y, z);
+		OAX6.UI.floorLayers[z].doorsLayer.add(door.sprite); // Override group
 		this.doors.push(door);
 	},
-	findPathTo: function(to, from, includeMobsOfAlignment){
+	findPathTo: function(to, from, z, includeMobsOfAlignment){
 		//TODO: Single finder object?
 		const finder = new PF.AStarFinder({
 		    allowDiagonal: true,
     		dontCrossCorners: false
 		});
-		const gridClone = this.pfGrid.clone();
+		const gridClone = this.pfGrids[z].clone();
 		
 		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
 		includeAlignments.forEach((alignment) => {
@@ -180,9 +184,9 @@ Level.prototype = {
 		this.items.splice(this.items.indexOf(item), 1);
 		OAX6.UI.removeItemSprite(item);
 	},
-	getItemAt: function(x, y) {
+	getItemAt: function(x, y, z) {
 		for (var i=0,item; item=this.items[i]; i++) {
-			if (item.x == x && item.y == y) {
+			if (item.x == x && item.y == y && item.z == z) {
 				return item;
 			}
 		}
@@ -198,14 +202,14 @@ Level.prototype = {
 
 		return null;
 	},
-	canMoveFrom: function(x, y, dx, dy) {
+	canMoveFrom: function(x, y, z, dx, dy) {
 		if (dx === 0 || dy === 0){
-			return !this.isSolid(x+dx, y+dy);
+			return !this.isSolid(x + dx, y + dy, z);
 		}
-		if (this.isSolid(x+dx, y) && this.isSolid(x, y+dy)){
+		if (this.isSolid(x + dx, y, z) && this.isSolid(x, y + dy, z)){
 			return false;
 		}
-		return !this.isSolid(x+dx, y+dy);
+		return !this.isSolid(x + dx, y + dy, z);
 	},
 	isSafeAround: function(x, y, alignment){
 		const dangerousMob = this.mobs.find((m) => {
@@ -221,8 +225,8 @@ Level.prototype = {
 	activateAll: function(){
 		this.mobs.forEach(m=>m.activate());	
 	},
-	isLineClear: function (xa, ya, xb, yb) {
-		return !Line.checkInLine(xa, ya, xb, yb, (x, y) => this.isSolid(x, y));
+	isLineClear: function (xa, ya, xb, yb, z) {
+		return !Line.checkInLine(xa, ya, xb, yb, (x, y) => this.isSolid(x, y, z));
 	},
 	isInCombat: function(mob) {
 		if (mob.hasBeenAttacked) {
@@ -252,8 +256,8 @@ Level.prototype = {
 	},
 	// Readies the level for the player to use it
 	activate() {
-		this.setSolidMask(this.solidMask); // Initializes the pfGrid
-		this.items.forEach(item => OAX6.UI.addItemSprite(item, item.x, item.y));
+		this.setSolidMasks(this.solidMasks); // Initializes the pfGrids
+		this.items.forEach(item => OAX6.UI.addItemSprite(item, item.x, item.y, item.z));
 	},
 	destroy() {
 		// Silently kill all mobs except player party.
@@ -266,8 +270,9 @@ Level.prototype = {
 		this.mobs = null;	
 		this.items = null;
 		this.doors = null;
-		this.solidMask = null;
-		this.opaqueMask = null;
+		this.solidMasks = null;
+		this.opaqueMasks = null;
+		this.pfGrids = null;
 		this.currentTurnCounter = 0;
 	}
 };

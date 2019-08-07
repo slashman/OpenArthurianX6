@@ -168,7 +168,7 @@ Mob.prototype = {
 			if (this.weapon && 
 				this.weapon.def.range && 
 				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.def.range &&
-				this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y)
+				this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y, this.z)
 				) {
 				return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
 			} else {
@@ -177,10 +177,10 @@ Mob.prototype = {
 		} 
 	},
 	bumpTowards: function (targetMob) {
-		const nextStep = this.level.findPathTo(targetMob, this, this.alignment);
+		const nextStep = this.level.findPathTo(targetMob, this, this.z, this.alignment);
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
-		const mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		const mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
 		if (mob){
 			if (mob.alignment !== this.alignment){
 				return this.attackOnDirection(dx, dy);
@@ -258,13 +258,16 @@ Mob.prototype = {
 		if (mob === OAX6.UI.player && this.isPartyMember()) {
 			return true;
 		}
+		if (mob.z != this.z) {
+			return false;
+		}
 		// TODO: Use Memory (last known position)
 		const dist = Geo.flatDist(mob.x, mob.y, this.x, this.y);
 		if (dist > 20) {
 			return false;
 		}
 		// Else trace a line and check no opaque tiles hit
-		return this.level.isLineClear(mob.x, mob.y, this.x, this.y);
+		return this.level.isLineClear(mob.x, mob.y, this.x, this.y, this.z);
 	},
 	isHostileMob: function(){
 		return this.alignment === Constants.Alignments.ENEMY;
@@ -282,7 +285,7 @@ Mob.prototype = {
 			return false;
 		}
 		const targetAlignment = this.isHostileMob() ? Constants.Alignments.PLAYER : Constants.Alignments.ENEMY;
-		const closerMob = this.level.getCloserMobTo(this.x, this.y, targetAlignment);
+		const closerMob = this.level.getCloserMobTo(this.x, this.y, this.z, targetAlignment);
 		if (closerMob && this.canTrack(closerMob)) {
 			return closerMob;
 		} else {
@@ -324,12 +327,12 @@ Mob.prototype = {
 		this.sprite.frame += 1;
 	},
 	moveTo: function(dx, dy){
-		if (!this.level.canMoveFrom(this.x, this.y, dx, dy)){
+		if (!this.level.canMoveFrom(this.x, this.y, this.z, dx, dy)){
 			this.reportAction("Move - Blocked");
 			return Timer.delay(500);
 		}
 
-		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		var mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
 		let blockedByMob = false;
 		const specialMovementRules = (this === OAX6.UI.player || OAX6.UI.activeMob === this) && PlayerStateMachine.state === PlayerStateMachine.WORLD;
 		if (mob){
@@ -391,7 +394,7 @@ Mob.prototype = {
     }
 	},
 	getOnDirection: function(dx, dy) {
-		var item = this.level.getItemAt(this.x + dx, this.y + dy);
+		var item = this.level.getItemAt(this.x + dx, this.y + dy, this.z);
 		if (item) {
 			const pickedQuantity = item.quantity;
 			this.addItem(item);
@@ -450,10 +453,10 @@ Mob.prototype = {
 		var x = this.x + dx,
 			y = this.y + dy;
 
-		if (!this.level.isSolid(x, y) && !this.level.getItemAt(x, y)) {
+		if (!this.level.isSolid(x, y, this.z) && !this.level.getItemAt(x, y, this.z)) {
 			var ind = this.inventory.indexOf(item);
 			this.inventory.splice(ind, 1);
-			this.level.addItem(item, x, y);
+			this.level.addItem(item, x, y, this.z);
 		} else {
 			this.reportAction("Can't drop it there!");
 		}
@@ -490,13 +493,13 @@ Mob.prototype = {
       }
       // Here we must check in advance if this attack will trigger the combat mode!
       // We cannot wait til the projectile animation is over!
-      var mob = this.level.getMobAt(x, y);
+      var mob = this.level.getMobAt(x, y, this.z);
       if (mob && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
 				PlayerStateMachine.startCombat(true);
 			}
       return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
         if (ammo.def.throwable) {
-          this.level.addItem(ammo, x, y);
+          this.level.addItem(ammo, x, y, this.z);
         }
         return this._attackPosition(x, y);
       });
@@ -523,7 +526,7 @@ Mob.prototype = {
 		return this._attackPosition(this.x + dx, this.y + dy);
 	},
 	_attackPosition: function(x, y){
-		var mob = this.level.getMobAt(x, y);
+		var mob = this.level.getMobAt(x, y, this.z);
 		if (mob){
 			// Attack!
 			OAX6.UI.showIcon(2, mob.x, mob.y);
@@ -532,7 +535,7 @@ Mob.prototype = {
 				OAX6.UI.hideIcon();
 				return this.attack(mob);
 			});
-		} else if (this.level.isSolid(x, y)) {
+		} else if (this.level.isSolid(x, y, this.z)) {
 			// TODO: Attack the map
 			this.reportAction("Attack - No one there!");
 			return Timer.delay(500);
@@ -573,7 +576,7 @@ Mob.prototype = {
 			if (this.definition.corpse){
 				const corpse = ItemFactory.createItem(this.definition.corpse);
 				this.level.removeMob(this);
-				this.level.addItem(corpse, this.x, this.y);
+				this.level.addItem(corpse, this.x, this.y, this.z);
 			}
 			if (this === OAX6.UI.player || this.isPartyMember()){
 				this.checkForGameOver();
@@ -630,6 +633,16 @@ Mob.prototype = {
 		if (player.dead && !player.party.find(p => !p.dead)) {
 			MessageBox.showMessage("GAME OVER!");
 		}
+	},
+	yank() {
+		if (this.level.isSolid(this.x, this.y, this.z + 1)) {
+			OAX6.UI.showMessage("Can't");
+			return;
+		}
+		this.z++;
+		OAX6.UI.floorLayers[this.z].mobsLayer.add(this.sprite);
+		OAX6.UI.updateFOV();
+
 	}
 };
 
