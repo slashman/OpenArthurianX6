@@ -413,7 +413,7 @@ Mob.prototype = {
 		return this.useInPosition(this.x + dx, this.y + dy);
 	},
 	useInPosition(x, y) {
-		var door = this.level.getDoorAt(x, y);
+		var door = this.level.getDoorAt(x, y, this.z);
 		if (door) {
 			if (door.isLocked()) {
 				OAX6.UI.showMessage("Locked!");
@@ -426,6 +426,7 @@ Mob.prototype = {
 				}
 			}
 		} else {
+
 			this.reportAction("Use - Nothing there!");
 		}
 	},
@@ -433,7 +434,7 @@ Mob.prototype = {
 		return this.useItemInPosition(this.x + dx, this.y + dy, item);
 	},
 	useItemInPosition(x, y, item) {
-		var door = this.level.getDoorAt(x, y);
+		var door = this.level.getDoorAt(x, y, this.z);
 		if (door) {
 			if (door.isLocked()) {
 				if (door.unlock(item)) {

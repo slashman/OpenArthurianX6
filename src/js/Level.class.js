@@ -201,9 +201,9 @@ Level.prototype = {
 
 		return null;
 	},
-	getDoorAt: function(x, y) {
-		for (var i=0,door; door=this.doors[i]; i++) {
-			if (door.x == x && door.y == y) {
+	getDoorAt: function(x, y, z) {
+		for (var i = 0, door; door = this.doors[i]; i++) {
+			if (door.x == x && door.y == y && door.z == z) {
 				return door;
 			}
 		}

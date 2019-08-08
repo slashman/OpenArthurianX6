@@ -22,7 +22,7 @@ Door.prototype = {
   openDoor(mob) {
     const level = this.level;
     const linkedDir = this.def.linked;
-    const sisterDoor = level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y);
+    const sisterDoor = level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
 
     if (!this.inRange(mob) || !sisterDoor.inRange(mob)) { return; }
     if (this.isLocked()) { return; }
@@ -51,7 +51,7 @@ Door.prototype = {
       this.lock = null;
       
       const linkedDir = this.def.linked;
-      const sisterDoor = this.level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y);
+      const sisterDoor = this.level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
       if (sisterDoor != null) {
         sisterDoor.unlock(key);
       }
