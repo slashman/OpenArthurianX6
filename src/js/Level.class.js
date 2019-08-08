@@ -137,7 +137,7 @@ Level.prototype = {
 	},
 	addDoor: function(door, x, y, z) {
 		OAX6.UI.addItemSprite(door, x, y, z);
-		OAX6.UI.floorLayers[z].doorsLayer.add(door.sprite); // Override group
+		OAX6.UI.floorLayers[z].objectsLayer.add(door.sprite); // Override group
 		this.doors.push(door);
 	},
 	findPathTo: function(to, from, z, includeMobsOfAlignment){

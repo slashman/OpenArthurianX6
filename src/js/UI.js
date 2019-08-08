@@ -56,7 +56,7 @@ const UI = {
 				mapLayer: this.game.add.group(baseGroup),
 				floorLayer: this.game.add.group(baseGroup),
 				mobsLayer: this.game.add.group(baseGroup),
-				doorsLayer: this.game.add.group(baseGroup),
+				objectsLayer: this.game.add.group(baseGroup),
 			}
 		}
 

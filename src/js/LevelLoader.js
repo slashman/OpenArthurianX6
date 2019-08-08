@@ -45,14 +45,18 @@ const LevelLoader = {
 		const tiledMap = this.loadTiledMap(mapData.name);
 		const mobsData = tiledMap.mobs;
 		const itemsData = tiledMap.items;
-		const doorsData = tiledMap.doors;
+		const objectsData = tiledMap.objects;
 
 		level.setSolidMasks(tiledMap.masks.solidMasks);
 		level.setOpaqueMasks(tiledMap.masks.opaqueMasks);
 		mobsData.forEach((mobData) => this.loadMob(mobData, level));
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
-		if (doorsData) {
-			doorsData.forEach((doorData) => this.loadDoor(tiledMap.map, doorData, level));
+		if (objectsData) {
+			objectsData.forEach((objectData) => {
+				if (objectData.type == 'door') {
+					this.loadDoor(tiledMap.map, objectData, level);
+				}
+			});
 		}
 		return level;
 	},
@@ -70,7 +74,7 @@ const LevelLoader = {
 			}
 		}
 		let aTerrainLayer;
-		const allDoors = [];
+		const objects = [];
 		for (let z = 0; z < 3; z++) {
 			const prefix = this.__getLayerPrefix(z);
 			for (let i = 1; i <= MAX_TILE_LAYERS_PER_FLOOR; i++) {
@@ -82,9 +86,7 @@ const LevelLoader = {
 			if (map.objects[prefix + 'Objects']) {
 				map.objects[prefix + 'Objects'].forEach(object => {
 					object.z = z;
-					if (object.type == 'door') {
-						allDoors.push(object);
-					}
+					objects.push(object);
 				});
 			}
 		}
@@ -92,10 +94,10 @@ const LevelLoader = {
 		aTerrainLayer.resizeWorld();
 		this.game.camera.deadzone = new Phaser.Rectangle(400 / 2 - 8, 300 / 2 - 8, 0, 0);
 		return {
-			map: map,
+			map,
 			mobs: this.loadTiledMapMobs(map),
 			items: this.loadTiledMapItems(map),
-			doors: allDoors,
+			objects,
 			masks: this.loadTiledMasks(map)
 		};
 	},
@@ -220,7 +222,7 @@ const LevelLoader = {
 		level.setOpaqueMasks(tiledMap.masks.opaqueMasks);
 		level.doors.forEach((door) => {
 			OAX6.UI.addItemSprite(door, door.x, door.y, door.z);
-			OAX6.UI.floorLayers[door.z].doorsLayer.add(door.sprite); // Override group
+			OAX6.UI.floorLayers[door.z].objectsLayer.add(door.sprite); // Override group
 			door.updateSolidAndOpaque();
 		});
 		level.activate();
