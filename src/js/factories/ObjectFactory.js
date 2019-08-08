@@ -2,17 +2,18 @@ const circular = require('circular-functions');
 
 const AppearanceFactory = require('../AppearanceFactory');
 const PlayerStateMachine = require('../PlayerStateMachine');
+const Stairs = require('../objects/Stairs');
 
 const ObjectFactory = {
 	setGame(game) {
 		this.game = game;
 	},
 	createObject: function(objectData){
-		Object.assign(objectData, objectData.properties);
-		const gameObject = {
-			appearanceId: objectData.appearanceId
-			
-		};
+		let gameObject;
+		if (objectData.type == 'Stairs') {
+			gameObject = new Stairs();
+		}
+		Object.assign(gameObject, objectData, objectData.properties);
 		gameObject.sprite = this.getSpriteForObject(this.game, gameObject);
 		return gameObject;
 	},

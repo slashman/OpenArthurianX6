@@ -426,8 +426,12 @@ Mob.prototype = {
 				}
 			}
 		} else {
-
-			this.reportAction("Use - Nothing there!");
+			var object = this.level.getObjectAt(x, y, this.z);
+			if (object) {
+				return object.use(this);
+			} else {
+				this.reportAction("Use - Nothing there!");
+			}
 		}
 	},
 	useItemOnDirection(dx, dy, item) {

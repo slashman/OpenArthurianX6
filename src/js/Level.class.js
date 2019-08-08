@@ -210,6 +210,9 @@ Level.prototype = {
 
 		return null;
 	},
+	getObjectAt: function(x, y, z) {
+		return this.objects.find(o => o.x == x && o.y == y && o.z == z);
+	},
 	canMoveFrom: function(x, y, z, dx, dy) {
 		if (dx === 0 || dy === 0){
 			return !this.isSolid(x + dx, y + dy, z);
