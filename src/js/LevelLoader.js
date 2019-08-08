@@ -6,6 +6,8 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const Inventory = require('./Inventory');
 const MobDescription = require('./MobDescription');
 
+const MAX_TILE_LAYERS_PER_FLOOR = 10;
+
 const LevelLoader = {
 	init(game, maps) {
 		this.__levels = {};
@@ -71,17 +73,18 @@ const LevelLoader = {
 		const allDoors = [];
 		for (let z = 0; z < 3; z++) {
 			const prefix = this.__getLayerPrefix(z);
-			const terrainLayer = createLayerIfExists(prefix + 'Terrain', OAX6.UI.floorLayers[z].mapLayer); // TODO: Are we keeping the previous layer when we transition to a new map?
-			if (z == 0) {
-				aTerrainLayer = terrainLayer;
+			for (let i = 1; i <= MAX_TILE_LAYERS_PER_FLOOR; i++) {
+				const layer = createLayerIfExists(prefix + 'Tiles ' + i, OAX6.UI.floorLayers[z].mapLayer); // TODO: Are we keeping the previous layers when we transition to a new map? Remove them!
+				if (z == 0 && i == 1) {
+					aTerrainLayer = layer;
+				}
 			}
-			createLayerIfExists(prefix + 'Vegetation', OAX6.UI.floorLayers[z].mapLayer);
-			createLayerIfExists(prefix + 'Buildings', OAX6.UI.floorLayers[z].mapLayer);
-			createLayerIfExists(prefix + 'Objects', OAX6.UI.floorLayers[z].mapLayer);
-			if (map.objects[prefix + 'Doors']) {
-				map.objects[prefix + 'Doors'].forEach(door => {
-					door.z = z;
-					allDoors.push(door);
+			if (map.objects[prefix + 'Objects']) {
+				map.objects[prefix + 'Objects'].forEach(object => {
+					object.z = z;
+					if (object.type == 'door') {
+						allDoors.push(object);
+					}
 				});
 			}
 		}
