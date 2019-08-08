@@ -6,7 +6,7 @@
          "name":"Tiles 1",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -17,7 +17,7 @@
          "name":"Tiles 2",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -28,7 +28,7 @@
          "name":"Tiles 3",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -39,7 +39,7 @@
          "name":"Tiles 4",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -77,18 +77,16 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorHL1",
-                     "lock":"goldKey",
-                     "type":"door"
+                     "doorTypeId":"doorHL1",
+                     "lockItemId":"goldKey"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "lock":"string",
-                     "type":"string"
+                     "doorTypeId":"string",
+                     "lockItemId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":512,
@@ -101,18 +99,16 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorHR1",
-                     "lock":"goldKey",
-                     "type":"door"
+                     "doorTypeId":"doorHR1",
+                     "lockItemId":"goldKey"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "lock":"string",
-                     "type":"string"
+                     "doorTypeId":"string",
+                     "lockItemId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":528,
@@ -125,16 +121,14 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorVR1",
-                     "type":"door"
+                     "doorTypeId":"doorVR1"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "type":"string"
+                     "doorTypeId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":464,
@@ -147,16 +141,14 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorVL1",
-                     "type":"door"
+                     "doorTypeId":"doorVL1"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "type":"string"
+                     "doorTypeId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":464,
@@ -169,16 +161,14 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorHR1",
-                     "type":"door"
+                     "doorTypeId":"doorHR1"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "type":"string"
+                     "doorTypeId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":544,
@@ -191,16 +181,14 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorHL1",
-                     "type":"door"
+                     "doorTypeId":"doorHL1"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "type":"string"
+                     "doorTypeId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":528,
@@ -213,16 +201,14 @@
                  "name":"",
                  "properties":
                     {
-                     "dir":"up",
-                     "type":"stairs"
+                     "direction":"up"
                     },
                  "propertytypes":
                     {
-                     "dir":"string",
-                     "type":"string"
+                     "direction":"string"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"Stairs",
                  "visible":true,
                  "width":16,
                  "x":480,
@@ -235,16 +221,14 @@
                  "name":"",
                  "properties":
                     {
-                     "dir":"up",
-                     "type":"stairs"
+                     "direction":"up"
                     },
                  "propertytypes":
                     {
-                     "dir":"string",
-                     "type":"string"
+                     "direction":"string"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"Stairs",
                  "visible":true,
                  "width":16,
                  "x":480,
@@ -333,16 +317,14 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorVR1",
-                     "type":"door"
+                     "doorTypeId":"doorVR1"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "type":"string"
+                     "doorTypeId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":496,
@@ -355,16 +337,14 @@
                  "name":"",
                  "properties":
                     {
-                     "id":"doorVL1",
-                     "type":"door"
+                     "doorTypeId":"doorVL1"
                     },
                  "propertytypes":
                     {
-                     "id":"string",
-                     "type":"string"
+                     "doorTypeId":"string"
                     },
                  "rotation":0,
-                 "type":"door",
+                 "type":"Door",
                  "visible":true,
                  "width":16,
                  "x":496,
@@ -377,16 +357,14 @@
                  "name":"",
                  "properties":
                     {
-                     "dir":"down",
-                     "type":"stairs"
+                     "direction":"down"
                     },
                  "propertytypes":
                     {
-                     "dir":"string",
-                     "type":"string"
+                     "direction":"string"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"Stairs",
                  "visible":true,
                  "width":16,
                  "x":464,
@@ -399,16 +377,14 @@
                  "name":"",
                  "properties":
                     {
-                     "dir":"down",
-                     "type":"stairs"
+                     "direction":"down"
                     },
                  "propertytypes":
                     {
-                     "dir":"string",
-                     "type":"string"
+                     "direction":"string"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"Stairs",
                  "visible":true,
                  "width":16,
                  "x":464,
@@ -416,7 +392,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 

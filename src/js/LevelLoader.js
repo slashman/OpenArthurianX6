@@ -53,7 +53,7 @@ const LevelLoader = {
 		itemsData.forEach((itemData) => this.loadItem(itemData, level));
 		if (objectsData) {
 			objectsData.forEach((objectData) => {
-				if (objectData.type == 'door') {
+				if (objectData.type == 'Door') {
 					this.loadDoor(tiledMap.map, objectData, level);
 				}
 			});
@@ -203,9 +203,9 @@ const LevelLoader = {
 		level.addItem(item, itemData.x, itemData.y, itemData.z);
 	},
 	loadDoor: function(map, doorData, level) {
-		const door = ItemFactory.createDoor(doorData.properties.id, level);
+		const door = ItemFactory.createDoor(doorData.properties.doorTypeId, level);
 
-		door.lock = doorData.properties.lock;
+		door.lock = doorData.properties.lockItemId;
 
 		level.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z);
 		level.setSolidAndOpaque(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z, true);
