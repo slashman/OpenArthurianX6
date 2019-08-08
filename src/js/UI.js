@@ -273,6 +273,13 @@ const UI = {
 		this.floorLayers[z].floorLayer.add(item.sprite);
 		item.sprite.visible = true;
 	},
+
+	locateEntitySpriteInWord: function(entity, layerName){
+		entity.sprite.x = entity.x * TILE_WIDTH;
+		entity.sprite.y = entity.y * TILE_HEIGHT;
+		this.floorLayers[entity.z][layerName].add(entity.sprite);
+	},
+
 	removeItemSprite: function(item) {
 		this.floorLayers[item.z].floorLayer.remove(item.sprite);
 		item.sprite.visible = false;

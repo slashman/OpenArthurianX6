@@ -13,7 +13,8 @@ const COMBAT_DISTANCE = 10;
 function Level(){
 	this.mobs = [];	
 	this.items = [];
-	this.doors = [];
+	this.doors = []; // TODO: Merge with objects?
+	this.objects = [];
 	this.solidMasks = null;
 	this.opaqueMasks = null;
 	this.pfGrids = [];
@@ -139,6 +140,13 @@ Level.prototype = {
 		OAX6.UI.addItemSprite(door, x, y, z);
 		OAX6.UI.floorLayers[z].objectsLayer.add(door.sprite); // Override group
 		this.doors.push(door);
+	},
+	addObject: function(object, x, y, z) {
+		object.x = x;
+		object.y = y;
+		object.z = z;
+		OAX6.UI.locateEntitySpriteInWord(object, 'objectsLayer');
+		this.objects.push(object);
 	},
 	findPathTo: function(to, from, z, includeMobsOfAlignment){
 		//TODO: Single finder object?

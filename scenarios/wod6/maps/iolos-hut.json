@@ -6,7 +6,7 @@
          "name":"Tiles 1",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":64,
          "x":0,
          "y":0
@@ -17,7 +17,7 @@
          "name":"Tiles 2",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":64,
          "x":0,
          "y":0
@@ -28,7 +28,7 @@
          "name":"Tiles 3",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":64,
          "x":0,
          "y":0
@@ -39,7 +39,7 @@
          "name":"Tiles 4",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":64,
          "x":0,
          "y":0
@@ -201,10 +201,12 @@
                  "name":"",
                  "properties":
                     {
+                     "appearanceId":"stairsUp",
                      "direction":"up"
                     },
                  "propertytypes":
                     {
+                     "appearanceId":"string",
                      "direction":"string"
                     },
                  "rotation":0,
@@ -221,10 +223,12 @@
                  "name":"",
                  "properties":
                     {
+                     "appearanceId":"stairsUp",
                      "direction":"up"
                     },
                  "propertytypes":
                     {
+                     "appearanceId":"string",
                      "direction":"string"
                     },
                  "rotation":0,
@@ -357,10 +361,12 @@
                  "name":"",
                  "properties":
                     {
+                     "appearanceId":"stairsDown",
                      "direction":"down"
                     },
                  "propertytypes":
                     {
+                     "appearanceId":"string",
                      "direction":"string"
                     },
                  "rotation":0,
@@ -377,10 +383,12 @@
                  "name":"",
                  "properties":
                     {
+                     "appearanceId":"stairsDown",
                      "direction":"down"
                     },
                  "propertytypes":
                     {
+                     "appearanceId":"string",
                      "direction":"string"
                     },
                  "rotation":0,

@@ -180,7 +180,7 @@ const Appearances = [
 		items: [
 			{
 				id: 'doorOpenHL1',
-				solid: true,
+				solid: true, // TODO: This doesn't belong to the appearance.
 				i: 18
 			},
 			{
@@ -217,6 +217,14 @@ const Appearances = [
 				id: 'doorVR1',
 				solid: true,
 				i: 21
+			},
+			{
+				id: 'stairsUp',
+				i: 3 * 33 + 4 
+			},
+			{
+				id: 'stairsDown',
+				i: 2 * 33 + 5
 			}
 		]
 	},

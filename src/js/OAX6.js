@@ -16,6 +16,7 @@ const MobFactory = require('./MobFactory');
 const PlayerFactory = require('./PlayerFactory');
 const AppearanceFactory = require('./AppearanceFactory');
 const ItemFactory = require('./ItemFactory');
+const ObjectFactory = require('./factories/ObjectFactory');
 const Storage = require('./Storage');
 
 const PlayerStateMachine = require('./PlayerStateMachine');
@@ -42,6 +43,7 @@ const OAX6 = {
 	startGame: function(game){
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);
+		ObjectFactory.setGame(game);
 		Dialogs.init(game);
 		MessageBox.init(game);
 		Inventory.init(game);

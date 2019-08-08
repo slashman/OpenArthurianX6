@@ -2,6 +2,7 @@ const Level = require('./Level.class');
 const NPCFactory = require('./NPCFactory');
 const MobFactory = require('./MobFactory');
 const ItemFactory = require('./ItemFactory');
+const ObjectFactory = require('./factories/ObjectFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const Inventory = require('./Inventory');
 const MobDescription = require('./MobDescription');
@@ -55,6 +56,8 @@ const LevelLoader = {
 			objectsData.forEach((objectData) => {
 				if (objectData.type == 'Door') {
 					this.loadDoor(tiledMap.map, objectData, level);
+				} else {
+					this.loadObject(tiledMap.map, objectData, level);
 				}
 			});
 		}
@@ -209,6 +212,10 @@ const LevelLoader = {
 
 		level.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z);
 		level.setSolidAndOpaque(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z, true);
+	},
+	loadObject: function(map, objectData, level) {
+		const object = ObjectFactory.createObject(objectData);
+		level.addObject(object, objectData.x / map.tileWidth, objectData.y / map.tileHeight - 1, objectData.z);
 	},
 	/**
 	 * Initializes the data for the different levels from a savegame
