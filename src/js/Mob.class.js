@@ -357,7 +357,8 @@ Mob.prototype = {
 		const object = this.level.getObjectAt(this.x + dx, this.y + dy, this.z);
 		if (object && object.type == 'Stairs') {
 			// Autouse if possible
-			return Promise.resolve().then(() => object.use(this))
+
+			return Promise.resolve().then(() => object.use(this, dx, dy))
 		}
 		// Position changes before the tween to "reserve" the spot
 		this.x += dx;
