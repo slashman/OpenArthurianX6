@@ -416,9 +416,13 @@ Mob.prototype = {
 		}
 	},
 	useOnDirection(dx, dy) {
-		return this.useInPosition(this.x + dx, this.y + dy);
+		return this.useInPosition(this.x + dx, this.y + dy, dx, dy);
 	},
-	useInPosition(x, y) {
+	useInPosition(x, y, dx, dy) {
+		if (!dx) {
+			dx = x - this.x;
+			dy = y - this.y;
+		}
 		var door = this.level.getDoorAt(x, y, this.z);
 		if (door) {
 			if (door.isLocked()) {
@@ -434,7 +438,7 @@ Mob.prototype = {
 		} else {
 			var object = this.level.getObjectAt(x, y, this.z);
 			if (object) {
-				return object.use(this);
+				return object.use(this, dx, dy);
 			} else {
 				this.reportAction("Use - Nothing there!");
 			}
