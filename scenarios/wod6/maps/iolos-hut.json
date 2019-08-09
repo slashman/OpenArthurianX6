@@ -202,12 +202,14 @@
                  "properties":
                     {
                      "appearanceId":"stairsUp",
-                     "direction":"up"
+                     "direction":"up",
+                     "isFloor":true
                     },
                  "propertytypes":
                     {
                      "appearanceId":"string",
-                     "direction":"string"
+                     "direction":"string",
+                     "isFloor":"bool"
                     },
                  "rotation":0,
                  "type":"Stairs",
@@ -224,12 +226,14 @@
                  "properties":
                     {
                      "appearanceId":"stairsUp",
-                     "direction":"up"
+                     "direction":"up",
+                     "isFloor":true
                     },
                  "propertytypes":
                     {
                      "appearanceId":"string",
-                     "direction":"string"
+                     "direction":"string",
+                     "isFloor":"bool"
                     },
                  "rotation":0,
                  "type":"Stairs",
@@ -362,12 +366,14 @@
                  "properties":
                     {
                      "appearanceId":"stairsDown",
-                     "direction":"down"
+                     "direction":"down",
+                     "isFloor":true
                     },
                  "propertytypes":
                     {
                      "appearanceId":"string",
-                     "direction":"string"
+                     "direction":"string",
+                     "isFloor":"bool"
                     },
                  "rotation":0,
                  "type":"Stairs",
@@ -384,12 +390,14 @@
                  "properties":
                     {
                      "appearanceId":"stairsDown",
-                     "direction":"down"
+                     "direction":"down",
+                     "isFloor":true
                     },
                  "propertytypes":
                     {
                      "appearanceId":"string",
-                     "direction":"string"
+                     "direction":"string",
+                     "isFloor":"bool"
                     },
                  "rotation":0,
                  "type":"Stairs",

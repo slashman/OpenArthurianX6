@@ -145,7 +145,7 @@ Level.prototype = {
 		object.x = x;
 		object.y = y;
 		object.z = z;
-		OAX6.UI.locateEntitySpriteInWord(object, 'objectsLayer');
+		OAX6.UI.locateEntitySpriteInWord(object, object.isFloor ? 'floorLayer' : 'objectsLayer');
 		this.objects.push(object);
 	},
 	findPathTo: function(to, from, z, includeMobsOfAlignment){
