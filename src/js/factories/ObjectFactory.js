@@ -14,6 +14,7 @@ const ObjectFactory = {
 			gameObject = new Stairs();
 		}
 		Object.assign(gameObject, objectData, objectData.properties);
+		delete gameObject.properties;
 		gameObject.sprite = this.getSpriteForObject(this.game, gameObject);
 		return gameObject;
 	},

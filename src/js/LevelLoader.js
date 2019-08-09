@@ -232,6 +232,9 @@ const LevelLoader = {
 			OAX6.UI.floorLayers[door.z].objectsLayer.add(door.sprite); // Override group
 			door.updateSolidAndOpaque();
 		});
+		level.objects.forEach(object => {
+			OAX6.UI.locateEntitySpriteInWord(object, object.isFloor ? 'floorLayer' : 'objectsLayer');
+		});
 		level.activate();
 		level.activateAll();
 	}

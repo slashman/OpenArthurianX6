@@ -1,4 +1,9 @@
+const circular = require('circular-functions');
+
 class Stairs {
+	constructor() {
+		this._c = circular.register('Stairs');
+	}
 	use(mob, dx, dy) {
 		const variation = this.direction == 'up' ? 1 : -1;
 		const targetZ = this.z + variation;
@@ -40,5 +45,15 @@ class Stairs {
 			})
 	}
 }
+
+circular.registerClass('Stairs', Stairs, {
+  transients: {
+    sprite: true
+  },
+  reviver: function(stairs, data) {
+    stairs.sprite = OAX6.ObjectFactory.getSpriteForObject(data.phaserGame, stairs);
+  }
+});
+
 
 module.exports = Stairs;
