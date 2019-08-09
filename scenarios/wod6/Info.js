@@ -1,4 +1,8 @@
 module.exports = {
+  config: {
+    tileWidth: 16,
+    tileHeight: 16
+  },
   startingState: {
     minuteOfDay: 1380,
     map: 'forest1',

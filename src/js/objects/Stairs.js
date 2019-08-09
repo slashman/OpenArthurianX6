@@ -1,10 +1,13 @@
 const circular = require('circular-functions');
 
+const scenarioInfo = require('../ScenarioInfo');
+
 class Stairs {
 	constructor() {
 		this._c = circular.register('Stairs');
 	}
 	use(mob, dx, dy) {
+		const { tileWidth, tileHeight } = scenarioInfo.config;
 		const variation = this.direction == 'up' ? 1 : -1;
 		const targetZ = this.z + variation;
 		const targetX = this.x - variation;
@@ -33,15 +36,15 @@ class Stairs {
 		 * - If the mob is the player, update FOV
 		 * - Walk another half-a tile
 		 */
-		return OAX6.UI.executeTween(mob.sprite, {x: mob.sprite.x + dx * 8, y: mob.sprite.y + dy * 8}, OAX6.UI.WALK_DELAY / 2)
+		return OAX6.UI.executeTween(mob.sprite, {x: mob.sprite.x + dx * tileWidth / 2, y: mob.sprite.y + dy * tileHeight / 2}, OAX6.UI.WALK_DELAY / 2)
 			.then(() => {
 				OAX6.UI.floorLayers[targetZ].mobsLayer.add(mob.sprite);
-				mob.sprite.x -= variation * 16;
-				mob.sprite.y -= variation * 16;
+				mob.sprite.x -= variation * tileWidth;
+				mob.sprite.y -= variation * tileHeight;
 				if (OAX6.UI.player == mob || OAX6.UI.activeMob == mob) {
 					OAX6.UI.updateFOV();
 				}
-				return OAX6.UI.executeTween(mob.sprite, {x: mob.sprite.x + dx * 8, y: mob.sprite.y + dy * 8}, OAX6.UI.WALK_DELAY / 2)
+				return OAX6.UI.executeTween(mob.sprite, {x: mob.sprite.x + dx * tileWidth / 2, y: mob.sprite.y + dy * tileHeight / 2}, OAX6.UI.WALK_DELAY / 2)
 			})
 	}
 }
