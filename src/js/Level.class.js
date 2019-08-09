@@ -15,6 +15,7 @@ function Level(){
 	this.items = [];
 	this.doors = []; // TODO: Merge with objects?
 	this.objects = [];
+	this.objectsMap = [];
 	this.solidMasks = null;
 	this.opaqueMasks = null;
 	this.pfGrids = [];
@@ -147,6 +148,13 @@ Level.prototype = {
 		object.z = z;
 		OAX6.UI.locateEntitySpriteInWord(object, object.isFloor ? 'floorLayer' : 'objectsLayer');
 		this.objects.push(object);
+		if (!this.objectsMap[z]) {
+			this.objectsMap[z] = [];
+		}
+		if (!this.objectsMap[z][x]) {
+			this.objectsMap[z][x] = [];
+		}
+		this.objectsMap[z][x][y] = object;
 	},
 	findPathTo: function(to, from, z, includeMobsOfAlignment){
 		//TODO: Single finder object?
@@ -211,7 +219,13 @@ Level.prototype = {
 		return null;
 	},
 	getObjectAt: function(x, y, z) {
-		return this.objects.find(o => o.x == x && o.y == y && o.z == z);
+		if (!this.objectsMap[z]) {
+			return undefined;
+		}
+		if (!this.objectsMap[z][x]) {
+			return undefined;
+		}
+		return this.objectsMap[z][x][y];
 	},
 	canMoveFrom: function(x, y, z, dx, dy) {
 		if (dx === 0 || dy === 0){
@@ -281,6 +295,8 @@ Level.prototype = {
 		this.mobs = null;	
 		this.items = null;
 		this.doors = null;
+		this.objects = null;
+		this.objectsMap = null;
 		this.solidMasks = null;
 		this.opaqueMasks = null;
 		this.pfGrids = null;

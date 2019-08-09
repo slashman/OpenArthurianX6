@@ -354,6 +354,11 @@ Mob.prototype = {
 			this.reportAction("Move - Blocked");
 			return Timer.delay(specialMovementRules ? 50 : 500);
 		}
+		const object = this.level.getObjectAt(this.x + dx, this.y + dy, this.z);
+		if (object && object.type == 'Stairs') {
+			// Autouse if possible
+			return Promise.resolve().then(() => object.use(this))
+		}
 		// Position changes before the tween to "reserve" the spot
 		this.x += dx;
 		this.y += dy;
