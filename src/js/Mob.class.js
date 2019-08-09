@@ -638,16 +638,6 @@ Mob.prototype = {
 		if (player.dead && !player.party.find(p => !p.dead)) {
 			MessageBox.showMessage("GAME OVER!");
 		}
-	},
-	yank() {
-		if (this.level.isSolid(this.x, this.y, this.z + 1)) {
-			OAX6.UI.showMessage("Can't");
-			return;
-		}
-		this.z++;
-		OAX6.UI.floorLayers[this.z].mobsLayer.add(this.sprite);
-		OAX6.UI.updateFOV();
-
 	}
 };
 
