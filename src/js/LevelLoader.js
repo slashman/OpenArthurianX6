@@ -209,6 +209,7 @@ const LevelLoader = {
 		const door = ItemFactory.createDoor(doorData.properties.doorTypeId, level);
 
 		door.lock = doorData.properties.lockItemId;
+		Object.assign(door, doorData.properties);
 
 		level.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z);
 		level.setSolidAndOpaque(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z, true);

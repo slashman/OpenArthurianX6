@@ -225,7 +225,24 @@ const Appearances = [
 			{
 				id: 'stairsDown',
 				i: 2 * 33 + 5
+			},
+			{
+				id: 'vLever',
+				i: 3 * 33 + 18 
+			},
+			{
+				id: 'wLever',
+				i: 4 * 33 + 18
+			},
+			{
+				id: 'vLeverOff',
+				i: 3 * 33 + 19 
+			},
+			{
+				id: 'wLeverOff',
+				i: 4 * 33 + 19
 			}
+
 		]
 	},
 	{

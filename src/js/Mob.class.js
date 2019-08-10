@@ -428,11 +428,12 @@ Mob.prototype = {
 			if (door.isLocked()) {
 				OAX6.UI.showMessage("Locked!");
 			} else {
-				door.openDoor(this, this.level);
-				if (door.open) {
-					OAX6.UI.showMessage("Use - Opened door");
-				} else {
-					OAX6.UI.showMessage("Use - Closed door");
+				if (door.openDoor(this, false)) {
+					if (door.open) {
+						OAX6.UI.showMessage("Use - Opened door");
+					} else {
+						OAX6.UI.showMessage("Use - Closed door");
+					}
 				}
 			}
 		} else {
@@ -453,7 +454,7 @@ Mob.prototype = {
 			if (door.isLocked()) {
 				if (door.unlock(item)) {
                     OAX6.UI.showMessage("Door Unlocked");
-                    door.openDoor(this, this.level);
+                    door.openDoor(this, false);
                 } else {
                     OAX6.UI.showMessage("Wrong key!");
                 }

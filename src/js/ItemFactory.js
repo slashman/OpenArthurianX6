@@ -56,7 +56,7 @@ const ItemFactory = {
 		});
 		return sprite;
 	},
-	// TODO: Move this somewhere else, the Door class has nothing to do with Item. Move the definitions too?
+	// TODO: Move this to ObjectFactory, the Door class has nothing to do with Item. Move the definitions too?
 	createDoor: function(id, level){
 		const def = this.itemsMap[id];
 		const door = new Door();

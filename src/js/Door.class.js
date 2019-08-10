@@ -19,13 +19,25 @@ circular.registerClass('Door', Door, {
 });
 
 Door.prototype = {
-  openDoor(mob) {
+  openDoor(mob, remote) {
     const level = this.level;
     const linkedDir = this.def.linked;
     const sisterDoor = level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
 
-    if (!this.inRange(mob) || !sisterDoor.inRange(mob)) { return; }
-    if (this.isLocked()) { return; }
+    if (!remote && (!this.inRange(mob) || !sisterDoor.inRange(mob))) {
+      return false;
+    }
+    if (this.remoteOnly && !remote) {
+      OAX6.UI.showMessage("Won't move!");
+      return false;
+    }
+    if (this.isLocked()) {
+      return false;
+    }
+    if (mob.level.getMobAt(this.x, this.y, this.z)) {
+      OAX6.UI.showMessage("Blocked");
+      return false;
+    }
 
     this.open = !this.open;
     this.switchSprite(); 
@@ -38,6 +50,7 @@ Door.prototype = {
       sisterDoor.updateSolidAndOpaque();
     }
     OAX6.UI.updateFOV();
+    return true;
   }, 
 
   updateSolidAndOpaque(){

@@ -3,8 +3,13 @@ const circular = require('circular-functions');
 const AppearanceFactory = require('../AppearanceFactory');
 const PlayerStateMachine = require('../PlayerStateMachine');
 const Stairs = require('../objects/Stairs');
+const Lever = require('../objects/Lever');
 
 const ObjectFactory = {
+	init(objectTypes) {
+		this.definitions = [];
+		objectTypes.forEach(ot => this.definitions[ot.id] = ot);
+	},
 	setGame(game) {
 		this.game = game;
 	},
@@ -12,14 +17,24 @@ const ObjectFactory = {
 		let gameObject;
 		if (objectData.type == 'Stairs') {
 			gameObject = new Stairs();
+		} else if (objectData.type == 'Lever') {
+			gameObject = new Lever();
+		} else {
+			gameObject = {};
 		}
 		Object.assign(gameObject, objectData, objectData.properties);
 		delete gameObject.properties;
+		if (gameObject.defid) {
+			gameObject.def = this.getDefinitionById(gameObject.defid);
+		}
 		gameObject.sprite = this.getSpriteForObject(this.game, gameObject);
 		return gameObject;
 	},
+	getDefinitionById(id) {
+		return this.definitions[id];
+	},
 	getSpriteForObject: function(game, gameObject) {
-		const appearance = AppearanceFactory.getAppearance(gameObject.appearanceId);
+		const appearance = AppearanceFactory.getAppearance(gameObject.getAppearanceId());
 		const sprite = game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		sprite.visible = true;
 		sprite.inputEnabled = true;

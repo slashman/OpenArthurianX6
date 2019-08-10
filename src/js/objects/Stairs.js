@@ -47,6 +47,9 @@ class Stairs {
 				return OAX6.UI.executeTween(mob.sprite, {x: mob.sprite.x + dx * tileWidth / 2, y: mob.sprite.y + dy * tileHeight / 2}, OAX6.UI.WALK_DELAY / 2)
 			})
 	}
+	getAppearanceId() {
+		return this.appearanceId;
+	}
 }
 
 circular.registerClass('Stairs', Stairs, {

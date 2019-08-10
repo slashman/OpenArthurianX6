@@ -218,6 +218,9 @@ Level.prototype = {
 
 		return null;
 	},
+	getDoorById(doorId) {
+		return this.doors.find(d => d.doorId == doorId);
+	},
 	getObjectAt: function(x, y, z) {
 		if (!this.objectsMap[z]) {
 			return undefined;

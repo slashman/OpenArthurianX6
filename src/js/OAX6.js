@@ -10,6 +10,7 @@ const NPCsData = require('./data/NPCs');
 const MobTypeData = require('./data/MobTypes');
 const ItemsData = require('./data/Items');
 const AppearancesData = require('./data/Appearances');
+const ObjectTypes = require('./data/ObjectTypes');
 
 const NPCFactory = require('./NPCFactory');
 const MobFactory = require('./MobFactory');
@@ -38,6 +39,7 @@ const OAX6 = {
 		MobFactory.init(MobTypeData);
 		AppearanceFactory.init(AppearancesData);
 		ItemFactory.init(ItemsData);
+		ObjectFactory.init(ObjectTypes);
 		UI.launch(this.startGame.bind(this));
 	},
 	startGame: function(game){
