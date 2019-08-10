@@ -250,11 +250,13 @@
                  "properties":
                     {
                      "defid":"wLever",
+                     "hidden":true,
                      "opensDoorId":"iolo1"
                     },
                  "propertytypes":
                     {
                      "defid":"string",
+                     "hidden":"bool",
                      "opensDoorId":"string"
                     },
                  "rotation":0,

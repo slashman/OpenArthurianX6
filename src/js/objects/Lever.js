@@ -6,6 +6,7 @@ class Lever {
 	constructor() {
 		this._c = circular.register('Lever');
 		this.open = false;
+		this.hidden = false;
 	}
 	use(mob, dx, dy) {
 		this.open = !this.open;
@@ -18,12 +19,20 @@ class Lever {
 			}
 		}
 	}
-	switchSprite() {
+	reveal() { // TODO: Put in superclass?
+		this.switchSprite();
+		this.hidden = false;
+		this.sprite.visible = true;
+	}
+	switchSprite() {  // TODO: Put in superclass?
 		const appearance = OAX6.AppearanceFactory.getAppearance(this.getAppearanceId());
 		this.sprite.frame = appearance.i;
 	}
 	getAppearanceId() {
 		return this.open ? this.def.openAppearance : this.def.closedAppearance;
+	}
+	getDescription() {
+		return 'a lever';
 	}
 }
 

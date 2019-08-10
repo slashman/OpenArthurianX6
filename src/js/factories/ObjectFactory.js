@@ -36,7 +36,11 @@ const ObjectFactory = {
 	getSpriteForObject: function(game, gameObject) {
 		const appearance = AppearanceFactory.getAppearance(gameObject.getAppearanceId());
 		const sprite = game.add.sprite(0, 0, appearance.tileset, appearance.i);
-		sprite.visible = true;
+		if (gameObject.hidden) {
+			sprite.visible = false;
+		} else {
+			sprite.visible = true;
+		}
 		sprite.inputEnabled = true;
 		sprite.events.onInputDown.add(() => { 
 			if (game.input.activePointer.rightButton.isDown) {

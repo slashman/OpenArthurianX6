@@ -50,6 +50,9 @@ class Stairs {
 	getAppearanceId() {
 		return this.appearanceId;
 	}
+	getDescription() {
+		return 'a stairway';
+	}
 }
 
 circular.registerClass('Stairs', Stairs, {

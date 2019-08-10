@@ -383,6 +383,17 @@ const PlayerStateMachine = {
         if (OAX6.UI.isFOVBlocked(x,y)) {
             return null;
         }
+        const object = this.player.level.getObjectAt(x, y, this.player.z);
+        if (object) {
+            if (object.hidden) {
+                object.hidden = false;
+                object.reveal();
+                OAX6.UI.showMessage("Look - You find a " + object.getDescription());
+            } else {
+                OAX6.UI.showMessage("Look - You see a " + object.getDescription());
+            }
+            return 'text';
+        }
         const mob = this.player.level.getMobAt(x, y, this.player.z);
         if (mob){
             MobDescription.showMob(mob);

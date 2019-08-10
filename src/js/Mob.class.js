@@ -355,7 +355,7 @@ Mob.prototype = {
 			return Timer.delay(specialMovementRules ? 50 : 500);
 		}
 		const object = this.level.getObjectAt(this.x + dx, this.y + dy, this.z);
-		if (object && object.type == 'Stairs') {
+		if (object && !object.hidden && object.type == 'Stairs') {
 			// Autouse if possible
 
 			return Promise.resolve().then(() => object.use(this, dx, dy))
@@ -438,7 +438,7 @@ Mob.prototype = {
 			}
 		} else {
 			var object = this.level.getObjectAt(x, y, this.z);
-			if (object) {
+			if (object && !object.hidden) {
 				return object.use(this, dx, dy);
 			} else {
 				this.reportAction("Use - Nothing there!");
