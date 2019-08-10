@@ -350,6 +350,10 @@ const PlayerStateMachine = {
 
     __lookCommand(position) {
         const shown = this.__lookAtPosition(position.x, position.y);
+        this.__lookCommandAftermath(shown);
+    },
+
+    __lookCommandAftermath(shown) {
         if (shown == 'basic') {
             this.setActionCallback(() => {
                 this.clearActionCallback();
@@ -376,7 +380,21 @@ const PlayerStateMachine = {
     __resetAfterLook() {
         this.examining = false;
         this.resetState();
+        if (this.state === PlayerStateMachine.INVENTORY){
+            this.__activateInventoryCallbacks();
+        }
         OAX6.UI.hideIcon();
+    },
+
+    __lookAtItem(item) {
+        this.examining = true;
+        if (item.def.isBook) {
+            OAX6.UI.readBook(item);
+            return 'book';
+        } else {
+            MobDescription.showItem(item);
+            return 'basic';
+        }
     },
 
     __lookAtPosition(x, y) {
@@ -483,6 +501,8 @@ const PlayerStateMachine = {
                 return this.dropItem();
             } else if (keyCode === Phaser.KeyCode.U){
                 return this.useInventoryItem();
+            } else if (keyCode === Phaser.KeyCode.L){
+                return this.lookAtInventoryItem();
             }
         }
     },
@@ -557,6 +577,18 @@ const PlayerStateMachine = {
             this.resetState();
             this.__activateInventoryCallbacks();
         });
+    },
+
+    lookAtInventoryItem: function() {
+        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        if (!item) {
+            return;
+        }
+        this.clearActionCallback();
+        this.clearDirectionCallback();
+        PlayerStateMachine.switchState(PlayerStateMachine.LOOK_BOX);
+        const shown = this.__lookAtItem(item);
+        this.__lookCommandAftermath(shown);
     },
 
     useInventoryItem: function() {

@@ -43,6 +43,7 @@ const BookPanel = {
         this.pages = this.__splitInPages(book.def.contents);
         this.currentPage = 0;
         this.__updateShownPage();
+        this.layer.parent.bringToTop(this.layer);
     },
 
     hide() {
