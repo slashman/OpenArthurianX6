@@ -341,9 +341,7 @@ Mob.prototype = {
 		if (mob){
 			blockedByMob = true;
 			if (specialMovementRules) {
-				if (mob.isPartyMember()) {
-					// blockedByMob = false; TODO: Activate when there's a separate Talk command
-				// } else if (this.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
+				if (this.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
 					Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
 					// Look at each other while talking
 					this.lookAt(dx, dy);
