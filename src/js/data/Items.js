@@ -19,6 +19,13 @@ const Items = [
 		damage: 6
 	},
 	{
+		id: 'mysticSword',
+		appearance: 'mysticSword',
+		name: 'Mystic Sword',
+		description: 'The greatest works of Zircon of Minoc, we found them in Serpent\'s Hold, during the Quest of the Avatar. They were vital to finish off the foes in the Abyss.',
+		damage: 20
+	},
+	{
 		id: 'spear',
 		appearance: 'spear',
 		name: 'Spear of Shamap',

@@ -35,6 +35,10 @@ const Appearances = [
 				i: 48
 			},
 			{
+				id: 'mysticSword',
+				i: 63
+			},
+			{
 				id: 'boomerang',
 				i: 49
 			},
