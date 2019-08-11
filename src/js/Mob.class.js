@@ -255,11 +255,11 @@ Mob.prototype = {
 		});
 	},
 	canTrack: function (mob) {
-		if (mob === OAX6.UI.player && this.isPartyMember()) {
-			return true;
-		}
 		if (mob.z != this.z) {
 			return false;
+		}
+		if (mob === OAX6.UI.player && this.isPartyMember()) {
+			return true;
 		}
 		// TODO: Use Memory (last known position)
 		const dist = Geo.flatDist(mob.x, mob.y, this.x, this.y);
@@ -273,7 +273,7 @@ Mob.prototype = {
 		return this.alignment === Constants.Alignments.ENEMY;
 	},
 	isPartyMember: function(){
-		return OAX6.UI.player.party.indexOf(this) !== -1;
+		return this == OAX6.UI.player || OAX6.UI.player.party.indexOf(this) !== -1;
 	},
 	getNearbyTarget: function(){
 		if (this.alignment === Constants.Alignments.NEUTRAL) {
@@ -594,11 +594,11 @@ Mob.prototype = {
 				this.level.removeMob(this);
 				this.level.addItem(corpse, this.x, this.y, this.z);
 			}
-			if (this === OAX6.UI.player || this.isPartyMember()){
+			if (this.isPartyMember()){
 				this.checkForGameOver();
-			}
-			if (this.isPartyMember()) {
-				OAX6.UI.player.removeFromParty(this);
+				if (this != OAX6.UI.player) {
+					OAX6.UI.player.removeFromParty(this);
+				}
 			}
 		}
 	},

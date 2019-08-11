@@ -95,7 +95,7 @@ Level.prototype = {
 		if (!nextActor || nextActor.dead || !this.isInCombat(nextActor)){
 			return this.actNext();
 		}
-		if (nextActor.isPartyMember() || nextActor === OAX6.UI.player) {
+		if (nextActor.isPartyMember()) {
 			OAX6.UI.locateMarker(nextActor);
 		}
 		OAX6.UI.showMessage(nextActor.getBattleDescription()+":");
@@ -290,7 +290,7 @@ Level.prototype = {
 	destroy() {
 		// Silently kill all mobs except player party.
 		this.mobs.forEach(m => {
-			if (!(m.isPartyMember() || this === OAX6.UI.player)) {
+			if (!m.isPartyMember()) {
 				m.dead = true;
 			}
 		});
