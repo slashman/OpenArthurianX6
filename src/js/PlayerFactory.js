@@ -12,7 +12,6 @@ const PlayerFactory = {
 		mob.alignment = Constants.Alignments.PLAYER;
 		PlayerStateMachine.player = mob;
 		PartyStatus.addMob(mob);
-		game.camera.follow(mob.sprite);
 		return mob;
 	}
 }

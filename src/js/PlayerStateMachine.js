@@ -401,7 +401,8 @@ const PlayerStateMachine = {
         if (OAX6.UI.isFOVBlocked(x,y)) {
             return null;
         }
-        const object = this.player.level.getObjectAt(x, y, this.player.z);
+        const {activeMob} = OAX6.UI;
+        const object = activeMob.level.getObjectAt(x, y, activeMob.z);
         if (object) {
             if (object.hidden) {
                 object.hidden = false;
@@ -412,13 +413,13 @@ const PlayerStateMachine = {
             }
             return 'text';
         }
-        const mob = this.player.level.getMobAt(x, y, this.player.z);
+        const mob = activeMob.level.getMobAt(x, y, activeMob.z);
         if (mob){
             MobDescription.showMob(mob);
             this.examining = true;
             return 'basic';
         }
-        var item = this.player.level.getItemAt(x, y, this.player.z);
+        var item = activeMob.level.getItemAt(x, y, activeMob.z);
         if (item) {
             this.examining = true;
             if (item.def.isBook) {
@@ -465,9 +466,14 @@ const PlayerStateMachine = {
                     return this.lookCommand();
                 } else if (keyCode === Phaser.KeyCode.I) {
                     return this.activateInventory(0);
-                } else if (keyCode >= Phaser.KeyCode.ONE && keyCode <= Phaser.KeyCode.ONE + MAX_PARTY_SIZE) {
-                    const partyMemberIndex = keyCode - Phaser.KeyCode.ONE;
+                } else if (keyCode >= Phaser.KeyCode.F1 && keyCode <= Phaser.KeyCode.F1 + this.player.party.length) {
+                    const partyMemberIndex = keyCode - Phaser.KeyCode.F1;
                     return this.activateInventory(partyMemberIndex);
+                } else if (keyCode >= Phaser.KeyCode.ONE && keyCode <= Phaser.KeyCode.ONE + this.player.party.length) {
+                    const partyMemberIndex = keyCode - Phaser.KeyCode.ONE;
+                    return this.activateSoloMode(partyMemberIndex);
+                } else if (keyCode == Phaser.KeyCode.ZERO) {
+                    return this.activatePartyMode();
                 }
             }
 
@@ -681,19 +687,20 @@ const PlayerStateMachine = {
     },
 
     clickOnDoor(door) {
+        const {activeMob} = OAX6.UI;
         if (this.state == PlayerStateMachine.WORLD) {
-            if (!door.inRange(this.player)) {
+            if (!door.inRange(activeMob)) {
                 OAX6.UI.showMessage("Too far");
                 return;
             }
-            this.player.useInPosition(door.x, door.y);
+            activeMob.useInPosition(door.x, door.y);
         } else if (this.state == PlayerStateMachine.FLOATING_ITEM) {
-            if (!door.inRange(this.player)) {
+            if (!door.inRange(activeMob)) {
                 OAX6.UI.showMessage("Too far");
                 Inventory.resetFloatingItem();
                 return;
             }
-            this.player.useItemInPosition(door.x, door.y, Inventory.useItemOn);
+            activeMob.useItemInPosition(door.x, door.y, Inventory.useItemOn);
             Inventory.resetFloatingItem();
         }
     },
@@ -724,7 +731,26 @@ const PlayerStateMachine = {
                 Inventory.resetFloatingItem();
             }
         });
+    },
+
+    activateSoloMode(partyMemberIndex) {
+        this.soloMode = true;
+        if (partyMemberIndex == 0) {
+            OAX6.UI.setActiveMob(OAX6.UI.player);
+        } else {
+            OAX6.UI.setActiveMob(OAX6.UI.player.party[partyMemberIndex - 1]);
+        }
+        OAX6.UI.showMessage("Solo Mode activated for " + OAX6.UI.activeMob.getDescription());
+        OAX6.UI.updateFOV();
+        return Promise.resolve();
+    },
+    activatePartyMode() {
+        this.soloMode = false;
+        this.player.activateParty();
+        OAX6.UI.showMessage("Party Mode activated");
+        OAX6.UI.setActiveMob(OAX6.UI.player);
     }
+
 };
 
 module.exports = PlayerStateMachine;

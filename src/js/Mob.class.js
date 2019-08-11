@@ -295,6 +295,9 @@ Mob.prototype = {
 			PlayerStateMachine.checkCombatReady();
 			return;
 		}
+		if (OAX6.UI.activeMob == this) {
+			return;
+		}
 		this.executingAction = true;
 		this.act().then(()=>{
 			this.executingAction = false;
@@ -640,6 +643,9 @@ Mob.prototype = {
 		if (player.dead && !player.party.find(p => !p.dead)) {
 			MessageBox.showMessage("GAME OVER!");
 		}
+	},
+	activateParty() {
+		this.party.forEach(m => m.activate());	
 	}
 };
 

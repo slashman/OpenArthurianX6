@@ -100,7 +100,7 @@ const UI = {
 		PartyStatus.update();
 	},
 	isFOVBlocked(x, y) {
-		return !this.fovMask[x - this.player.x + Constants.FOV_RADIUS + 1][y - this.player.y + Constants.FOV_RADIUS + 1];
+		return !this.fovMask[x - this.activeMob.x + Constants.FOV_RADIUS + 1][y - this.activeMob.y + Constants.FOV_RADIUS + 1];
 	},
 	updateFOV: function() {
 		/*
@@ -125,27 +125,27 @@ const UI = {
 				}
 			}
 		}
-		this.fovBlockLayer.x = (this.player.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
-		this.fovBlockLayer.y = (this.player.y - Constants.FOV_RADIUS - 1) * TILE_HEIGHT;
+		this.fovBlockLayer.x = (this.activeMob.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
+		this.fovBlockLayer.y = (this.activeMob.y - Constants.FOV_RADIUS - 1) * TILE_HEIGHT;
 
 		// Make sure we are displaying the correct storie
 		for (let i = 0; i < 3; i++) {
-			this.floorLayers[i].baseGroup.visible = this.player.z >= i;
+			this.floorLayers[i].baseGroup.visible = this.activeMob.z >= i;
 		}
 	},
 	shootRay: function (a) {
 		var step = 0.3333;
-		var maxdist = this.player.sightRange < Constants.FOV_RADIUS ? this.player.sightRange : Constants.FOV_RADIUS;
+		var maxdist = this.activeMob.sightRange < Constants.FOV_RADIUS ? this.activeMob.sightRange : Constants.FOV_RADIUS;
 		maxdist /= step;
 		var dx = Math.cos(a) * step;
 		var dy = -Math.sin(a) * step;
-		var xx = this.player.x, yy = this.player.y;
+		var xx = this.activeMob.x, yy = this.activeMob.y;
 		for (var i = 0; i < maxdist; ++i) {
 			var testx = Math.round(xx);
 			var testy = Math.round(yy);
 			try { 
-				this.fovMask[testx - this.player.x + Constants.FOV_RADIUS + 1][testy - this.player.y + Constants.FOV_RADIUS + 1] = true;
-				if (this.player.level.isOpaque(testx, testy, this.player.z))
+				this.fovMask[testx - this.activeMob.x + Constants.FOV_RADIUS + 1][testy - this.activeMob.y + Constants.FOV_RADIUS + 1] = true;
+				if (this.activeMob.level.isOpaque(testx, testy, this.activeMob.z))
 					return;
 			} catch(err) {
 				// Catch OOB
@@ -345,6 +345,10 @@ const UI = {
   	} else {
   		BookPanel.previousPages();
   	}
+  },
+  setActiveMob(mob) {
+  	this.game.camera.follow(mob.sprite);
+	this.activeMob = mob;
   }
 }
 
