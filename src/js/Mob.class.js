@@ -58,12 +58,9 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		if (this === OAX6.UI.player){
-			// Enable action
-			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
-				PlayerStateMachine.actionEnabled = true;
-			}
-			OAX6.UI.activeMob = false;
+		if (this.isPartyMember() && PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+			PlayerStateMachine.actionEnabled = true;
+			OAX6.UI.activeMob = this;
 			return Promise.resolve();
 		}
 		if (!PlayerStateMachine.allowMobsActing()) {
@@ -100,18 +97,12 @@ Mob.prototype = {
 		}
 		let subIntent = this.intent; // While we have a general intent, it may change for this action
 		if (this.isPartyMember()){
-			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
-				OAX6.UI.activeMob = this;
-				PlayerStateMachine.actionEnabled = true;
-				return Promise.resolve();
+			//TODO: Fix issue with pathfinding empty routes to player
+			if (this.x === player.x && this.y === player.y){
+				//TODO: Move to an open space?
+				subIntent = 'waitCommand';
 			} else {
-				//TODO: Fix issue with pathfinding empty routes to player
-				if (this.x === player.x && this.y === player.y){
-					//TODO: Move to an open space?
-					subIntent = 'waitCommand';
-				} else {
-					subIntent = 'seekPlayer';
-				}
+				subIntent = 'seekPlayer';
 			}
 		} else {
 			// Surviving is the most important, so always look for enemies first
@@ -334,13 +325,13 @@ Mob.prototype = {
 
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
 		let blockedByMob = false;
-		const specialMovementRules = (this === OAX6.UI.player || OAX6.UI.activeMob === this) && PlayerStateMachine.state === PlayerStateMachine.WORLD;
+		const specialMovementRules = OAX6.UI.activeMob === this && PlayerStateMachine.state === PlayerStateMachine.WORLD;
 		if (mob){
 			blockedByMob = true;
 			if (specialMovementRules) {
 				if (mob.isPartyMember()) {
 					// blockedByMob = false; TODO: Activate when there's a separate Talk command
-				} else if (this.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
+				// } else if (this.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
 					Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
 					// Look at each other while talking
 					this.lookAt(dx, dy);
@@ -363,7 +354,7 @@ Mob.prototype = {
 		// Position changes before the tween to "reserve" the spot
 		this.x += dx;
 		this.y += dy;
-		if (this === OAX6.UI.player){
+		if (this === OAX6.UI.activeMob){
 			OAX6.UI.updateFOV();
 		}
 		var dir = OAX6.UI.selectDir(dx, dy);
@@ -608,7 +599,7 @@ Mob.prototype = {
 	reportAction: function(action){
 		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
-		} else if (OAX6.UI.player == this){ 
+		} else if (OAX6.UI.activeMob == this){ 
 			if (PlayerStateMachine.state === PlayerStateMachine.TARGETTING){
 				OAX6.UI.showMessage(action);
 			}

@@ -68,6 +68,7 @@ const OAX6 = {
 		const startingState = scenarioInfo.startingState;
 		const player = PlayerFactory.buildPlayer(game, undefined, 0, 0, 0);
 		UI.player = player;
+		UI.activeMob = player;
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
 		startingState.party.forEach(function(partyMember) {
 			const npc = NPCFactory.buildNPC(game, partyMember.id, undefined, 0, 0, 0);
@@ -88,6 +89,7 @@ const OAX6 = {
 		PlayerStateMachine.player = player;
 		game.camera.follow(player.sprite);
 		UI.player = player;
+		UI.activeMob = player;
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
 		/*LevelLoader.setLevelsData({
 			[player.level.mapId]: player.level

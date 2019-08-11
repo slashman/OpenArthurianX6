@@ -41,7 +41,7 @@ class Stairs {
 				OAX6.UI.floorLayers[targetZ].mobsLayer.add(mob.sprite);
 				mob.sprite.x -= variation * tileWidth;
 				mob.sprite.y -= variation * tileHeight;
-				if (OAX6.UI.player == mob || OAX6.UI.activeMob == mob) {
+				if (OAX6.UI.activeMob == mob) {
 					OAX6.UI.updateFOV();
 				}
 				return OAX6.UI.executeTween(mob.sprite, {x: mob.sprite.x + dx * tileWidth / 2, y: mob.sprite.y + dy * tileHeight / 2}, OAX6.UI.WALK_DELAY / 2)

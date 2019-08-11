@@ -75,6 +75,9 @@ Level.prototype = {
 	removeMob: function(mob){
 		this.mobs.splice(this.mobs.indexOf(mob), 1);
 	},
+	/**
+	 * When in combat mode, determines the next mob to act, and calls its `act` function
+	 */
 	actNext: function(){
 		if (this.destroyed) {
 			// This level is no longer active, so stop processing the queue
@@ -95,16 +98,16 @@ Level.prototype = {
 		if (!nextActor || nextActor.dead || !this.isInCombat(nextActor)){
 			return this.actNext();
 		}
-		if (nextActor.isPartyMember()) {
-			OAX6.UI.locateMarker(nextActor);
-		}
 		OAX6.UI.showMessage(nextActor.getBattleDescription()+":");
-		if (nextActor !== OAX6.UI.player){
+		if (nextActor.isPartyMember()){
+			OAX6.UI.locateMarker(nextActor);
+			nextActor.act();
+			// Player will take its time, then call actNext himself
+			// via the PlayerStateMachine
+		} else {
 			Timer.delay(250)
 			.then(()=>{
-				if (nextActor.alignment !== OAX6.UI.player.alignment){
-					OAX6.UI.hideMarker();
-				}
+				OAX6.UI.hideMarker();
 			});
 			nextActor.act()
 			.then(()=>{
@@ -113,11 +116,7 @@ Level.prototype = {
 					this.actNext();
 				}
 			});
-		} else {
-			nextActor.act();
-			// Player will take its time, then call actNext himself
-			// via the PlayerStateMachine
-		}
+		} 
 	},
 	isMobActive: function(){
 		return this.mobs.find(m=>m.executingAction === true);
