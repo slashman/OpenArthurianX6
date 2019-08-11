@@ -35,7 +35,7 @@ const MobTypes = [
 	},
 	{
 		id: 'iolo',
-		appearance: 'man2',
+		appearance: 'iolo',
 		name: 'Iolo',
 		hp: 20,
 		damage: 3,
