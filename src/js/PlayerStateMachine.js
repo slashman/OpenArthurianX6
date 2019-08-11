@@ -735,6 +735,7 @@ const PlayerStateMachine = {
 
     activateSoloMode(partyMemberIndex) {
         this.soloMode = true;
+        this.player.deactivateParty();
         if (partyMemberIndex == 0) {
             OAX6.UI.setActiveMob(OAX6.UI.player);
         } else {
@@ -746,9 +747,10 @@ const PlayerStateMachine = {
     },
     activatePartyMode() {
         this.soloMode = false;
-        this.player.activateParty();
         OAX6.UI.showMessage("Party Mode activated");
         OAX6.UI.setActiveMob(OAX6.UI.player);
+        this.player.activateParty();
+        OAX6.UI.updateFOV();
     }
 
 };

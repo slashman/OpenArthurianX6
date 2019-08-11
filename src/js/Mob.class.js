@@ -101,6 +101,8 @@ Mob.prototype = {
 			if (this.x === player.x && this.y === player.y){
 				//TODO: Move to an open space?
 				subIntent = 'waitCommand';
+			} else if (this.z != player.z){
+				subIntent = 'waitCommand';
 			} else {
 				subIntent = 'seekPlayer';
 			}
@@ -283,8 +285,15 @@ Mob.prototype = {
 			return false;
 		}
 	},
+	deactivate() {
+		this.deactivateNext = true;
+	},
 	activate: function() {
 		if (this.dead){
+			return;
+		}
+		if (this.deactivateNext) {
+			this.deactivateNext = false;
 			return;
 		}
 		if (this.isTalking || PlayerStateMachine.state === PlayerStateMachine.COMBAT) {
@@ -646,6 +655,9 @@ Mob.prototype = {
 	},
 	activateParty() {
 		this.party.forEach(m => m.activate());	
+	},
+	deactivateParty() {
+		this.party.forEach(m => m.deactivate());	
 	}
 };
 
