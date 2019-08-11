@@ -45,6 +45,7 @@ Level.prototype = {
 	setSolidAndOpaque: function(x, y, z, solid) {
 		this.solidMasks[z][x][y] = solid;
 		this.opaqueMasks[z][x][y] = solid;
+		this.updatePathfindingGrid(z);
 	},
 	getMobAt: function(x, y, z){
 		// TODO: Replace for this.mobs.find
@@ -63,9 +64,8 @@ Level.prototype = {
 	},
 	setSolidMasks: function(solidMasks) {
 		this.solidMasks = solidMasks;
-		solidMasks.forEach((solidMask, i) => {
-			const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
-			this.pfGrids[i] = new PF.Grid(pfMask);
+		solidMasks.forEach((solidMask, z) => {
+			this.updatePathfindingGrid(z);
 		})
 		
 	},
@@ -303,6 +303,14 @@ Level.prototype = {
 		this.opaqueMasks = null;
 		this.pfGrids = null;
 		this.currentTurnCounter = 0;
+	},
+	/**
+	 * Should by called anytime a "solid" tile changes status
+	 */
+	updatePathfindingGrid(z) {
+		const solidMask = this.solidMasks[z];
+		const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
+		this.pfGrids[z]= new PF.Grid(pfMask);
 	}
 };
 
