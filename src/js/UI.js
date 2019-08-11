@@ -349,6 +349,13 @@ const UI = {
   setActiveMob(mob) {
   	this.game.camera.follow(mob.sprite);
 	this.activeMob = mob;
+  },
+  getActiveMobIndex() {
+  	if (this.activeMob == this.player) {
+  		return 0;
+  	} else {
+  		return this.player.party.indexOf(this.activeMob) + 1;
+  	}
   }
 }
 

@@ -434,6 +434,9 @@ const PlayerStateMachine = {
     },
 
     activateInventory: function(partyMemberIndex) {
+        if (partyMemberIndex == undefined) {
+            partyMemberIndex = OAX6.UI.getActiveMobIndex();
+        }
         // TODO: Note that this will support being called with a different index
         return new Promise((resolve) => {
             const opened = Inventory.open(partyMemberIndex);
@@ -465,7 +468,7 @@ const PlayerStateMachine = {
                 } else if (keyCode === Phaser.KeyCode.L) {
                     return this.lookCommand();
                 } else if (keyCode === Phaser.KeyCode.I) {
-                    return this.activateInventory(0);
+                    return this.activateInventory();
                 } else if (keyCode >= Phaser.KeyCode.F1 && keyCode <= Phaser.KeyCode.F1 + this.player.party.length) {
                     const partyMemberIndex = keyCode - Phaser.KeyCode.F1;
                     return this.activateInventory(partyMemberIndex);
