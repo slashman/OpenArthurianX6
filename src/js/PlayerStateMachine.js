@@ -322,7 +322,31 @@ const PlayerStateMachine = {
             }
         });
     },
-
+    talkCommand(){
+        return this._selectPosition('Talk').then(position => {
+            if (position != null) {
+                const {x, y} = position;
+                if (OAX6.UI.isFOVBlocked(x,y)) {
+                    return false;
+                }
+                const {activeMob} = OAX6.UI;
+                const mob = activeMob.level.getMobAt(x, y, activeMob.z);
+                if (mob && activeMob.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
+                    // Conversations only work in WORLD state. We assume we come from that state.
+                    this.resetState();
+                    activeMob.talkWithMob(mob);
+                    return true;
+                }
+                return false;
+            } else {
+                return false;
+            }
+        }).then(talked => {
+            if (!talked) {
+                this.resetState();
+            }
+        });
+    },
     lookCommand(){
         return this._selectPosition('Look').then(position => {
             if (position != null) {
@@ -456,9 +480,11 @@ const PlayerStateMachine = {
                 if (keyCode === Phaser.KeyCode.C){
                     return this.startCombat(true);
                 } else if (keyCode === Phaser.KeyCode.A){
-                    return this.attackCommand(); //TODO: Instead of a direction, this should allow targetting based on range (Similar to T)
-                } else if (keyCode === Phaser.KeyCode.T){ // Throw
+                    return this.attackCommand(); //TODO: Instead of a direction, this should allow targetting based on range (Similar to R)
+                } else if (keyCode === Phaser.KeyCode.R) { // Ranged Attack
                     return this.rangedAttackCommand();
+                } else if (keyCode === Phaser.KeyCode.T) {
+                    return this.talkCommand();
                 } else if (keyCode === Phaser.KeyCode.G){
                     return this.getCommand();
                 } else if (keyCode === Phaser.KeyCode.S){

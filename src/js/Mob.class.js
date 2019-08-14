@@ -325,9 +325,6 @@ Mob.prototype = {
 	lookAt: function(dx, dy) {
 		var dir = OAX6.UI.selectDir(dx, dy);
 		this.sprite.animations.play('walk_'+dir, 0);
-
-		// TODO: Do something about this since the first frame is midwalk... 
-		this.sprite.frame += 1;
 	},
 	moveTo: function(dx, dy){
 		if (!this.level.canMoveFrom(this.x, this.y, this.z, dx, dy)){
@@ -341,13 +338,9 @@ Mob.prototype = {
 		if (mob){
 			blockedByMob = true;
 			if (specialMovementRules) {
-				if (this.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
-					Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
-					// Look at each other while talking
-					this.lookAt(dx, dy);
-					mob.lookAt(-dx, -dy);
-					this.reportAction("Move - Talk");
-					return Timer.delay(500);
+				if (mob.isPartyMember()) {
+					// TODO: Autoswap positions
+					blockedByMob = false; // Step on mob. Pray nothing bad happens.
 				}
 			}
 		} 
@@ -656,6 +649,13 @@ Mob.prototype = {
 	},
 	deactivateParty() {
 		this.party.forEach(m => m.deactivate());	
+	},
+	talkWithMob(mob) {
+		Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
+		const dx = Math.sign(mob.x - this.x);
+		const dy = Math.sign(mob.y - this.y);
+		this.lookAt(dx, dy);
+		mob.lookAt(-dx, -dy);
 	}
 };
 
