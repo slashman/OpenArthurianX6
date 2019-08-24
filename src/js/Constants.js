@@ -11,5 +11,8 @@ module.exports = {
     PLAYER: 'player'
   },
 
-  FOV_RADIUS: 15
+  FOV_RADIUS: 15,
+
+  GAME_WIDTH: 400,
+  GAME_HEIGHT: 300
 }

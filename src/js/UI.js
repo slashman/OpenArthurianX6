@@ -25,7 +25,7 @@ const STRETCH = false;
 
 const UI = {
 	launch: function(then){
-		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
+		new Phaser.Game(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, Phaser.AUTO, '', this);
 		this.afterInit = then;
 	},
 	preload: function(){
