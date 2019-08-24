@@ -101,7 +101,7 @@ const PlayerStateMachine = {
             varx = 1;
         }
 
-        if (this.game.input.activePointer.rightButton.isDown) {
+        if (this.game.input.activePointer.isDown) {
             const pointer = this.game.input.activePointer;
             const varObj = OAX6.UI.selectQuadrant(pointer.position);
             varx = varObj.x;
