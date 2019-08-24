@@ -23,6 +23,9 @@ const ItemFactory = {
 	},
 	createItem: function(id, quantity){
 		const def = this.itemsMap[id];
+		if (!def) {
+			throw new Error("Invalid item id: [" + id + "]");
+		}
 		const item = new Item();
 		if (quantity !== undefined) {
 			item.quantity = quantity;
