@@ -60,7 +60,7 @@ const UI = {
 			}
 		}
 
-		this.fovBlockLayer = this.game.add.group();
+		this.fovBlockLayer = this.game.add.group(this.worldLayer);
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
@@ -116,6 +116,15 @@ const UI = {
 		for (var a = 0; a < Math.PI * 2; a += step)
 			this.shootRay(a);
 
+
+		this.fovBlockLayer.x = (this.activeMob.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
+		this.fovBlockLayer.y = (this.activeMob.y - Constants.FOV_RADIUS - 1) * TILE_HEIGHT;
+
+		// Make sure we are displaying the correct storie
+		for (let i = 0; i < 3; i++) {
+			this.floorLayers[i].baseGroup.visible = this.activeMob.z >= i;
+		}
+
 		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
 			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) {
 				if (x == Constants.FOV_RADIUS + 1 && y == Constants.FOV_RADIUS + 1) {
@@ -125,13 +134,9 @@ const UI = {
 				}
 			}
 		}
-		this.fovBlockLayer.x = (this.activeMob.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
-		this.fovBlockLayer.y = (this.activeMob.y - Constants.FOV_RADIUS - 1) * TILE_HEIGHT;
 
-		// Make sure we are displaying the correct storie
-		for (let i = 0; i < 3; i++) {
-			this.floorLayers[i].baseGroup.visible = this.activeMob.z >= i;
-		}
+		this.fovBlockLayer.updateTransform(); // We need to force this in order to prevent glitches. DONT MOVE THIS FROM HERE.
+		
 	},
 	shootRay: function (a) {
 		var step = 0.3333;
