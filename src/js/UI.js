@@ -59,7 +59,6 @@ const UI = {
 				objectsLayer: this.game.add.group(baseGroup),
 			}
 		}
-
 		this.fovBlockLayer = this.game.add.group(this.worldLayer);
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
@@ -361,6 +360,23 @@ const UI = {
   	} else {
   		return this.player.party.indexOf(this.activeMob) + 1;
   	}
+  },
+  selectQuadrant(point) {
+  	let xvar = yvar = 0;
+  	if (point.x > this.game.width / 2 + TILE_WIDTH / 2) {
+  		xvar = 1;
+  	} else if (point.x < this.game.width / 2 - TILE_WIDTH / 2) {
+  		xvar = -1;
+  	}
+  	if (point.y > this.game.height / 2 + TILE_HEIGHT / 2) {
+  		yvar = 1;
+  	} else if (point.y < this.game.height / 2 - TILE_HEIGHT / 2) {
+  		yvar = -1;
+  	}
+  	return {
+  		x: xvar,
+  		y: yvar
+  	};
   }
 }
 

@@ -100,6 +100,14 @@ const PlayerStateMachine = {
         } else if(this.cursors.right.isDown) {
             varx = 1;
         }
+
+        if (this.game.input.activePointer.rightButton.isDown) {
+            const pointer = this.game.input.activePointer;
+            const varObj = OAX6.UI.selectQuadrant(pointer.position);
+            varx = varObj.x;
+            vary = varObj.y;
+        }
+
         if (varx !== 0 || vary !== 0){
             OAX6.UI.hideMarker(); 
             this.actionEnabled = false;
