@@ -14,5 +14,7 @@ module.exports = {
   FOV_RADIUS: 15,
 
   GAME_WIDTH: 400,
-  GAME_HEIGHT: 300
+  GAME_HEIGHT: 300,
+
+  SAVEGAME_VERSION: '1' 
 }
