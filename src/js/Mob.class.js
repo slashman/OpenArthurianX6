@@ -298,6 +298,7 @@ Mob.prototype = {
 		}
 		if (this.isTalking || PlayerStateMachine.state === PlayerStateMachine.COMBAT) {
 			//TODO: May be check state === DIALOG instead of this.isTalking?
+			this.deactivatedDuringDialog = true;
 			return;
 		}
 		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
@@ -331,7 +332,6 @@ Mob.prototype = {
 			this.reportAction("Move - Blocked");
 			return Timer.delay(500);
 		}
-
 		var mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
 		let blockedByMob = false;
 		const specialMovementRules = OAX6.UI.activeMob === this && PlayerStateMachine.state === PlayerStateMachine.WORLD;
@@ -363,7 +363,7 @@ Mob.prototype = {
 		var dir = OAX6.UI.selectDir(dx, dy);
 		this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
 		this.reportAction("Move");
-		
+
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
 	/*

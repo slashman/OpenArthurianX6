@@ -263,7 +263,10 @@ module.exports = {
 		PlayerStateMachine.clearInputDialogCallback();
 
 		this.chat.mob.isTalking = false;
-		this.chat.mob.activate(); 
+		if (this.chat.mob.deactivatedDuringDialog) {
+			this.chat.mob.deactivatedDuringDialog = false;
+			this.chat.mob.activate();
+		}
 
 		this.name.text = "";
 
