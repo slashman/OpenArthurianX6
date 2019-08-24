@@ -96,6 +96,12 @@ const Items = [
 		capacity: 5
 	},
 	{
+		id: 'cowCorpse',
+		appearance: 'cowCorpse',
+		name: 'Cow Body',
+		capacity: 10
+	},
+	{
 		id: 'bones',
 		appearance: 'bones',
 		name: 'Bones'
