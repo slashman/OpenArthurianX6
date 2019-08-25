@@ -229,7 +229,16 @@ Level.prototype = {
 		}
 		return this.objectsMap[z][x][y];
 	},
+	isValidCoordinate(x, y) {
+		if (x < 0 || x >= this.solidMasks[0].length || y < 0 || y >= this.solidMasks[0][0].length) {
+			return false;
+		}
+		return true;
+	},
 	canMoveFrom: function(x, y, z, dx, dy) {
+		if (!this.isValidCoordinate(x + dx, y + dy)) {
+			return false;
+		}
 		if (dx === 0 || dy === 0){
 			return !this.isSolid(x + dx, y + dy, z);
 		}
