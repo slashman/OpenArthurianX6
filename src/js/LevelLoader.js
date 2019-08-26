@@ -96,6 +96,7 @@ const LevelLoader = {
 
 		aTerrainLayer.resizeWorld();
 		this.game.camera.deadzone = new Phaser.Rectangle(this.game.width / 2 - 8, this.game.height / 2 - 8, 0, 0);
+		this.game.camera.bounds = null;
 		return {
 			map,
 			mobs: this.loadTiledMapMobs(map),
