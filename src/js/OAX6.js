@@ -59,6 +59,7 @@ const OAX6 = {
 		} else {
 			this.newGame(game);
 		}
+		UI.showMessage("Welcome to OAX6 - Press F for Fullscreen");
 
 		game.canvas.oncontextmenu = function (e) {
 			e.preventDefault();

@@ -296,6 +296,10 @@ const PlayerStateMachine = {
         });
     },
 
+    toggleFullScreen() {
+        OAX6.UI.toggleFullScreen();
+    },
+
     /**
      * Saves the game
      */
@@ -503,6 +507,8 @@ const PlayerStateMachine = {
                     return this.lookCommand();
                 } else if (keyCode === Phaser.KeyCode.I) {
                     return this.activateInventory();
+                } else if (keyCode === Phaser.KeyCode.F) {
+                    return this.toggleFullScreen();
                 } else if (keyCode >= Phaser.KeyCode.F1 && keyCode <= Phaser.KeyCode.F1 + this.player.party.length) {
                     const partyMemberIndex = keyCode - Phaser.KeyCode.F1;
                     return this.activateInventory(partyMemberIndex);

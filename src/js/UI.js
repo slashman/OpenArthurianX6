@@ -21,7 +21,7 @@ const BookPanel = require('./ui/BookPanel');
 
 const scenarioInfo = require('./ScenarioInfo');
 
-const STRETCH = false;
+const STRETCH = true;
 
 const UI = {
 	launch: function(then){
@@ -39,6 +39,11 @@ const UI = {
 			this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
 			this.game.scale.setUserScale(2, 2);
 		}
+
+		this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+		this.game.scale.onFullScreenChange.add(() => {
+			OAX6.UI.showMessage(this.game.scale.isFullScreen ? "Full screen enabled" : "Full screen disabled");
+		});
 		
 		this.game.renderer.renderSession.roundPixels = true;  
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
@@ -377,7 +382,14 @@ const UI = {
   		x: xvar,
   		y: yvar
   	};
-  }
+  },
+	toggleFullScreen() {
+		if (this.game.scale.isFullScreen) {
+			this.game.scale.stopFullScreen();
+		} else {
+			this.game.scale.startFullScreen(false);
+		}
+	}
 }
 
 module.exports = UI;
