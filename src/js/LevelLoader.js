@@ -70,7 +70,6 @@ const LevelLoader = {
 		var map = this.game.add.tilemap(mapId);
 		map.addTilesetImage('terrain', 'terrain');
 		map.addTilesetImage('items', 'items');
-		map.addTilesetImage('monsters', 'monsters');
 		function createLayerIfExists(layerName, group) {
 			if (map.getLayerIndex(layerName) != null) {
 				return map.createLayer(layerName, false, false, group);
@@ -78,6 +77,7 @@ const LevelLoader = {
 		}
 		let aTerrainLayer;
 		const objects = [];
+		const mobs = [];
 		for (let z = 0; z < 3; z++) {
 			const prefix = this.__getLayerPrefix(z);
 			for (let i = 1; i <= MAX_TILE_LAYERS_PER_FLOOR; i++) {
@@ -92,6 +92,13 @@ const LevelLoader = {
 					objects.push(object);
 				});
 			}
+			if (map.objects[prefix + 'Mobs']) {
+				map.objects[prefix + 'Mobs'].forEach(mob => {
+					mob.z = z;
+					this.__processTiledObject(map, mob);
+					mobs.push(mob);
+				});
+			}
 		}
 
 		aTerrainLayer.resizeWorld();
@@ -99,11 +106,16 @@ const LevelLoader = {
 		this.game.camera.bounds = null;
 		return {
 			map,
-			mobs: this.loadTiledMapMobs(map),
+			mobs,
 			items: this.loadTiledMapItems(map),
 			objects,
 			masks: this.loadTiledMasks(map)
 		};
+	},
+	__processTiledObject(map, _object) {
+		Object.assign(_object, _object.properties);
+		_object.x = _object.x / map.tileWidth;
+		_object.y = _object.y / map.tileHeight;
 	},
 	loadTiledMapItems: function(map) {
 		const w = map.width;
@@ -133,36 +145,6 @@ const LevelLoader = {
 			}
 		}
 		return data;
-	},
-	loadTiledMapMobs: function(map) {
-		const w = map.width;
-		const h = map.height;
-		const mobData = [];
-
-		for (let z = 0; z < 3; z++) {
-			const layerId = this.__getLayerPrefix(z) + 'Mobs';
-			const layerIndex = map.getLayerIndex(layerId);
-			if (layerIndex === null) {
-				continue;
-			}
-			for (let x = 0; x < w; x++) {
-				for (let y = 0; y < h; y++) {
-					const tile = map.getTile(x, y, layerId);
-					if (tile !== null) {
-						const mobType = tile.properties.type || 'mob';
-						const mobTypeId = tile.properties.id;
-						mobData.push({
-							type: mobType,
-							id: mobTypeId,
-							x: x,
-							y: y,
-							z: z
-						});
-					}
-				}
-			}
-		}
-		return mobData;
 	},
 	loadTiledMasks: function(map) {
 		let w = map.width,
@@ -195,10 +177,10 @@ const LevelLoader = {
 	},
 	loadMob: function(mobData, level){
 		let mob = null;
-		if (mobData.type === 'npc'){
-			mob = NPCFactory.buildNPC(this.game, mobData.id, level, mobData.x, mobData.y, mobData.z);
+		if (mobData.type === 'NPC'){
+			mob = NPCFactory.buildNPC(this.game, mobData.npcId, level, mobData.x, mobData.y, mobData.z);
 		} else {
-			mob = MobFactory.buildMob(this.game, mobData.id, level, mobData.x, mobData.y, mobData.z);
+			mob = MobFactory.buildMob(this.game, mobData.mobId, level, mobData.x, mobData.y, mobData.z);
 		}
 		level.addMob(mob);
 	},

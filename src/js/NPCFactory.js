@@ -24,6 +24,9 @@ const NPCFactory = {
 	 */
 	buildNPC: function(game, id, level, x, y, z){
 		const definition = this.npcMap[id];
+		if (!definition) {
+			throw new Error("Missing NPC definition [" + id + "]");
+		}
 		const npc = MobFactory.buildMob(game, definition.type, level, x, y, z);
 		npc.npcDefid = id;
 		npc.npcDefinition = this.getDefinition(id);
