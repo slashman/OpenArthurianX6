@@ -49,6 +49,7 @@ const UI = {
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
 
 		this.nextMove = 0;
+		this.currentMessageIndex = 0;
 		Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
 	create: function(){
@@ -194,8 +195,19 @@ const UI = {
 		});
 	},
 	showMessage: function(message){
-		console.log(message);
 		this.tempCombatLabel.text = message;
+		this.tempCombatLabel.font = 'pixeled';
+		this.currentMessageIndex++;
+		if (this.currentMessageIndex == 10000) {
+			this.currentMessageIndex = 0;
+		}
+		const messageIndex = this.currentMessageIndex;
+		return Timer.delay(5000).then(()=>{
+			if (messageIndex == this.currentMessageIndex) {
+				this.tempCombatLabel.font = 'grayFont';
+			}
+		});
+
 	},
 	clearMessage: function() {
 		this.tempCombatLabel.text = "";
