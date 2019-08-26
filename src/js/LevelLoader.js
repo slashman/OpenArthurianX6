@@ -78,6 +78,7 @@ const LevelLoader = {
 		let aTerrainLayer;
 		const objects = [];
 		const mobs = [];
+		const items = [];
 		for (let z = 0; z < 3; z++) {
 			const prefix = this.__getLayerPrefix(z);
 			for (let i = 1; i <= MAX_TILE_LAYERS_PER_FLOOR; i++) {
@@ -99,6 +100,13 @@ const LevelLoader = {
 					mobs.push(mob);
 				});
 			}
+			if (map.objects[prefix + 'Items']) {
+				map.objects[prefix + 'Items'].forEach(item => {
+					item.z = z;
+					this.__processTiledObject(map, item);
+					items.push(item);
+				});
+			}
 		}
 
 		aTerrainLayer.resizeWorld();
@@ -107,7 +115,7 @@ const LevelLoader = {
 		return {
 			map,
 			mobs,
-			items: this.loadTiledMapItems(map),
+			items,
 			objects,
 			masks: this.loadTiledMasks(map)
 		};
@@ -115,36 +123,7 @@ const LevelLoader = {
 	__processTiledObject(map, _object) {
 		Object.assign(_object, _object.properties);
 		_object.x = _object.x / map.tileWidth;
-		_object.y = _object.y / map.tileHeight;
-	},
-	loadTiledMapItems: function(map) {
-		const w = map.width;
-		const h = map.height;
-		const data = [];
-		for (let z = 0; z < 3; z++) {
-			const layerId = this.__getLayerPrefix(z) + 'Items';
-			const layerIndex = map.getLayerIndex(layerId);
-			if (layerIndex === null) {
-				continue;
-			}
-			for (let x = 0; x < w; x++) {
-				for (let y = 0; y < h; y++) {
-					const tile = map.getTile(x, y, layerId);
-					if (tile !== null) {
-						const itemId = tile.properties.id;
-						const amount = tile.properties.amount || 1;
-						data.push({
-							id: itemId,
-							amount,
-							x: x,
-							y: y,
-							z: z
-						});
-					}
-				}
-			}
-		}
-		return data;
+		_object.y = _object.y / map.tileHeight - 1;
 	},
 	loadTiledMasks: function(map) {
 		let w = map.width,
@@ -185,7 +164,7 @@ const LevelLoader = {
 		level.addMob(mob);
 	},
 	loadItem: function(itemData, level) {
-		const item = ItemFactory.createItem(itemData.id, itemData.amount);
+		const item = ItemFactory.createItem(itemData.itemId, itemData.amount);
 		level.addItem(item, itemData.x, itemData.y, itemData.z);
 	},
 	loadDoor: function(map, doorData, level) {
