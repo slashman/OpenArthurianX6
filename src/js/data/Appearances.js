@@ -232,7 +232,7 @@ const Appearances = [
 			},
 			{
 				id: 'stairsUp',
-				i: 3 * 33 + 4 
+				i: 6 * 33 + 15 
 			},
 			{
 				id: 'stairsDown',
