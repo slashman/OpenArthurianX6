@@ -343,6 +343,46 @@
                  "width":16,
                  "x":608,
                  "y":256
+                }, 
+                {
+                 "gid":2001,
+                 "height":16,
+                 "id":68,
+                 "name":"YellowPotion",
+                 "properties":
+                    {
+                     "itemId":"yellowPotion"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":576,
+                 "y":448
+                }, 
+                {
+                 "gid":2000,
+                 "height":16,
+                 "id":69,
+                 "name":"BluePotion",
+                 "properties":
+                    {
+                     "itemId":"bluePotion"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":592,
+                 "y":448
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -918,7 +958,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":68,
+ "nextobjectid":70,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

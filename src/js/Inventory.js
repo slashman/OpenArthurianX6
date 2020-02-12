@@ -1,3 +1,5 @@
+//TODO: Rename to InventoryPopup once the item dragging changes are merged.
+
 function initDraggableGroup(draggable, group) {
     draggable.inputEnabled = true;
     draggable.input.enableDrag();

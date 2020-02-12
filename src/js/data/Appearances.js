@@ -54,6 +54,14 @@ const Appearances = [
 				id: 'chainMail',
 				i: 16 * 6 + 0
 			},
+			{
+				id: 'bluePotion',
+				i: 2
+			},
+			{
+				id: 'yellowPotion',
+				i: 3
+			}
 		]
 	},
   // Projectiles

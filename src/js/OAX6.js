@@ -110,7 +110,8 @@ window.OAX6 = {
 	ItemFactory,
 	AppearanceFactory,
 	PlayerStateMachine,
-	ObjectFactory
+	ObjectFactory,
+	Inventory
 };
 
 module.exports = OAX6;

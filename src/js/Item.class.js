@@ -21,6 +21,14 @@ Item.prototype = {
   playProjectileAnimation(projectile, fromX, fromY, toX, toY) {
   	const flyAppearance = OAX6.AppearanceFactory.getAppearance(projectile.def.flyAppearance);
     return OAX6.UI.playProjectileAnimation(this.def.flyType, flyAppearance, fromX, fromY, toX, toY);
+  },
+  recoverHP(mob) {
+    mob.hp.increase(5);
+    OAX6.UI.showMessage(mob.name + " recovers 5 HP");
+  },
+  recoverMP(mob) {
+    //TODO: Recover MP when there is MP
+    OAX6.UI.showMessage(mob.name + " recovers 5 MP");
   }
 }
 

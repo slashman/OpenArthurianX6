@@ -443,21 +443,54 @@ Mob.prototype = {
 		return this.useItemInPosition(this.x + dx, this.y + dy, item);
 	},
 	useItemInPosition(x, y, item) {
-		var door = this.level.getDoorAt(x, y, this.z);
-		if (door) {
-			if (door.isLocked()) {
-				if (door.unlock(item)) {
-                    OAX6.UI.showMessage("Door Unlocked");
-                    door.openDoor(this, false);
-                } else {
-                    OAX6.UI.showMessage("Wrong key!");
-                }
-            } else {
-                OAX6.UI.showMessage("Door is not locked");
-            }
-        } else {
-			this.reportAction("Use - Nothing there!");
+		const itemEffect = item.def.effect
+		if (!itemEffect) {
+			OAX6.UI.showMessage("Cannot be used");
+			return;
 		}
+		const mob = this.level.getMobAt(x, y, this.z);
+		const door = this.level.getDoorAt(x, y, this.z);
+		let used = false;
+		switch (itemEffect.type) {
+			case 'unlockDoor':
+				if (door) {
+					if (door.isLocked()) {
+						if (door.unlock(item)) {
+							OAX6.UI.showMessage("Door Unlocked");
+							door.openDoor(this, false);
+							used = true;
+						} else {
+							OAX6.UI.showMessage("Wrong key!");
+						}
+					} else {
+						OAX6.UI.showMessage("Door is not locked");
+					}
+				} else {
+					this.reportAction("Use - Nothing there!");
+				}
+				break;
+			case 'recoverHP':
+				if (mob) {
+					item.recoverHP(mob);
+					used = true;
+				} else {
+					this.reportAction("Use - Noone there!");
+				}
+				break;
+			case 'recoverMP':
+				if (mob) {
+					item.recoverMP(mob);
+					used = true;
+				} else {
+					this.reportAction("Use - Noone there!");
+				}
+				break;
+		}
+		if (used && item.def.spendable) {
+			this.reduceItemQuantity(item);
+			OAX6.Inventory.updateInventory();
+		}
+		
 	},
 	dropOnDirection: function(dx, dy, item) {
 		var x = this.x + dx,
@@ -492,12 +525,8 @@ Mob.prototype = {
       if (!ammo) {
         this.reportAction("Attack - No Ammo.");
         return Promise.resolve(false);
-      }
-      if (ammo.quantity && ammo.quantity > 1) {
-        ammo.quantity--;
-      } else {
-        this.inventory.splice(this.inventory.findIndex(i => i.defid === ammo.defid), 1);
-      }
+	  }
+	  this.reduceItemQuantity(ammo);
       if (ammo === this.weapon) {
         this.weapon = undefined;
       }
@@ -520,6 +549,21 @@ Mob.prototype = {
 		} else {
 			this.reportAction("Attack - Out of range!");
 			return Promise.resolve();
+		}
+	},
+	// TODO: Move to model/Inventory once it's refactored.
+	reduceItemQuantity(item, variation) {
+		variation = variation || 1;
+		if (item.quantity) {
+			if (item.quantity > variation) {
+				item.quantity -= variation;
+			} else if (item.quantity < variation) {
+				throw new Error('Not enough quantity of item ' + item.name + ' to reduce by ' + quantity);
+			} else {
+				this.inventory.splice(this.inventory.findIndex(i => i.defid === item.defid), 1);
+			}
+		} else {
+			this.inventory.splice(this.inventory.findIndex(i => i.defid === item.defid), 1);
 		}
 	},
   getAmmunitionFor: function(weapon) {
