@@ -438,6 +438,7 @@ Mob.prototype = {
 				this.reportAction("Use - Nothing there!");
 			}
 		}
+		// TODO: Allow using items in the ground
 	},
 	useItemOnDirection(dx, dy, item) {
 		return this.useItemInPosition(this.x + dx, this.y + dy, item);
@@ -486,7 +487,8 @@ Mob.prototype = {
 				}
 				break;
 			case 'playMusic': 
-				OAX6.UI.showMessage("Let's play some music!");
+				OAX6.UI.showMessage("Playing " + item.def.name + ', press 1 - 9 to play, ESC to finish.');
+				PlayerStateMachine.switchToMusicState(item);
 				break;
 		}
 		if (used && item.def.spendable) {

@@ -3,11 +3,10 @@ const Timer = require('./Timer');
 const Geo = require('./Geo');
 const Random = require('./Random');
 const Inventory = require('./Inventory');
-const ItemFactory = require('./ItemFactory');
 const Storage = require('./Storage');
 const MobDescription = require('./MobDescription');
+const MusicManager = require('./manager/MusicManager.class');
 
-const MAX_PARTY_SIZE = 3;
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -20,6 +19,7 @@ const PlayerStateMachine = {
     MESSAGE_BOX : 7,
     FLOATING_ITEM : 8,
     LOOK_BOX    : 9,
+    MUSIC       : 10,
 
     init: function(game) {
         this.game = game;
@@ -126,6 +126,13 @@ const PlayerStateMachine = {
         //TODO: Maybe restrict switches, like don't switch to dialog from combat
         this.previousState = this.state;
         this.state = stateId;
+    },
+
+    switchToMusicState: function(instrument) {
+        this.switchState(PlayerStateMachine.MUSIC);
+        this.clearActionCallback(); // TODO: Streamline action and direction callbacks, make them respond to state machine states?
+        this.clearDirectionCallback();
+        this.__musicManager = new MusicManager(instrument);
     },
 
     resetState: function(holdAction) {
@@ -556,6 +563,23 @@ const PlayerStateMachine = {
         }
     },
 
+    updateMusicAction() {
+        const keyCode = this._inkey();
+        if (keyCode) {
+            if (keyCode === Phaser.KeyCode.ONE){
+                return this.__musicManager.playNote(1);
+            } else if (keyCode === Phaser.KeyCode.TWO){
+                return this.__musicManager.playNote(2);
+            } else if (keyCode === Phaser.KeyCode.THREE){
+                return this.__musicManager.playNote(3);
+            } else if (keyCode === Phaser.KeyCode.ESC){
+                this.resetState();
+                if (this.state == PlayerStateMachine.INVENTORY) {
+                    this.__activateInventoryCallbacks(); // ugly as hell.
+                }
+            }
+        }
+    },
 
     startCombat: function(ensurePlayerFirst){
         OAX6.UI.modeLabel.text = 'Combat';
@@ -695,6 +719,10 @@ const PlayerStateMachine = {
             case PlayerStateMachine.INVENTORY:
                 this.updateInventoryAction();
                 break;
+            case PlayerStateMachine.MUSIC:
+                this.updateMusicAction();
+                break;
+
         }
     },
 
