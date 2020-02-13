@@ -485,6 +485,9 @@ Mob.prototype = {
 					this.reportAction("Use - Noone there!");
 				}
 				break;
+			case 'playMusic': 
+				OAX6.UI.showMessage("Let's play some music!");
+				break;
 		}
 		if (used && item.def.spendable) {
 			this.reduceItemQuantity(item);

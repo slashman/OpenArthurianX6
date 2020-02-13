@@ -646,12 +646,21 @@ const PlayerStateMachine = {
             return;
         }
         this.clearActionCallback();
-        return this._selectDirection('Use').then(dir => {
+        return Promise.resolve()
+        .then(() => {
+            if (item.def.useOnSelf) {
+                return { x: 0, y: 0 };
+            } else {
+                return this._selectDirection('Use');
+            }
+        }).then(dir => {
             if (dir !== null) {
                 Inventory.currentMob.useItemOnDirection(dir.x, dir.y, item);
             }
-            this.resetState();
-            this.__activateInventoryCallbacks();
+            if (!item.def.useOnSelf) {
+                this.resetState();
+                this.__activateInventoryCallbacks();
+            }
         });
     },
 

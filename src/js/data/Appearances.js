@@ -61,6 +61,10 @@ const Appearances = [
 			{
 				id: 'yellowPotion',
 				i: 3
+			},
+			{
+				id: 'lute',
+				i: 72
 			}
 		]
 	},

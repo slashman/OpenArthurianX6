@@ -173,6 +173,17 @@ const Items = [
 			type: 'recoverMP'
 		},
 		spendable: true
+	},
+	{
+		id: 'lute',
+		appearance: 'lute',
+		description: 'You can play music with it.',
+		name: 'Lute',
+		effect: {
+			type: 'playMusic',
+			sounds: 'lute'
+		},
+		useOnSelf: true
 	}
 ]
 

@@ -383,6 +383,26 @@
                  "width":16,
                  "x":592,
                  "y":448
+                }, 
+                {
+                 "gid":2070,
+                 "height":16,
+                 "id":70,
+                 "name":"Lute",
+                 "properties":
+                    {
+                     "itemId":"lute"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":496,
+                 "y":448
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -958,7 +978,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":70,
+ "nextobjectid":71,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",
