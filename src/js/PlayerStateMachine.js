@@ -235,12 +235,11 @@ const PlayerStateMachine = {
      */
     useCommand: function() {
         return this._selectDirection('Use').then(dir=>{
+            this.resetState();
             if (dir != null) {
                 const activeMob = OAX6.UI.activeMob || this.player;
                 return activeMob.useOnDirection(dir.x, dir.y);
             }
-        }).then(()=>{
-            this.resetState();
         });
     },
 

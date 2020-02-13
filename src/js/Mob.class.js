@@ -418,6 +418,8 @@ Mob.prototype = {
 			dy = y - this.y;
 		}
 		var door = this.level.getDoorAt(x, y, this.z);
+		var object = this.level.getObjectAt(x, y, this.z);
+		var item = this.level.getItemAt(x, y, this.z);
 		if (door) {
 			if (door.isLocked()) {
 				OAX6.UI.showMessage("Locked!");
@@ -430,15 +432,13 @@ Mob.prototype = {
 					}
 				}
 			}
+		} else if (object && !object.hidden) {
+			return object.use(this, dx, dy);
+		} else if (item) {
+			return this.useItemInPosition(x, y, item);
 		} else {
-			var object = this.level.getObjectAt(x, y, this.z);
-			if (object && !object.hidden) {
-				return object.use(this, dx, dy);
-			} else {
-				this.reportAction("Use - Nothing there!");
-			}
+			this.reportAction("Use - Nothing there!");
 		}
-		// TODO: Allow using items in the ground
 	},
 	useItemOnDirection(dx, dy, item) {
 		return this.useItemInPosition(this.x + dx, this.y + dy, item);
@@ -450,6 +450,7 @@ Mob.prototype = {
 			return;
 		}
 		const mob = this.level.getMobAt(x, y, this.z);
+		// TODO: If there is no mob there, and I used the item in the ground, the active mob should be the target of the action.
 		const door = this.level.getDoorAt(x, y, this.z);
 		let used = false;
 		switch (itemEffect.type) {
