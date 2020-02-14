@@ -29,6 +29,25 @@ Item.prototype = {
   recoverMP(mob) {
     //TODO: Recover MP when there is MP
     OAX6.UI.showMessage(mob.name + " recovers 5 MP");
+  },
+  toggleLit() {
+    if (this.isLit == undefined) {
+      this.isLit = false;
+    }
+    this.isLit = !this.isLit;
+    this.updateSprite();
+  },
+  updateSprite() {
+    const appearance = this.getAppearance();
+    this.sprite.frame = appearance.i;
+  },
+  getAppearance() {
+    const { def } = this;
+		let appearanceId = def.appearance;
+		if (def.type == 'lightSource') {
+			appearanceId = this.isLit ? def.appearances.lit : def.appearances.off;
+		} 
+    return OAX6.AppearanceFactory.getAppearance(appearanceId)
   }
 }
 

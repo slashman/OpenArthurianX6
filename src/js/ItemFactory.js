@@ -21,7 +21,9 @@ const ItemFactory = {
 	getAppearance: function(id){
 		return this.appearancesMap[id];
 	},
-	createItem: function(id, quantity){
+	createItem: function(itemData){
+		const id = itemData.itemId;
+		const quantity = itemData.quantity;
 		const def = this.itemsMap[id];
 		if (!def) {
 			throw new Error("Invalid item id: [" + id + "]");
@@ -40,6 +42,9 @@ const ItemFactory = {
 		}
 		item.def = Object.assign({}, def);
 		item.defid = def.id;
+		if (def.type == 'lightSource') {
+			item.isLit = itemData.isLit;
+		}
 		item.sprite = this.getSpriteForItem(this.game, item);
 		return item;
 	},
@@ -47,8 +52,7 @@ const ItemFactory = {
 		return Object.assign({}, this.itemsMap[defid]);
 	},
 	getSpriteForItem: function(game, item) {
-		const { def } = item;
-		const appearance = AppearanceFactory.getAppearance(def.appearance);
+		const appearance = item.getAppearance();
 		const sprite = game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		sprite.visible = false;
 		sprite.inputEnabled = true;

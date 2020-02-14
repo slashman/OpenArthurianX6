@@ -403,6 +403,70 @@
                  "width":16,
                  "x":496,
                  "y":448
+                }, 
+                {
+                 "gid":2224,
+                 "height":16,
+                 "id":71,
+                 "name":"Torch",
+                 "properties":
+                    {
+                     "isLit":true,
+                     "itemId":"torch"
+                    },
+                 "propertytypes":
+                    {
+                     "isLit":"bool",
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"LightSource",
+                 "visible":true,
+                 "width":16,
+                 "x":464,
+                 "y":288
+                }, 
+                {
+                 "gid":2222,
+                 "height":16,
+                 "id":72,
+                 "name":"Torch 2",
+                 "properties":
+                    {
+                     "itemId":"torch"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"LightSource",
+                 "visible":true,
+                 "width":16,
+                 "x":464,
+                 "y":256
+                }, 
+                {
+                 "gid":2224,
+                 "height":16,
+                 "id":73,
+                 "name":"Torch 3",
+                 "properties":
+                    {
+                     "isLit":true,
+                     "itemId":"torch"
+                    },
+                 "propertytypes":
+                    {
+                     "isLit":"bool",
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"LightSource",
+                 "visible":true,
+                 "width":16,
+                 "x":560,
+                 "y":336
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -978,7 +1042,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":71,
+ "nextobjectid":76,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

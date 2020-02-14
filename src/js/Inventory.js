@@ -94,7 +94,7 @@ module.exports = {
         OAX6.UI.showMessage("Use " + inventory[index].def.name + " on ...");
 
         const PSM = OAX6.runner.playerStateMachine;
-        const appearance = OAX6.AppearanceFactory.getAppearance(inventory[index].def.appearance);
+        const appearance = inventory[index].getAppearance();
         PSM.setCursor(appearance.tileset, appearance.i);
 
         this.useItemOn = inventory[index];
@@ -161,7 +161,7 @@ module.exports = {
 
         for (var i=start;i<end;i++) {
             if (inventory[i]) {
-                var appearance = OAX6.AppearanceFactory.getAppearance(inventory[i].def.appearance);
+                var appearance = inventory[i].getAppearance();
                 this.invSlots[i-start].loadTexture(appearance.tileset, appearance.i);
                 if (inventory[i].quantity !== undefined && inventory[i].quantity > 1){
                   this.quantityLabels[i-start].visible = true;
@@ -175,14 +175,14 @@ module.exports = {
             }
         }
         if (mob.weapon) {
-            const appearance = OAX6.AppearanceFactory.getAppearance(mob.weapon.def.appearance);
+            const appearance = mob.weapon.getAppearance()
             this.weaponSlot.loadTexture(appearance.tileset, appearance.i);
             this.weaponSlot.visible = true;
         } else {
             this.weaponSlot.visible = false;
         }
         if (mob.armor) {
-            const appearance = OAX6.AppearanceFactory.getAppearance(mob.armor.def.appearance);
+            const appearance = mob.armor.getAppearance();
             this.armorSlot.loadTexture(appearance.tileset, appearance.i);
             this.armorSlot.visible = true;
         } else {

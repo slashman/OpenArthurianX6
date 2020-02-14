@@ -164,7 +164,7 @@ const LevelLoader = {
 		level.addMob(mob);
 	},
 	loadItem: function(itemData, level) {
-		const item = ItemFactory.createItem(itemData.itemId, itemData.amount);
+		const item = ItemFactory.createItem(itemData);
 		level.addItem(item, itemData.x, itemData.y, itemData.z);
 	},
 	loadDoor: function(map, doorData, level) {

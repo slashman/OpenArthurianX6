@@ -65,6 +65,15 @@ const Appearances = [
 			{
 				id: 'lute',
 				i: 72
+			},
+			{
+				id: 'litTorch',
+				i: 225
+				// TODO: Add animation with 226
+			},
+			{
+				id: 'offTorch',
+				i: 224
 			}
 		]
 	},

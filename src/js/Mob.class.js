@@ -491,9 +491,16 @@ Mob.prototype = {
 				OAX6.UI.showMessage("Playing " + item.def.name + ', press 1 - 9 to play, ESC to finish.');
 				PlayerStateMachine.switchToMusicState(item);
 				break;
+			case 'toggleLit':
+				item.toggleLit();
+				OAX6.UI.showMessage('Use - You turn ' + (item.isLit ? 'on' : 'off') + ' the ' + item.def.name + '.');
+				used = true;
+				break;
 		}
-		if (used && item.def.spendable) {
-			this.reduceItemQuantity(item);
+		if (used) {
+			if (item.def.spendable) {
+				this.reduceItemQuantity(item);
+			}
 			OAX6.Inventory.updateInventory();
 		}
 		
@@ -634,7 +641,7 @@ Mob.prototype = {
 			this.dead = true;
 			this.sprite.destroy();
 			if (this.definition.corpse){
-				const corpse = ItemFactory.createItem(this.definition.corpse);
+				const corpse = ItemFactory.createItem({ itemId: this.definition.corpse });
 				this.level.removeMob(this);
 				this.level.addItem(corpse, this.x, this.y, this.z);
 			}

@@ -9,7 +9,7 @@ const NPCs = [
 		armor: 'chainMail',
 		weapon: 'magicAxe',
 		items: [
-			{ id: 'journalOfTheQuest', quantity: 1 }
+			{ itemId: 'journalOfTheQuest', quantity: 1 }
 		],
 	},
 	{
@@ -98,8 +98,8 @@ const NPCs = [
 		alignment: 'player',
 		weapon: 'crossbow',
 		items: [
-			{ id: 'ironBolt', quantity: 50 },
-			{ id: 'fish', quantity: 3 }
+			{ itemId: 'ironBolt', quantity: 50 },
+			{ itemId: 'fish', quantity: 3 }
 		],
 		intent: 'seekPlayer',
 		triggers: [

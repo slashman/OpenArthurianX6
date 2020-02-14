@@ -184,6 +184,22 @@ const Items = [
 			sounds: 'lute'
 		},
 		useOnSelf: true
+	},
+	{
+		id: 'torch',
+		type: 'lightSource',
+		description: 'Creates light.',
+		name: 'Torch',
+		appearances: {
+			lit: 'litTorch',
+			off: 'offTorch',
+		},
+		lightRadius: 5,
+		effect: {
+			type: 'toggleLit'
+			
+		},
+		useOnSelf: true
 	}
 ]
 

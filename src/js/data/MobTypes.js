@@ -113,7 +113,7 @@ const MobTypes = [
 		alignment: 'enemy',
 		weapon: 'crossbow',
 		items: [
-			{ id: 'ironBolt', quantity: 10 }
+			{ itemId: 'ironBolt', quantity: 10 }
 		]
 	},
 	{
@@ -130,7 +130,7 @@ const MobTypes = [
 		alignment: 'enemy',
 		weapon: 'crossbow',
 		items: [
-			{ id: 'ironBolt', quantity: 10 }
+			{ itemId: 'ironBolt', quantity: 10 }
 		]
 	}
 ]

@@ -49,7 +49,7 @@ module.exports = {
   },
 
   showItem(item) {
-    const appearance = AppearanceFactory.getAppearance(item.def.appearance);
+    const appearance = item.getAppearance();
 
     let key = appearance.tileset;
     let frame = appearance.i;

@@ -38,22 +38,20 @@ const MobFactory = {
 	},
 	addItems(mob, definition) {
 		if (definition.weapon) {
-			mob.weapon = ItemFactory.createItem(definition.weapon);
+			mob.weapon = ItemFactory.createItem({ itemId: definition.weapon });
 		}
 		if (definition.armor) {
-			mob.armor = ItemFactory.createItem(definition.armor);
+			mob.armor = ItemFactory.createItem({ itemId: definition.armor });
 		}
 		if (definition.items) {
 			definition.items.forEach(item => {
-				let id, quantity;
 				if (typeof item === 'string') {
-					id = item;
-					quantity = 1;
-				} else {
-					id = item.id;
-					quantity = item.quantity;
+					item = {
+						itemId: item,
+						quantity: 1
+					}
 				}
-				mob.addItem(ItemFactory.createItem(id, quantity));
+				mob.addItem(ItemFactory.createItem(item));
 			})
 		}
 	},
