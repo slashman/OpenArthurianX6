@@ -132,7 +132,7 @@ const PlayerStateMachine = {
         this.switchState(PlayerStateMachine.MUSIC);
         this.clearActionCallback(); // TODO: Streamline action and direction callbacks, make them respond to state machine states?
         this.clearDirectionCallback();
-        this.__musicManager = new MusicManager(instrument);
+        this.__musicManager = new MusicManager(this.game, instrument);
     },
 
     resetState: function(holdAction) {
@@ -565,12 +565,8 @@ const PlayerStateMachine = {
     updateMusicAction() {
         const keyCode = this._inkey();
         if (keyCode) {
-            if (keyCode === Phaser.KeyCode.ONE){
-                return this.__musicManager.playNote(1);
-            } else if (keyCode === Phaser.KeyCode.TWO){
-                return this.__musicManager.playNote(2);
-            } else if (keyCode === Phaser.KeyCode.THREE){
-                return this.__musicManager.playNote(3);
+            if (keyCode >= Phaser.KeyCode.ONE && keyCode <= Phaser.KeyCode.NINE){
+                return this.__musicManager.playNote(keyCode - Phaser.KeyCode.ONE + 1);
             } else if (keyCode === Phaser.KeyCode.ESC){
                 this.resetState();
                 if (this.state == PlayerStateMachine.INVENTORY) {
