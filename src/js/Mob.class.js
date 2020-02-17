@@ -1,9 +1,15 @@
+const circular = require('circular-functions');
+
 const Bus = require('./Bus');
 const Random = require('./Random');
 const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
 const Geo = require('./Geo');
+const Line = require('./Line');
+const MessageBox = require('./MessageBox');
+const PartyStatus = require('./ui/PartyStatus');
+const Constants = require('./Constants');
 
 /**
  * Represents a being living inside a world
@@ -23,7 +29,27 @@ function Mob(level, x, y, z){
 	this.speed = null;
 	this.party = [];
 	this.inventory = [];
+	this.flags = {};
+	this.flags._c = circular.setSafe();
+	this.combatTurns = 0;
+	this.sightRange = 15;
+	this._c = circular.register('Mob');
 }
+
+circular.registerClass('Mob', Mob, {
+	transients: {
+		sprite: true,
+		definition: true,
+		npcDefinition: true
+	},
+	reviver(mob, data) {
+		mob.definition = OAX6.MobFactory.getDefinition(mob.defid);
+		if (mob.npcDefid) {
+			mob.npcDefinition = OAX6.NPCFactory.getDefinition(mob.npcDefid);
+		}
+		mob.sprite = OAX6.MobFactory.getSpriteForMob(data.phaserGame, mob);
+	}
+});
 
 Mob.prototype = {
 	/**	
@@ -32,96 +58,254 @@ Mob.prototype = {
 	 * mob scheduler
 	 */
 	act: function(){
-		const player = OAX6.UI.player;
-		if (this === player){
-			// Enable action
-			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
-				PlayerStateMachine.actionEnabled = true;
-			}
-			OAX6.UI.activeMob = false;
+		if (this.isPartyMember() && PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+			PlayerStateMachine.actionEnabled = true;
+			OAX6.UI.activeMob = this;
 			return Promise.resolve();
-		} else if (player && this.alignment === player.alignment){
-			// This is a party member
-			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
-				OAX6.UI.activeMob = this;
-				PlayerStateMachine.actionEnabled = true;
-				return Promise.resolve();
-			} else {
-				//TODO: Fix issue with pathfinding empty routes to player
-				if (this.x === player.x && this.y === player.y){
-					//TODO: Move to an open space?
-					// Do nothing
-					this.reportAction("Stand by");
-					return Timer.delay(1000);
+		}
+		if (!PlayerStateMachine.allowMobsActing()) {
+			this.reportAction("Stand by");
+			return Timer.delay(1000);
+		}
+		return this.__executeAI().then(() => this.__checkTriggers());
+	},
+	__checkTriggers() {
+		const player = OAX6.UI.player;
+		const promises = [];
+		if (this.npcDefinition && this.npcDefinition.triggers) {
+			const playerDistanceTriggers = this.__getActiveTriggersByType('playerDistance');
+			playerDistanceTriggers.forEach(t => {
+				if (Geo.flatDist(player.x, player.y, this.x, this.y) < t.value) {
+					promises.push(this.executeTriggerActions(t));
 				}
-				const nextStep = this.level.findPathTo(player, this, this.alignment);
-				return this.moveTo(nextStep.dx, nextStep.dy);
+			});
+		}
+		if (promises.length) {
+			return Promise.all(promises);
+		} else {
+			return Promise.resolve();
+		}
+	},
+	__getActiveTriggersByType(triggerType) {
+		return this.npcDefinition.triggers.filter(t => t.type === triggerType && !this.flags['trigger_' + t.id]);
+	},
+	__executeAI() {
+		const player = OAX6.UI.player;
+		// If mob is too far from player and hasn't been attacked, it mustn't act
+		if (!this.level.isInCombat(this)) {
+			return Timer.delay(1000);	
+		}
+		let subIntent = this.intent; // While we have a general intent, it may change for this action
+		if (this.isPartyMember()){
+			//TODO: Fix issue with pathfinding empty routes to player
+			if (this.x === player.x && this.y === player.y){
+				//TODO: Move to an open space?
+				subIntent = 'waitCommand';
+			} else if (this.z != player.z){
+				subIntent = 'waitCommand';
+			} else {
+				subIntent = 'seekPlayer';
 			}
 		} else {
+			// Surviving is the most important, so always look for enemies first
+			// Note that neutral enemies will by default have no target
 			const nearbyTarget = this.getNearbyTarget();
-			if (!nearbyTarget || this.alignment == 'n'){
-				if (Random.chance(50)){
-					var dx = Random.num(-1,1);
-					var dy = Random.num(-1,1);
-					if (dx === 0 && dy === 0){
-						dx = 1;
-					}
-					return this.moveTo(dx, dy);
-				} else {
-					// Do nothing
-					this.reportAction("Stand by");
-					return Timer.delay(1000);
-				}
-			} else if (nearbyTarget){
-				const nextStep = this.level.findPathTo(nearbyTarget, this, this.alignment);
-				let dx = nextStep.dx;
-				let dy = nextStep.dy;
-				const mob = this.level.getMobAt(this.x + dx, this.y + dy);
-				if (mob){
-					if (mob.alignment !== this.alignment){
-						return this.attackOnDirection(dx, dy);
-					} else {
-						dx = Random.num(-1,1);
-						dy = Random.num(-1,1);
-						if (dx === 0 && dy === 0){
-							dx = 1;
-						}
-						return this.moveTo(dx, dy);
-					}
-				} else {
-					return this.moveTo(dx, dy);
-				}
+			if (nearbyTarget) {
+				subIntent = 'combat';
+			} else if (subIntent === 'seekPlayer' && !this.canTrack(player)) {
+				subIntent = 'waitCommand';
+			}
+		}
+		if (subIntent === 'waitCommand') {
+			this.reportAction("Stand by");
+			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
+				return Promise.resolve();
 			} else {
 				return Timer.delay(1000);
 			}
+		} else if (subIntent === 'seekPlayer') {
+			return this.bumpTowards(player);
+		} else if (subIntent === 'wander') {
+			// TODO: Follow schedule
+			var dx = Random.num(-1,1);
+			var dy = Random.num(-1,1);
+			if (dx === 0 && dy === 0){
+				dx = 1;
+			}
+			return this.moveTo(dx, dy);
+		} else if (subIntent === 'combat') {
+			return this.onCombatTurn().then(() => this.combatAction());
+		} else {
+			return Timer.delay(1000);
 		}
 	},
+	combatAction: function () {
+		if (this.dead){
+			return Promise.resolve();
+		}
+		const nearbyTarget = this.getNearbyTarget();
+		if (!nearbyTarget){
+			if (Random.chance(50)){
+				var dx = Random.num(-1,1);
+				var dy = Random.num(-1,1);
+				if (dx === 0 && dy === 0){
+					dx = 1;
+				}
+				return this.moveTo(dx, dy);
+			} else {
+				// Do nothing
+				this.reportAction("Stand by");
+				return Timer.delay(1000);
+			}
+		} else {
+			if (this.weapon && 
+				this.weapon.def.range && 
+				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.def.range &&
+				this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y, this.z)
+				) {
+				return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
+			} else {
+				return this.bumpTowards(nearbyTarget);
+			}
+		} 
+	},
+	bumpTowards: function (targetMob) {
+		const nextStep = this.level.findPathTo(targetMob, this, this.z, this.alignment);
+		let dx = nextStep.dx;
+		let dy = nextStep.dy;
+		const mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
+		if (mob){
+			if (mob.alignment !== this.alignment){
+				return this.attackOnDirection(dx, dy);
+			} else {
+				return Timer.delay(1000);
+			}
+		} else {
+			return this.moveTo(dx, dy);
+		}
+	},
+	onCombatTurn: function() {
+		return Promise.resolve().then(() => {
+			if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT){
+				return;
+			}
+			// combatTurnsOver triggers
+			if (!this.npcDefinition) {
+				return;
+			}
+			let promise = Promise.resolve();
+			this.combatTurns++;
+			const combatTurnsOverTriggers = this.__getActiveTriggersByType('combatTurnsOver');
+			combatTurnsOverTriggers.forEach(t => {
+				if (this.combatTurns >= t.value) {
+					promise = promise.then(() => this.executeTriggerActions(t));
+				}
+			});
+			return promise;
+		});
+	},
+	executeTriggerActions: function(trigger) {
+		return Promise.resolve().then(() => {
+			let p = Promise.resolve();
+			trigger.actions.forEach(a => {
+				let promiseFunction;
+				switch (a.type) {
+					case 'console':
+						// TODO: Chain this to the promise, must be a function returning a promise, not a promise.
+						promiseFunction = new Promise(r => {
+							console.log(a.value);
+							r();	
+						});
+						break;
+					case 'cutscene':
+						promiseFunction = () => OAX6.UI.showScene(a.value);
+						break;
+					case 'openLevel':
+						promiseFunction = () => new Promise(r => {
+							const oldLevel = OAX6.UI.player.level;
+							OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
+							oldLevel.destroy();
+							OAX6.UI.updateFOV();
+							r();
+						});
+						break;
+					case 'endCombat':
+						promiseFunction = () => PlayerStateMachine.endCombat();
+						break;
+					case 'talk':
+						// TODO: Chain this to the promise
+						Bus.emit('startDialog', {mob: this, dialog: this.npcDefinition.dialog, player: OAX6.UI.player});
+						break;
+					case 'showMessage':
+						promiseFunction = () => OAX6.UI.showMessage(a.value);
+						break;
+				}
+				p = p.then(promiseFunction);
+				
+			});
+			this.flags['trigger_' + trigger.id] = true;
+			return p;
+		});
+	},
+	canTrack: function (mob) {
+		if (mob.z != this.z) {
+			return false;
+		}
+		if (mob === OAX6.UI.player && this.isPartyMember()) {
+			return true;
+		}
+		// TODO: Use Memory (last known position)
+		const dist = Geo.flatDist(mob.x, mob.y, this.x, this.y);
+		if (dist > 20) {
+			return false;
+		}
+		// Else trace a line and check no opaque tiles hit
+		return this.level.isLineClear(mob.x, mob.y, this.x, this.y, this.z);
+	},
 	isHostileMob: function(){
-		return this.alignment === 'a';
+		return this.alignment === Constants.Alignments.ENEMY;
 	},
 	isPartyMember: function(){
-		return this.alignment === 'b';
+		return this == OAX6.UI.player || OAX6.UI.player.party.indexOf(this) !== -1;
 	},
 	getNearbyTarget: function(){
-		//TODO: Implement some LOS.
-		if (this.isHostileMob()){
-			return this.level.getCloserMobTo(this.x, this.y, 'b');
-		} else if (this.isPartyMember()){
-			return this.level.getCloserMobTo(this.x, this.y, 'a');
+		if (this.alignment === Constants.Alignments.NEUTRAL) {
+			// TODO: If was attacked, target the offender
+			// TODO: Wild animals may attack randomly
+			return false;
+		}
+		if (this.intent === 'waitCommand') {
+			return false;
+		}
+		const targetAlignment = this.isHostileMob() ? Constants.Alignments.PLAYER : Constants.Alignments.ENEMY;
+		const closerMob = this.level.getCloserMobTo(this.x, this.y, this.z, targetAlignment);
+		if (closerMob && this.canTrack(closerMob)) {
+			return closerMob;
 		} else {
 			return false;
 		}
+	},
+	deactivate() {
+		this.deactivateNext = true;
 	},
 	activate: function() {
 		if (this.dead){
 			return;
 		}
+		if (this.deactivateNext) {
+			this.deactivateNext = false;
+			return;
+		}
 		if (this.isTalking || PlayerStateMachine.state === PlayerStateMachine.COMBAT) {
 			//TODO: May be check state === DIALOG instead of this.isTalking?
+			this.deactivatedDuringDialog = true;
 			return;
 		}
 		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 			PlayerStateMachine.checkCombatReady();
+			return;
+		}
+		if (OAX6.UI.activeMob == this) {
 			return;
 		}
 		this.executingAction = true;
@@ -130,7 +314,7 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
 			} 
-			if (this.isHostileMob() || this.isPartyMember()){
+			if (this.isHostileMob() || this.isPartyMember() || this.intent === 'seekPlayer'){
 				// Reactivate immediately
 				return Timer.next();
 			} else {
@@ -142,45 +326,44 @@ Mob.prototype = {
 	lookAt: function(dx, dy) {
 		var dir = OAX6.UI.selectDir(dx, dy);
 		this.sprite.animations.play('walk_'+dir, 0);
-
-		// TODO: Do something about this since the first frame is midwalk... 
-		this.sprite.frame += 1;
 	},
 	moveTo: function(dx, dy){
-		if (!this.level.canMoveFrom(this.x, this.y, dx, dy)){
+		if (!this.level.canMoveFrom(this.x, this.y, this.z, dx, dy)){
 			this.reportAction("Move - Blocked");
 			return Timer.delay(500);
 		}
-
-		var mob = this.level.getMobAt(this.x + dx, this.y + dy);
+		var mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
+		let blockedByMob = false;
+		const specialMovementRules = OAX6.UI.activeMob === this && PlayerStateMachine.state === PlayerStateMachine.WORLD;
 		if (mob){
-			if (this.canStartDialog && mob.dialog){
-				Bus.emit('startDialog', {mob: mob, dialog: mob.dialog});
-				
-				// Look at each other while talking
-				this.lookAt(dx, dy);
-				mob.lookAt(-dx, -dy);
-				this.reportAction("Move - Talk");
-				return Timer.delay(500);
-			} else if (this === OAX6.UI.player || OAX6.UI.activeMob === this){
-				if (mob.isPartyMember() && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
-					console.log("Pass thru");
-				} else {
-					this.reportAction("Move - Blocked");
-					return Timer.delay(500);
+			blockedByMob = true;
+			if (specialMovementRules) {
+				if (mob.isPartyMember()) {
+					// TODO: Autoswap positions
+					blockedByMob = false; // Step on mob. Pray nothing bad happens.
 				}
-			} else {
-				this.reportAction("Move - Blocked");
-				return Timer.delay(500);
 			}
 		} 
+		if (blockedByMob) {
+			this.reportAction("Move - Blocked");
+			return Timer.delay(specialMovementRules ? 50 : 500);
+		}
+		const object = this.level.getObjectAt(this.x + dx, this.y + dy, this.z);
+		if (object && !object.hidden && object.type == 'Stairs') {
+			// Autouse if possible
+
+			return Promise.resolve().then(() => object.use(this, dx, dy))
+		}
 		// Position changes before the tween to "reserve" the spot
 		this.x += dx;
 		this.y += dy;
-
+		if (this === OAX6.UI.activeMob){
+			OAX6.UI.updateFOV();
+		}
 		var dir = OAX6.UI.selectDir(dx, dy);
 		this.sprite.animations.play('walk_'+dir, OAX6.UI.WALK_FRAME_RATE);
 		this.reportAction("Move");
+
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
 	addItemToFreeSlot: function(item) {
@@ -193,52 +376,160 @@ Mob.prototype = {
 		// TODO: Will cause issues when there are more items than the ones that can be displayed
 		this.inventory.push(item);
 	},
-	getOnDirection: function(dx, dy) {
-		var item = this.level.getItemAt(this.x + dx, this.y + dy);
-		if (item) {
-			const pickedQuantity = item.quantity;
-      if (item.def.stackLimit) {
-        const existingItem = this.inventory.find(i => i && i.id === item.id);
-        if (existingItem) {
-          if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
-            existingItem.quantity += item.quantity;
-          } else {
-            item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
-            existingItem.quantity = existingItem.def.stackLimit;
-            this.addItemToFreeSlot(item);
-          }
+	/*
+	 * Relocates the mob without a tween, for example when the level loads
+	 */
+	relocate (x, y) {
+		this.x = x;
+		this.y = y;
+		this.sprite.x = this.x * 16;
+		this.sprite.y = this.y * 16;
+	},
+	addItem: function(item) {
+    if (item.def.stackLimit) {
+      const existingItem = this.inventory.find(i => i.defid === item.defid);
+      if (existingItem) {
+        if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
+          existingItem.quantity += item.quantity;
         } else {
-          this.addItemToFreeSlot(item);
+          item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
+          existingItem.quantity = existingItem.def.stackLimit;
+          this.inventory.push(item);
         }
       } else {
         this.addItemToFreeSlot(item);
       }
+    } else {
+      this.inventory.push(item);
+    }
+	},
+	getOnDirection: function(dx, dy) {
+		var item = this.level.getItemAt(this.x + dx, this.y + dy, this.z);
+		if (item) {
+			const pickedQuantity = item.quantity;
+			this.addItem(item);
 			this.level.removeItem(item);
       if (item.quantity === 1) {
-        this.reportAction("Got a " + item.name);  
+        this.reportAction("Got a " + item.def.name);  
       } else {
-        this.reportAction("Got " + pickedQuantity + " " + item.name);  
+        this.reportAction("Got " + pickedQuantity + " " + item.def.name);  
       }
 			
 		} else {
 			this.reportAction("Get - Nothing there!");
 		}
 	},
+	useOnDirection(dx, dy) {
+		return this.useInPosition(this.x + dx, this.y + dy, dx, dy);
+	},
+	useInPosition(x, y, dx, dy) {
+		if (!dx) {
+			dx = x - this.x;
+			dy = y - this.y;
+		}
+		var door = this.level.getDoorAt(x, y, this.z);
+		var object = this.level.getObjectAt(x, y, this.z);
+		var item = this.level.getItemAt(x, y, this.z);
+		if (door) {
+			if (door.isLocked()) {
+				OAX6.UI.showMessage("Locked!");
+			} else {
+				if (door.openDoor(this, false)) {
+					if (door.open) {
+						OAX6.UI.showMessage("Use - Opened door");
+					} else {
+						OAX6.UI.showMessage("Use - Closed door");
+					}
+				}
+			}
+		} else if (object && !object.hidden) {
+			return object.use(this, dx, dy);
+		} else if (item) {
+			return this.useItemInPosition(x, y, item);
+		} else {
+			this.reportAction("Use - Nothing there!");
+		}
+	},
+	useItemOnDirection(dx, dy, item) {
+		return this.useItemInPosition(this.x + dx, this.y + dy, item);
+	},
+	useItemInPosition(x, y, item) {
+		const itemEffect = item.def.effect
+		if (!itemEffect) {
+			OAX6.UI.showMessage("Cannot be used");
+			return;
+		}
+		const mob = this.level.getMobAt(x, y, this.z);
+		// TODO: If there is no mob there, and I used the item in the ground, the active mob should be the target of the action.
+		const door = this.level.getDoorAt(x, y, this.z);
+		let used = false;
+		switch (itemEffect.type) {
+			case 'unlockDoor':
+				if (door) {
+					if (door.isLocked()) {
+						if (door.unlock(item)) {
+							OAX6.UI.showMessage("Door Unlocked");
+							door.openDoor(this, false);
+							used = true;
+						} else {
+							OAX6.UI.showMessage("Wrong key!");
+						}
+					} else {
+						OAX6.UI.showMessage("Door is not locked");
+					}
+				} else {
+					this.reportAction("Use - Nothing there!");
+				}
+				break;
+			case 'recoverHP':
+				if (mob) {
+					item.recoverHP(mob);
+					used = true;
+				} else {
+					this.reportAction("Use - Noone there!");
+				}
+				break;
+			case 'recoverMP':
+				if (mob) {
+					item.recoverMP(mob);
+					used = true;
+				} else {
+					this.reportAction("Use - Noone there!");
+				}
+				break;
+			case 'playMusic': 
+				OAX6.UI.showMessage("Playing " + item.def.name + ', press 1 - 9 to play, ESC to finish.');
+				PlayerStateMachine.switchToMusicState(item);
+				break;
+			case 'toggleLit':
+				item.toggleLit();
+				OAX6.UI.showMessage('Use - You turn ' + (item.isLit ? 'on' : 'off') + ' the ' + item.def.name + '.');
+				used = true;
+				break;
+		}
+		if (used) {
+			if (item.def.spendable) {
+				this.reduceItemQuantity(item);
+			}
+			OAX6.Inventory.updateInventory();
+		}
+		
+	},
 	dropOnDirection: function(dx, dy, item) {
 		var x = this.x + dx,
 			y = this.y + dy;
 
-		if (!this.level.isSolid(x, y) && !this.level.getItemAt(x, y)) {
+		if (!this.level.isSolid(x, y, this.z) && !this.level.getItemAt(x, y, this.z)) {
 			var ind = this.inventory.indexOf(item);
 			this.inventory.splice(ind, 1);
-			this.level.addItem(item, x, y);
+			this.level.addItem(item, x, y, this.z);
 		} else {
 			this.reportAction("Can't drop it there!");
 		}
 	},
 	attackToPosition: function(x, y){
 		const weapon = this.weapon;
-		const range = weapon ? (weapon.range || 1) : 1;
+		const range = weapon ? (weapon.def.range || 1) : 1;
 		const dist = Geo.flatDist(this.x, this.y, x, y);
 		if (dist > range){
 			this.reportAction("Attack - Out of range!");
@@ -257,19 +548,20 @@ Mob.prototype = {
       if (!ammo) {
         this.reportAction("Attack - No Ammo.");
         return Promise.resolve(false);
-      }
-      if (ammo.quantity && ammo.quantity > 1) {
-        ammo.quantity--;
-      } else {
-        this.inventory.splice(this.inventory.findIndex(i => i.id === ammo.id), 1);
-      }
+	  }
+	  this.reduceItemQuantity(ammo);
       if (ammo === this.weapon) {
         this.weapon = undefined;
       }
-      // TODO: Stashes of ammo
+      // Here we must check in advance if this attack will trigger the combat mode!
+      // We cannot wait til the projectile animation is over!
+      var mob = this.level.getMobAt(x, y, this.z);
+      if (mob && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
+				PlayerStateMachine.startCombat(true);
+			}
       return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
-        if (ammo.throwable) {
-          this.level.addItem(ammo, x, y);
+        if (ammo.def.throwable) {
+          this.level.addItem(ammo, x, y, this.z);
         }
         return this._attackPosition(x, y);
       });
@@ -282,10 +574,25 @@ Mob.prototype = {
 			return Promise.resolve();
 		}
 	},
+	// TODO: Move to model/Inventory once it's refactored.
+	reduceItemQuantity(item, variation) {
+		variation = variation || 1;
+		if (item.quantity) {
+			if (item.quantity > variation) {
+				item.quantity -= variation;
+			} else if (item.quantity < variation) {
+				throw new Error('Not enough quantity of item ' + item.name + ' to reduce by ' + quantity);
+			} else {
+				this.inventory.splice(this.inventory.findIndex(i => i.defid === item.defid), 1);
+			}
+		} else {
+			this.inventory.splice(this.inventory.findIndex(i => i.defid === item.defid), 1);
+		}
+	},
   getAmmunitionFor: function(weapon) {
-    const ammoType = weapon.usesProjectileType;
+    const ammoType = weapon.def.usesProjectileType;
     if (ammoType) {
-      const onInventory = this.inventory.find(i => i.id === ammoType);
+      const onInventory = this.inventory.find(i => i.defid === ammoType);
       return onInventory;
     } else {
       // No ammo, throw the weapon!
@@ -296,7 +603,7 @@ Mob.prototype = {
 		return this._attackPosition(this.x + dx, this.y + dy);
 	},
 	_attackPosition: function(x, y){
-		var mob = this.level.getMobAt(x, y);
+		var mob = this.level.getMobAt(x, y, this.z);
 		if (mob){
 			// Attack!
 			OAX6.UI.showIcon(2, mob.x, mob.y);
@@ -305,7 +612,7 @@ Mob.prototype = {
 				OAX6.UI.hideIcon();
 				return this.attack(mob);
 			});
-		} else if (this.level.isSolid(x, y)) {
+		} else if (this.level.isSolid(x, y, this.z)) {
 			// TODO: Attack the map
 			this.reportAction("Attack - No one there!");
 			return Timer.delay(500);
@@ -315,10 +622,9 @@ Mob.prototype = {
 		}
 	},
 	attack: function(mob){
-		if (mob === OAX6.UI.player || mob.isPartyMember()){
-			if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
-				PlayerStateMachine.startCombat();
-			}
+		mob.hasBeenAttacked = true;
+		if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
+			PlayerStateMachine.startCombat(true);
 		}
 		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
@@ -345,9 +651,15 @@ Mob.prototype = {
 			this.dead = true;
 			this.sprite.destroy();
 			if (this.definition.corpse){
-				const corpse = ItemFactory.createItem(this.definition.corpse);
+				const corpse = ItemFactory.createItem({ itemId: this.definition.corpse });
 				this.level.removeMob(this);
-				this.level.addItem(corpse, this.x, this.y);
+				this.level.addItem(corpse, this.x, this.y, this.z);
+			}
+			if (this.isPartyMember()){
+				this.checkForGameOver();
+				if (this != OAX6.UI.player) {
+					OAX6.UI.player.removeFromParty(this);
+				}
 			}
 		}
 	},
@@ -355,10 +667,10 @@ Mob.prototype = {
 
 	},
 	reportAction: function(action){
-		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT || this === OAX6.UI.player){
+		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
-		} else if (OAX6.UI.player == this){ 
-			if (PlayerStateMachine.state === PlayerStateMachine.GET){
+		} else if (OAX6.UI.activeMob == this){ 
+			if (PlayerStateMachine.state === PlayerStateMachine.TARGETTING){
 				OAX6.UI.showMessage(action);
 			}
 		}
@@ -374,7 +686,7 @@ Mob.prototype = {
 			desc = this.definition.name;
 		}
 		if (this.weapon){
-			desc += " armed with "+this.weapon.name;
+			desc += " armed with "+this.weapon.def.name;
 		}
 		return desc;
 	},
@@ -387,6 +699,30 @@ Mob.prototype = {
 	},
 	addMobToParty: function(mob){
 		this.party.push(mob);
+		PartyStatus.addMob(mob);
+	},
+	removeFromParty: function(mob){
+		this.party.splice(this.party.indexOf(mob), 1);
+		PartyStatus.removeMob(mob);
+	},
+	checkForGameOver: function() {
+		const player = OAX6.UI.player;
+		if (player.dead && !player.party.find(p => !p.dead)) {
+			MessageBox.showMessage("GAME OVER!");
+		}
+	},
+	activateParty() {
+		this.party.forEach(m => m.activate());	
+	},
+	deactivateParty() {
+		this.party.forEach(m => m.deactivate());	
+	},
+	talkWithMob(mob) {
+		Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
+		const dx = Math.sign(mob.x - this.x);
+		const dy = Math.sign(mob.y - this.y);
+		this.lookAt(dx, dy);
+		mob.lookAt(-dx, -dy);
 	}
 };
 

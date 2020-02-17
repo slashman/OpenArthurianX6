@@ -1,4 +1,21 @@
 const INVENTORY_SLOTS = {x: 74, y: 21, w: 18, h: 18};
+//TODO: Rename to InventoryPopup once the item dragging changes are merged.
+
+function initDraggableGroup(draggable, group) {
+    draggable.inputEnabled = true;
+    draggable.input.enableDrag();
+    draggable.origin = new Phaser.Point(draggable.x, draggable.y);
+    draggable.events.onDragUpdate.add((obj, pointer, x, y, snapPoint, isFirstUpdate) => {
+        if (isFirstUpdate){
+            group.startDragPos = new Phaser.Point(group.x, group.y);
+            draggable.startDragPos = new Phaser.Point(draggable.x, draggable.y);
+        }
+        group.x = group.startDragPos.x - draggable.origin.x + x;
+        group.y = group.startDragPos.y - draggable.origin.y + y;
+        draggable.x = draggable.startDragPos.x;
+        draggable.y = draggable.startDragPos.y;
+    });
+}
 
 module.exports = {
     init: function(game) {
@@ -14,6 +31,8 @@ module.exports = {
         this.inventoryGroup.y = 50;
 
         this.inventoryBackground = this.game.add.image(0, 0, "inventory");
+
+        initDraggableGroup(this.inventoryBackground, this.inventoryGroup);
         
         this.inventoryGroup.add(this.inventoryBackground);
 
@@ -32,11 +51,27 @@ module.exports = {
             this.inventoryGroup.add(invSlot);
             this.inventoryGroup.add(quantityLabel);
 
+            invSlot.inputEnabled = true;
+            ((index) => {
+                invSlot.events.onInputUp.add((object, pointer, isOver) => {
+                    if (this.game.time.time - pointer.timeDown < 300) {
+                        this.onItemSelected(index);
+                    }
+                });
+            })(i);
+            initDraggableGroup(invSlot, this.inventoryGroup);
+
             if (x == this.COLUMNS) {
                 x = 0;
                 y += 1;
             }
         }
+
+        this.weaponSlot = this.game.add.image(21, 52, 'ui');
+        this.inventoryGroup.add(this.weaponSlot);
+        this.armorSlot = this.game.add.image(53, 20, 'ui');
+        this.inventoryGroup.add(this.armorSlot);
+
 
         this.cursor = this.game.add.image(0, 0, 'ui');
         this.cursor.frame = 6;
@@ -58,12 +93,36 @@ module.exports = {
         this.UI.UILayer.add(this.inventoryGroup);
         this.UI.UILayer.add(this.drag.sprite);
 
+        this.useItemOn = null;
+
         this.close();
+    },
+
+    onItemSelected: function(index) {
+        const inventory = this.currentMob.inventory;
+
+        if (!inventory[index]) { return; }
+
+        OAX6.UI.showMessage("Use " + inventory[index].def.name + " on ...");
+
+        const PSM = OAX6.runner.playerStateMachine;
+        const appearance = inventory[index].getAppearance();
+        PSM.setCursor(appearance.tileset, appearance.i);
+
+        this.useItemOn = inventory[index];
+        PSM.activateFloatingItem();
+    },
+
+    resetFloatingItem: function() {
+        const PSM = OAX6.runner.playerStateMachine;
+        this.useItemOn = null;
+        PSM.setCursor(null, null);
+        PSM.activateInventory();
     },
 
     moveCursor: function(x, y) {
         var amount = x + y * this.COLUMNS,
-            inventory = this.UI.player.inventory,
+            inventory = this.currentMob.inventory,
             scrolled = false,
             dir = Math.sign(amount),
             prevSlot = this.cursorSlot,
@@ -108,15 +167,24 @@ module.exports = {
         this.cursor.y = y;
     },
 
-    updateInventory: function() {
-        var player = OAX6.UI.player,
-            inventory = player.inventory,
+    updateInventory: function(partyMemberIndex) {
+        if (partyMemberIndex != undefined) {
+            this.currentPartyMemberIndex = partyMemberIndex;
+        } else {
+            partyMemberIndex = this.currentPartyMemberIndex;
+        }
+        const mob = partyMemberIndex == 0 ? OAX6.UI.player : OAX6.UI.player.party[partyMemberIndex - 1];
+        if (!mob) {
+            return false;
+        }
+        this.currentMob = mob;
+        var inventory = mob.inventory,
             start = this.scroll * this.COLUMNS,
             end = start+this.MAX_DISPLAY;
 
         for (var i=start;i<end;i++) {
             if (inventory[i]) {
-                var appearance = inventory[i].appearance;
+                var appearance = inventory[i].getAppearance();
                 this.invSlots[i-start].loadTexture(appearance.tileset, appearance.i);
                 if (inventory[i].quantity !== undefined && inventory[i].quantity > 1){
                   this.quantityLabels[i-start].visible = true;
@@ -129,8 +197,22 @@ module.exports = {
                 this.quantityLabels[i-start].visible = false;
             }
         }
-
+        if (mob.weapon) {
+            const appearance = mob.weapon.getAppearance()
+            this.weaponSlot.loadTexture(appearance.tileset, appearance.i);
+            this.weaponSlot.visible = true;
+        } else {
+            this.weaponSlot.visible = false;
+        }
+        if (mob.armor) {
+            const appearance = mob.armor.getAppearance();
+            this.armorSlot.loadTexture(appearance.tileset, appearance.i);
+            this.armorSlot.visible = true;
+        } else {
+            this.armorSlot.visible = false;
+        }
         this.moveCursor(0, 0);
+        return true;
     },
 
     updateDragItem: function(x, y) {
@@ -215,14 +297,17 @@ module.exports = {
         }
     },
 
-    open: function() {
-        this.inventoryGroup.visible = true;
-
-        this.updateInventory();
+    open: function(partyMemberIndex) {
+        const opened = this.updateInventory(partyMemberIndex);
+        if (opened) {
+            this.inventoryGroup.visible = true;
+        }
+        return opened;
     },
 
     close: function() {
         this.cursorSlot = 0;
+        this.partyMemberIndex = -1;
         this.inventoryGroup.visible = false;
     },
 

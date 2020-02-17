@@ -61,24 +61,20 @@ module.exports = {
 	},
 	tintWords: function(bitmapText, words, color) {
 		var msg = bitmapText.text;
-
-		for (var k=0,word;word=words[k];k++) {
+		words.forEach(word => {
 			var reg = new RegExp("(?!" + word + ").", "g"),
 				count = msg.replace(reg, "").length,
 				lastIndex = 0,
 				wordLength = word.length;
 
-			for (var i=0;i<count;i++) {
-				var index1 = msg.indexOf(word, lastIndex),
-					index2 = index1 + wordLength;
-
-				for (var j=0;j<wordLength;j++) {
+			for (var i=0; i < count; i++) {
+				var index1 = msg.indexOf(word, lastIndex), index2 = index1 + wordLength;
+				for (var j=0; j<wordLength; j++) {
 					bitmapText.getChildAt(index1 + j).tint = color;
 				}
-
 				lastIndex = index1 + 1;
 			}
-		}
+		});
 	},
 	splitInLines: function(text, isShowMore) {
 		var lines = [],
@@ -87,8 +83,11 @@ module.exports = {
 			words = text.split(/\s/g);
 
 		measureTool.text = "";
-		for (var i=0,word;word=words[i];i++) {
-			if (line.length != 0) { measureTool.text += " "; }
+		for (let i = 0; i < words.length; i++) {
+			const word = words[i];
+			if (line.length !== 0) {
+				measureTool.text += " ";
+			}
 
 			measureTool.text += word;
 
@@ -106,7 +105,7 @@ module.exports = {
 			line = measureTool.text;
 		}
 
-		if (line != "") {
+		if (line !== "") {
 			lines.push(line);
 		}
 
@@ -114,51 +113,107 @@ module.exports = {
 
 		return lines;
 	},
-	addDialog: function(dialog, isShowMore) {
-		var msg = dialog.dialog,
-			keywords = this.getKeywords(msg);
-			
-		// Split in lines
-		lines = this.splitInLines(msg, isShowMore);
-		
-		var showMoreMaxLines = this.maxLines + ((isShowMore)? 1 : 0),
-			showMoreSpliceAt = this.maxLines - ((isShowMore)? 0 : 1),
-			showMore = false;
 
-		this.playerInput.visible = true;
-		
-		if (lines.length >= showMoreMaxLines) {
-			this.backlogLines = lines.splice(showMoreSpliceAt).join(" ");
-			showMore = true;
-			PlayerStateMachine.setInputDialogCallback(this.showMoreLines, this);
-		}
-
-		for (var i=0,line;line=lines[i];i++) {
-			// Remove [] out of keywords
-			line = line.replace(/[\[\]]/g, "");
-			var dialogLine = this.dialogLines[this.chatLog.length];
-
-			if (!dialogLine) {
-				for (var j=1;j<this.maxLines;j++) {
-					this.dialogLines[j].y -= this.fontSize;
-				}
-
-				dialogLine = this.dialogLines[0];
-				dialogLine.y += (this.maxLines - 1) * this.fontSize;
-
-				this.dialogLines.push(this.dialogLines.shift());
+	selectVariant(variants) {
+		return variants.find((v) => {
+			if (!v.condition) {
+				return true;
 			}
+			if (v.condition.value === false) {
+				// Undefined flags count as false!
+				return this.player.flags[v.condition.flag] === false || 
+					this.player.flags[v.condition.flag] === undefined;
+			} else {
+				return this.player.flags[v.condition.flag] === true;
+			}
+		});
+	},
 
-			dialogLine.text = line;
-			this.chatLog.push(line);
-
-			var color = 0xffff00;
-			this.tintWords(dialogLine, keywords, color);
+	addDialog: function(dialog, isShowMore) {
+		let fragment = dialog;
+		if (dialog.variants) {
+			fragment = this.selectVariant(dialog.variants);
+			if (fragment === undefined) {
+				this.addDialog(this.chat.dialog.unknown);
+				return;
+			}
 		}
+		this.addDialogFragment(fragment);
+	},
 
-		if (showMore) {
+	addDialogFragment(fragment) {
+		var msg = fragment.dialog;
+		if (!Array.isArray(msg)) {
+			msg = [msg];
+		}
+		// Queue all message pieces
+		this.messageQueue = [];
+		msg.forEach(m => this.messageQueue.unshift(m));
+		this.showNextDialogPiece();
+	},
+	showNextDialogPiece(){
+		PlayerStateMachine.clearInputDialogCallback();
+		let msg = this.messageQueue.pop();
+		if (typeof msg === 'object'){
+			if (!msg.type) {
+				msg.type = 'event';
+			}
+			if (msg.type === 'dialogInterruption') {
+				this.name.text = msg.name;
+				msg = msg.text;
+			} else if (msg.type === 'event') {
+				this.name.text = '';
+				msg = msg.text;
+			} else {
+				switch (msg.type) {
+					case 'joinParty':
+						Bus.emit('addToParty', this.currentMob);
+						break;
+					case 'setFlag':
+						let value = true;
+						if (msg.value !== undefined) {
+							value = msg.value;
+						}
+						this.player.flags[msg.flagName] = value;
+						break;
+					case 'endConversation':
+						this.endDialog();
+						this.playerInput.visible = false;
+						break;
+					case 'setHostile':
+						this.player.level.activateHostile();
+						break;
+				}
+				this.playerInput.visible = true;
+				if (this.messageQueue.length > 0) {
+					this.showNextDialogPiece();
+					this.playerInput.visible = false;
+				}
+				return;
+			}
+		} else {
+			this.name.text = this.currentMob.npcDefinition.name; // Only if known?
+		}
+		this.dialogLines.forEach(l => l.text = '');
+		const lines = this.splitInLines(msg);
+		if (lines.length > this.maxLines) {
+			const nextPart = lines.splice(this.maxLines).join(" ");
+			this.messageQueue.push(nextPart);
+		}
+		this.playerInput.visible = true;
+		if (this.messageQueue.length > 0) {
+			PlayerStateMachine.setInputDialogCallback(this.showNextDialogPiece, this);
 			this.playerInput.visible = false;
 		}
+
+		lines.forEach((line, i) => {
+			const keywords = this.getKeywords(line);
+			// Remove [] out of keywords
+			line = line.replace(/[\[\]]/g, "");
+			const dialogLine = this.dialogLines[i];
+			dialogLine.text = line;
+			this.tintWords(dialogLine, keywords, 0xffff00);
+		});
 	},
 	blinkingCursor: function() {
 		if (this.blinkOut) {
@@ -181,46 +236,14 @@ module.exports = {
 
 		Timer.set(Phaser.Timer.SECOND * 0.3, this.blinkingCursor, this);
 	},
-	/*
-	 * Sample structure of dialog object
-	 {
-		mob: {
-			name: "Kram",
-			appearance: "A young man with a baseball cap",
-			portrait: "kram" // Sprite key
-		},
-		dialog: [
-			{
-				key: "greeting",
-				dialog: "Hello, Avatar! I was [expecting] you"
-			},
-			{
-				key: "name",
-				dialog: "My name is Kram, lord of [Kramlandia]"
-			},
-			{
-				key: "expecting",
-				dialog: "Yes, I knew you'd come."
-			},
-			{
-				key: "job",
-				dialog: "I create worlds"
-			},
-			{
-				key: "kramlandia",
-				dialog: "A fair nation, full of bandits and thieves"	
-			},
-			{
-				key: "bye",
-				dialog: "Hasta la vista, baby"
-			},
-		]
-	 }
-	 */
+	
 	startDialog: function(chat){
+		if (!PlayerStateMachine.allowConversation()) { return; }
+		
+		this.player = chat.player;
 		var mob = chat.mob,
 			dialog = chat.dialog;
-
+		this.currentMob = mob;
 		this.chat = chat;
 
 		PlayerStateMachine.switchState(PlayerStateMachine.DIALOG);
@@ -228,6 +251,7 @@ module.exports = {
 
 		this.name.text = mob.npcDefinition.name;
 		this.addDialog(dialog.greeting, false);
+		
 
 		this.dialogUI.visible = true;
 
@@ -239,7 +263,10 @@ module.exports = {
 		PlayerStateMachine.clearInputDialogCallback();
 
 		this.chat.mob.isTalking = false;
-		this.chat.mob.activate(); 
+		if (this.chat.mob.deactivatedDuringDialog) {
+			this.chat.mob.deactivatedDuringDialog = false;
+			this.chat.mob.activate();
+		}
 
 		this.name.text = "";
 
@@ -260,26 +287,16 @@ module.exports = {
 		this.blinkOut = true;
 	},
 	sendInput: function(line) {
+		if (line.trim() === '') {
+			line = 'bye';
+		}
 		var dialog = this.chat.dialog[line.toLowerCase()];
-
+		if (dialog && dialog.synonym) {
+			dialog = this.chat.dialog[dialog.synonym];
+		}
 		if (!dialog) {
 			dialog = this.chat.dialog.unknown;
 		}
-
-		this.addDialog({dialog: "> " + line}, false);
 		this.addDialog(dialog, false);
-
-		if (line.toLowerCase() == "bye") {
-			PlayerStateMachine.setInputDialogCallback(this.endDialog, this);
-			this.playerInput.visible = false;
-		}
-	},
-	showMoreLines: function() {
-		var line = this.backlogLines;
-		this.backlogLines = null;
-
-		PlayerStateMachine.clearInputDialogCallback();
-
-		this.addDialog({ dialog: line }, true);
 	}
 }

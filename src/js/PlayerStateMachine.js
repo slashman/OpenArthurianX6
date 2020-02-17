@@ -3,7 +3,10 @@ const Timer = require('./Timer');
 const Geo = require('./Geo');
 const Random = require('./Random');
 const Inventory = require('./Inventory');
-const ItemFactory = require('./ItemFactory');
+const Storage = require('./Storage');
+const MobDescription = require('./MobDescription');
+const MusicManager = require('./manager/MusicManager.class');
+
 
 const PlayerStateMachine = {
     NOTHING     : 0,
@@ -11,8 +14,12 @@ const PlayerStateMachine = {
     DIALOG      : 2,
     COMBAT      : 3,
     COMBAT_SYNC : 4,
-    GET         : 5,
+    TARGETTING  : 5,
     INVENTORY   : 6,
+    MESSAGE_BOX : 7,
+    FLOATING_ITEM : 8,
+    LOOK_BOX    : 9,
+    MUSIC       : 10,
 
     init: function(game) {
         this.game = game;
@@ -23,6 +30,10 @@ const PlayerStateMachine = {
         this.actionEnabled = true;
 
         PlayerStateMachine.inventory = [];
+
+        this.cursorSprite = this.game.add.sprite(0, 0, 'ui');
+        this.cursorSprite.visible = false;
+        OAX6.UI.UILayer.add(this.cursorSprite);
 
         this.inputDialog = "";
         this.inputTextDelay = Phaser.Timer.SECOND * 0.3;
@@ -35,79 +46,78 @@ const PlayerStateMachine = {
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
-        this.game.input.keyboard.addKey(Phaser.KeyCode.I).onDown.add(this.activateInventory, this);
-        this.game.input.keyboard.addKey(Phaser.KeyCode.D).onDown.add(this.dropItem, this);
-        
         this.game.input.mouse.enabled = true;
         this.game.input.mouse.capture = true;
     },
-    listenDirections: function(){
-    	if (this.directionCallback){
-    		var varx = 0;
-			var vary = 0;
-			if(this.cursors.up.isDown) {
-				vary = -1;
-			} else if(this.cursors.down.isDown) {
-				vary = 1;
-			}
-			if(this.cursors.left.isDown) {
-				varx = -1;
-			} else if(this.cursors.right.isDown) {
-				varx = 1;
-			}
-    		this.directionCallback({x: varx, y: vary});
-    	}
+    setCursor: function(tileset, frame) {
+        this.cursorSprite.loadTexture(tileset, frame);
+        this.cursorSprite.visible = true;
     },
-	listenAction: function(){
-    if (this.actionCallback){
-      this.actionCallback();
-    } else if (this.directionCallback) {
-      // For actions such as pick item in place
-      return this.directionCallback({x: 0, y: 0});
-    }
-  },
-  cancelAction: function() {
-    this.player.reportAction("Canceled");
-    if (this.directionCallback) {
-      this.directionCallback(null, true);
-    }
-    if (this.actionCallback){
-      this.actionCallback(true);
-    }
-        /*if (!this.directionCallback && !this.actionCallback) { return; }
-
-        //this.switchState(this.previousState);
-        this.actionEnabled = true;
-
-        this.clearActionCallback();
-        this.clearDirectionCallback();
-
-        OAX6.UI.hideIcon();
-
-        this.player.reportAction("Canceled");*/
+    updateCursorPosition: function() {
+        this.cursorSprite.position.set(this.game.input.activePointer.x, this.game.input.activePointer.y);
+    },
+    listenDirections: function(){
+        if (this.directionCallback){
+            var varx = 0;
+            var vary = 0;
+            if(this.cursors.up.isDown) {
+                vary = -1;
+            } else if(this.cursors.down.isDown) {
+                vary = 1;
+            }
+            if(this.cursors.left.isDown) {
+                varx = -1;
+            } else if(this.cursors.right.isDown) {
+                varx = 1;
+            }
+            this.directionCallback({x: varx, y: vary});
+        }
+    },
+    listenAction: function(){
+        if (this.actionCallback){
+            this.actionCallback();
+        } else if (this.directionCallback) {
+            // For actions such as pick item in place
+            return this.directionCallback({x: 0, y: 0});
+        }
+    },
+    cancelAction: function() {
+        if (this.directionCallback) {
+            this.directionCallback(null, true);
+        }
+        if (this.actionCallback){
+            this.actionCallback(true);
+        }
     },
     checkMovement: function() {
         var varx = 0;
-		var vary = 0;
-		if(this.cursors.up.isDown) {
-			vary = -1;
-		} else if(this.cursors.down.isDown) {
-			vary = 1;
-		}
-		if(this.cursors.left.isDown) {
-			varx = -1;
-		} else if(this.cursors.right.isDown) {
-			varx = 1;
-		}
-		if (varx !== 0 || vary !== 0){
-			OAX6.UI.hideMarker(); 
-			this.actionEnabled = false;
-			const activeMob = OAX6.UI.activeMob || this.player;
-			return activeMob.moveTo(varx, vary);
-		} else {
-			return false;
-		}
+        var vary = 0;
+        if(this.cursors.up.isDown) {
+            vary = -1;
+        } else if(this.cursors.down.isDown) {
+            vary = 1;
+        }
+        if(this.cursors.left.isDown) {
+            varx = -1;
+        } else if(this.cursors.right.isDown) {
+            varx = 1;
+        }
 
+        if (this.game.input.activePointer.isDown) {
+            const pointer = this.game.input.activePointer;
+            const varObj = OAX6.UI.selectQuadrant(pointer.position);
+            varx = varObj.x;
+            vary = varObj.y;
+        }
+
+        if (varx !== 0 || vary !== 0){
+            OAX6.UI.hideMarker(); 
+            this.actionEnabled = false;
+            const activeMob = OAX6.UI.activeMob || this.player;
+            return activeMob.moveTo(varx, vary);
+        } else {
+            return false;
+        }
     },
 
     enableAction: function() {
@@ -120,6 +130,20 @@ const PlayerStateMachine = {
         this.state = stateId;
     },
 
+    switchToMusicState: function(instrument) {
+        this.switchState(PlayerStateMachine.MUSIC);
+        this.clearActionCallback(); // TODO: Streamline action and direction callbacks, make them respond to state machine states?
+        this.clearDirectionCallback();
+        this.__musicManager = new MusicManager(this.game, instrument);
+    },
+
+    resetState: function(holdAction) {
+        this.switchState(this.previousState);
+        if (!holdAction) {
+            this.actionEnabled = true;
+        }
+    },
+
     setInputDialogCallback: function(callback, context) {
         this.inputDialogCallback = callback.bind(context);
     },
@@ -129,41 +153,40 @@ const PlayerStateMachine = {
     },
 
     setDirectionCallback: function(cb){
-    	this.directionCallback = cb;
+        this.directionCallback = cb;
     },
 
     clearDirectionCallback: function(){
-    	this.directionCallback = null;
+        this.directionCallback = null;
     },
 
     setActionCallback: function(cb){
-    	this.actionCallback = cb;
+        this.actionCallback = cb;
     },
 
     clearActionCallback: function(){
-    	this.actionCallback = null;
+        this.actionCallback = null;
     },
 
     _inkey: function(){
-		var key = this.game.input.keyboard.lastKey;
+        var key = this.game.input.keyboard.lastKey;
         if (key && key.isDown && key.repeats == 1) {
             return key.keyCode;
         } else {
-        	return false;
+            return false;
         }
     },
 
     updateDialogAction: function() {
         var key = this.game.input.keyboard.lastKey;
-        if (key.isDown && key.repeats == 1) {
+        if (key && key.isDown && key.repeats == 1) {
             var keyCode = key.keyCode;
 
             if (this.inputDialogCallback !== null) {
-            	// TODO: Maybe refactor to not do this on the update cycle, instead have a key listener
+                // TODO: Maybe refactor to not do this on the update cycle, instead have a key listener
                 if (keyCode == Phaser.KeyCode.ENTER) {
                     this.inputDialogCallback();
                 }
-
                 return;
             }
 
@@ -184,165 +207,379 @@ const PlayerStateMachine = {
             }
         }
     },
-    attackCommand: function(){
-    	// Select a direction
-    	const activeMob = OAX6.UI.activeMob || this.player;
-    	return new Promise((resolve)=>{
-    		this.actionEnabled = false;
-    		activeMob.reportAction("Attack - Where?");
-    		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
-			this.setDirectionCallback((dir) => {
-				OAX6.UI.hideIcon();
-				activeMob.reportAction("Attack - "+Geo.getDirectionName(dir));
-				this.clearDirectionCallback();
-				Timer.delay(500).then(()=>resolve(dir));
-			});
-		}).then(dir=>{
-			if (dir !== null) {
-				return activeMob.attackOnDirection(dir.x, dir.y);
-			} else {
-				// ??? Is flow controlled?
-			}
-		});
-    },
-    getCommand: function() {
-        // Select a direction
-        const activeMob = OAX6.UI.activeMob || this.player;
-    	return new Promise((resolve)=>{
-            this.switchState(PlayerStateMachine.GET);
-    		this.actionEnabled = false;
-    		activeMob.reportAction("Get - Where?");
-    		OAX6.UI.hideMarker();
-    		OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
-			this.setDirectionCallback((dir, canceled) => {
-                OAX6.UI.hideIcon();
-                this.clearDirectionCallback();
 
-                if (canceled) {
-                    return resolve(null);
-                }
-				
-				activeMob.reportAction("Get - "+Geo.getDirectionName(dir));
-				Timer.delay(500).then(()=>resolve(dir));
-			});
-		}).then(dir=>{
+    attackCommand: function(){
+        return this._selectDirection('Attack').then(dir => {
+            if (dir !== null) {
+                const activeMob = OAX6.UI.activeMob || this.player;
+                return activeMob.attackOnDirection(dir.x, dir.y);
+            } else {
+                // ??? Is flow controlled?
+            }
+        }).then(()=>{
+            this.resetState();
+        });
+    },
+
+    getCommand: function() {
+        return this._selectDirection('Get').then(dir => {
             if (dir != null) {
+                const activeMob = OAX6.UI.activeMob || this.player;
                 return activeMob.getOnDirection(dir.x, dir.y);
             }
-		}).then(()=>{
-            this.switchState(PlayerStateMachine.WORLD);
-            this.actionEnabled = true;
+        }).then(()=>{
+            this.resetState();
         });
     },
-    rangedAttackCommand: function(){
-    	const activeMob = OAX6.UI.activeMob || this.player;
-    	return new Promise((resolve)=>{
-    		this.actionEnabled = false;
-    		activeMob.reportAction("Attack - Where?");
-    		OAX6.UI.hideMarker();
-    		let cursor = {
-    			x: activeMob.x,
-    			y: activeMob.y
-    		};
-    		OAX6.UI.showIcon(4, cursor.x, cursor.y);
-			this.setDirectionCallback((dir, cancelled) => {
-        if (cancelled) {
-          return;
-        }
-				cursor.x += dir.x;
-				cursor.y += dir.y;
-				//TODO: Limit based on mob's range
-				OAX6.UI.showIcon(4, cursor.x, cursor.y);
-			});
-			this.setActionCallback((cancelled) => {
-				this.clearDirectionCallback();
-				this.clearActionCallback();
-				OAX6.UI.hideIcon();
-        if (cancelled) {
-          resolve(null);
-        }
-				resolve(cursor);
-			});
-		}).then(position => {
-      if (position !== null) {
-        return activeMob.attackToPosition(position.x, position.y).then(done => {
-          if (!done) {
-            this.actionEnabled = true;
-            OAX6.UI.hideIcon();
-          };
+
+    /**
+     * Uses things in the world.
+     */
+    useCommand: function() {
+        return this._selectDirection('Use').then(dir=>{
+            this.resetState();
+            if (dir != null) {
+                const activeMob = OAX6.UI.activeMob || this.player;
+                return activeMob.useOnDirection(dir.x, dir.y);
+            }
         });
-      } else {
-        this.actionEnabled = true;
-        OAX6.UI.hideIcon();
-        this.player.reportAction("Canceled");
-      }
-		});
     },
-    activateInventory: function() {
-        // TODO: Needs to define from where can open the inventory and probably a better way to access it
-        if (PlayerStateMachine.state != PlayerStateMachine.WORLD && PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
 
-        return new Promise((resolve) => {
-            const inventory = this.player.backpack;
-
-            if (inventory.isOpen()) {
-                inventory.close();
-                PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+    /**
+     * Utility function to set the UI in "Select direction" mode,
+     * resolves to a fiven direction, or null if the player cancelled.
+     *
+     * Other user actions make use of this to implement specific logic
+     */
+    _selectDirection(verb) {
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return new Promise((resolve)=>{
+            this.switchState(PlayerStateMachine.TARGETTING);
+            this.actionEnabled = false;
+            activeMob.reportAction(verb + " - Where?");
+            OAX6.UI.hideMarker();
+            OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
+            this.setDirectionCallback((dir, cancelled) => {
+                OAX6.UI.hideIcon();
                 this.clearDirectionCallback();
-            } else {
-                inventory.open();
-                PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
-                this.setDirectionCallback(this.updateInventoryDirection.bind(this));
-            }
-
-            resolve(true);
-        })
+                if (cancelled) {
+                    return resolve(null);
+                }
+                activeMob.reportAction(verb + " - " + Geo.getDirectionName(dir));
+                Timer.delay(500).then(()=>resolve(dir));
+            });
+        });
     },
+
+    _selectPosition(verb) {
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return new Promise((resolve)=>{
+            this.switchState(PlayerStateMachine.TARGETTING);
+            this.actionEnabled = false;
+            activeMob.reportAction(verb + " - Where?");
+            OAX6.UI.hideMarker();
+            let cursor = {
+                x: activeMob.x,
+                y: activeMob.y
+            };
+            OAX6.UI.showIcon(4, cursor.x, cursor.y);
+            this.setDirectionCallback((dir, cancelled) => {
+                if (cancelled) {
+                    return;
+                }
+                cursor.x += dir.x;
+                cursor.y += dir.y;
+                //TODO: Limit based on mob's range
+                OAX6.UI.showIcon(4, cursor.x, cursor.y);
+            });
+            this.setActionCallback((cancelled) => {
+                this.clearDirectionCallback();
+                this.clearActionCallback();
+                OAX6.UI.hideIcon();
+                if (cancelled) {
+                    resolve(null);
+                }
+                resolve(cursor);
+            });
+        });
+    },
+
+    toggleFullScreen() {
+        OAX6.UI.toggleFullScreen();
+    },
+
+    /**
+     * Saves the game
+     */
+    saveCommand() {
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return Promise.resolve()
+        .then(()=>{
+            this.switchState(PlayerStateMachine.NOTHING);
+            this.actionEnabled = false;
+            OAX6.UI.showMessage("Saving Game...");
+            return Storage.saveGame(this.player);
+        }).then(()=>{
+            OAX6.UI.showMessage("Game Saved.");
+            this.resetState();
+        });
+    },
+
+    rangedAttackCommand: function(){
+        const activeMob = OAX6.UI.activeMob || this.player;
+        return this._selectPosition('Attack').then(position => {
+            if (position !== null) {
+                return activeMob.attackToPosition(position.x, position.y).then(done => {
+                    if (!done) {
+                        this.resetState();
+                        OAX6.UI.hideIcon();
+                    }
+                });
+            } else {
+                this.resetState();
+                OAX6.UI.hideIcon();
+                this.player.reportAction("Canceled");
+            }
+        });
+    },
+    talkCommand(){
+        return this._selectPosition('Talk').then(position => {
+            if (position != null) {
+                const {x, y} = position;
+                if (OAX6.UI.isFOVBlocked(x,y)) {
+                    return false;
+                }
+                const {activeMob} = OAX6.UI;
+                const mob = activeMob.level.getMobAt(x, y, activeMob.z);
+                if (mob && activeMob.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
+                    // Conversations only work in WORLD state. We assume we come from that state.
+                    this.resetState();
+                    activeMob.talkWithMob(mob);
+                    return true;
+                }
+                return false;
+            } else {
+                return false;
+            }
+        }).then(talked => {
+            if (!talked) {
+                this.resetState();
+            }
+        });
+    },
+    lookCommand(){
+        return this._selectPosition('Look').then(position => {
+            if (position != null) {
+                this.resetState(true);
+                PlayerStateMachine.switchState(PlayerStateMachine.LOOK_BOX);
+                this.__lookCommand(position, false);
+            } else {
+                this.__resetAfterLook(false);
+            }
+        });
+    },
+    lookMouseCommand(position) {
+        // Only works in WORLD state
+        if (this.state !== PlayerStateMachine.WORLD) {
+            return;
+        }
+        // Only one thing can be examined at a time
+        if (this.examining) {
+            return;
+        }
+        this.actionEnabled = false;
+        PlayerStateMachine.switchState(PlayerStateMachine.LOOK_BOX);
+        this.__lookCommand(position, true);
+    },
+
+    __lookCommand(position) {
+        const shown = this.__lookAtPosition(position.x, position.y);
+        this.__lookCommandAftermath(shown);
+    },
+
+    __lookCommandAftermath(shown) {
+        if (shown == 'basic') {
+            this.setActionCallback(() => {
+                this.clearActionCallback();
+                MobDescription.hide();
+                this.__resetAfterLook();
+            });
+        } else if (shown == 'book') {
+            this.setActionCallback(() => {
+                this.clearActionCallback();
+                this.clearDirectionCallback();
+                OAX6.UI.hideBook();
+                this.__resetAfterLook();
+            });
+            this.setDirectionCallback((dir) => {
+                if (dir && dir.x) {
+                    OAX6.UI.flipBook(dir.x);
+                }
+            });
+        } else {
+            this.__resetAfterLook();
+        }
+    },
+
+    __resetAfterLook() {
+        this.examining = false;
+        this.resetState();
+        if (this.state === PlayerStateMachine.INVENTORY){
+            this.__activateInventoryCallbacks();
+        }
+        OAX6.UI.hideIcon();
+    },
+
+    __lookAtItem(item) {
+        this.examining = true;
+        if (item.def.isBook) {
+            OAX6.UI.readBook(item);
+            return 'book';
+        } else {
+            MobDescription.showItem(item);
+            return 'basic';
+        }
+    },
+
+    __lookAtPosition(x, y) {
+        if (OAX6.UI.isFOVBlocked(x,y)) {
+            return null;
+        }
+        const {activeMob} = OAX6.UI;
+        const object = activeMob.level.getObjectAt(x, y, activeMob.z);
+        if (object) {
+            if (object.hidden) {
+                object.hidden = false;
+                object.reveal();
+                OAX6.UI.showMessage("Look - You find a " + object.getDescription());
+            } else {
+                OAX6.UI.showMessage("Look - You see a " + object.getDescription());
+            }
+            return 'text';
+        }
+        const mob = activeMob.level.getMobAt(x, y, activeMob.z);
+        if (mob){
+            MobDescription.showMob(mob);
+            this.examining = true;
+            return 'basic';
+        }
+        var item = activeMob.level.getItemAt(x, y, activeMob.z);
+        if (item) {
+            this.examining = true;
+            if (item.def.isBook) {
+                OAX6.UI.readBook(item);
+                return 'book';
+            } else {
+                MobDescription.showItem(item);
+                return 'basic';
+            }
+        }
+        return null;
+    },
+
+    activateInventory: function(partyMemberIndex) {
+        if (partyMemberIndex == undefined) {
+            partyMemberIndex = OAX6.UI.getActiveMobIndex();
+        }
+        // TODO: Note that this will support being called with a different index
+        return new Promise((resolve) => {
+            const opened = Inventory.open(partyMemberIndex);
+            if (opened) {
+                PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
+                this.__activateInventoryCallbacks();
+            }
+            resolve(true);
+        });
+    },
+    
     updateWorldAction: function() {
-    	Promise.resolve()
-    	.then(()=>{
-			const keyCode = this._inkey();
-	    	if (keyCode) {
-	    		if (keyCode === Phaser.KeyCode.C){
-	            	return this.startCombat(true);
-				} else if (keyCode === Phaser.KeyCode.A){
-	            	return this.attackCommand(); //TODO: Instead of a direction, this should allow targetting based on range (Similar to T)
-				} else if (keyCode === Phaser.KeyCode.T){ // Throw
-	            	return this.rangedAttackCommand();
-				} else if (keyCode === Phaser.KeyCode.G){
-	            	return this.getCommand();
-				}
+        Promise.resolve()
+        .then(()=>{
+            const keyCode = this._inkey();
+            if (keyCode) {
+                if (keyCode === Phaser.KeyCode.C){
+                    return this.startCombat(true);
+                } else if (keyCode === Phaser.KeyCode.A){
+                    return this.attackCommand(); //TODO: Instead of a direction, this should allow targetting based on range (Similar to R)
+                } else if (keyCode === Phaser.KeyCode.R) { // Ranged Attack
+                    return this.rangedAttackCommand();
+                } else if (keyCode === Phaser.KeyCode.T) {
+                    return this.talkCommand();
+                } else if (keyCode === Phaser.KeyCode.G){
+                    return this.getCommand();
+                } else if (keyCode === Phaser.KeyCode.S){
+                    return this.saveCommand();
+                } else if (keyCode === Phaser.KeyCode.U) {
+                    return this.useCommand();
+                } else if (keyCode === Phaser.KeyCode.L) {
+                    return this.lookCommand();
+                } else if (keyCode === Phaser.KeyCode.I) {
+                    return this.activateInventory();
+                } else if (keyCode === Phaser.KeyCode.F) {
+                    return this.toggleFullScreen();
+                } else if (keyCode >= Phaser.KeyCode.F1 && keyCode <= Phaser.KeyCode.F1 + this.player.party.length) {
+                    const partyMemberIndex = keyCode - Phaser.KeyCode.F1;
+                    return this.activateInventory(partyMemberIndex);
+                } else if (keyCode >= Phaser.KeyCode.ONE && keyCode <= Phaser.KeyCode.ONE + this.player.party.length) {
+                    const partyMemberIndex = keyCode - Phaser.KeyCode.ONE;
+                    return this.activateSoloMode(partyMemberIndex);
+                } else if (keyCode == Phaser.KeyCode.ZERO) {
+                    return this.activatePartyMode();
+                }
             }
 
-			return this.checkMovement();
-		}).then((acted)=>{ 
-			if (acted === false){
-				return;
-			}
-			switch (this.state) {
-				case PlayerStateMachine.WORLD:
-				case PlayerStateMachine.DIALOG:
-    				this.enableAction();
+            return this.checkMovement();
+        }).then((acted)=>{ 
+            if (acted === false){
+                return;
+            }
+            switch (this.state) {
+                case PlayerStateMachine.WORLD:
+                case PlayerStateMachine.DIALOG:
+                    this.enableAction();
                     break;
                 case PlayerStateMachine.COMBAT:
-                	// End combat if no enemies nearby
-                	if (this.player.level.isSafeAround(this.player.x, this.player.y, this.player.alignment)){
-                		this.switchState(PlayerStateMachine.WORLD);
-                		this.player.level.activateAll();
-                		OAX6.UI.activeMob = this.player;
-                		this.enableAction();
-                		OAX6.UI.showMessage("Combat is over!");
-                	} else {
-                		this.player.level.actNext(); // TODO: Change for this.currentLevel
-                	}
+                    // End combat if no enemies nearby
+                    if (this.player.level.isSafeAround(this.player.x, this.player.y, this.player.alignment)){
+                        this.endCombat();
+                        OAX6.UI.showMessage("Combat is over!");
+                    } else {
+                        this.player.level.actNext(); // TODO: Change for this.currentLevel
+                    }
                     break;
             }
-		});
+        });
+    },
+
+    updateInventoryAction() {
+        const keyCode = this._inkey();
+        if (keyCode) {
+            if (keyCode === Phaser.KeyCode.D){
+                return this.dropItem();
+            } else if (keyCode === Phaser.KeyCode.U){
+                return this.useInventoryItem();
+            } else if (keyCode === Phaser.KeyCode.L){
+                return this.lookAtInventoryItem();
+            }
+        }
+    },
+
+    updateMusicAction() {
+        const keyCode = this._inkey();
+        if (keyCode) {
+            if (keyCode >= Phaser.KeyCode.ONE && keyCode <= Phaser.KeyCode.NINE){
+                return this.__musicManager.playNote(keyCode - Phaser.KeyCode.ONE + 1);
+            } else if (keyCode === Phaser.KeyCode.ESC){
+                this.resetState();
+                if (this.state == PlayerStateMachine.INVENTORY) {
+                    this.__activateInventoryCallbacks(); // ugly as hell.
+                }
+            }
+        }
     },
 
     startCombat: function(ensurePlayerFirst){
-    	OAX6.UI.modeLabel.text = "Combat";
+        OAX6.UI.modeLabel.text = 'Combat';
         this.actionEnabled = false;
         this.playerGoesFirst = ensurePlayerFirst || Random.chance(50);
         this.switchState(PlayerStateMachine.COMBAT_SYNC);
@@ -354,7 +591,7 @@ const PlayerStateMachine = {
     checkCombatReady: function(){
         // Sync all enemies, make sure they are ready for TBS.
         if (this.state === PlayerStateMachine.COMBAT){
-        	return;
+            return;
         }
         if (!this.player.level.isMobActive()){ // TODO: Change for this.currentLevel
             this._combatStarted();
@@ -369,37 +606,93 @@ const PlayerStateMachine = {
         this.player.level.actNext();
     },
 
-    updateInventoryDirection: function(dir) {
-      if (dir !== null) {
-        Inventory.moveCursor(dir.x, dir.y);
-      }
+    /*
+     * Whenever combat ends, we need to make sure the actors are back
+     * into the "real time" mode and the UI is given back to the player
+     * to control.
+     */
+    endCombat: function () {
+        if (this.state !== PlayerStateMachine.COMBAT){
+            return;
+        }
+        OAX6.UI.modeLabel.text = 'Exploration';
+        this.switchState(PlayerStateMachine.WORLD);
+        this.player.level.activateAll();
+        OAX6.UI.activeMob = this.player;
+        this.enableAction();
+    },
+
+    updateInventoryDirection: function(dir, cancelled) {
+        if (cancelled) {
+            Inventory.close();
+            PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+            this.clearDirectionCallback();
+        }
+        if (dir !== null) {
+            Inventory.moveCursor(dir.x, dir.y);
+        }
     },
 
     dropItem: function() {
-        if (PlayerStateMachine.state != PlayerStateMachine.INVENTORY) { return; }
-
-        var item = PlayerStateMachine.inventory[Inventory.cursorSlot];
-        if (!item) { return; }
-
-		const activeMob = OAX6.UI.activeMob || this.player;
-        // TODO: Show the inventory of the activeMob
-
-        return new Promise((resolve) => {
-            activeMob.reportAction("Drop - Where?");
-            OAX6.UI.hideMarker();
-            OAX6.UI.showIcon(3, activeMob.x, activeMob.y);
-            this.clearDirectionCallback();
-            this.setDirectionCallback((dir) => {
-                OAX6.UI.hideIcon();
-                activeMob.reportAction("Drop - "+Geo.getDirectionName(dir));
-                this.clearDirectionCallback();
-                Timer.delay(500).then(()=>resolve(dir));
-            });
-        }).then((dir) => {
-            activeMob.dropOnDirection(dir.x, dir.y, item);
-            Inventory.updateInventory();
-            this.setDirectionCallback(this.updateInventoryDirection.bind(this));
+        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        if (!item) {
+            return;
+        }
+        this.clearActionCallback();
+        return this._selectDirection('Drop').then(dir => {
+            if (dir !== null) {
+                Inventory.currentMob.dropOnDirection(dir.x, dir.y, item);
+                Inventory.updateInventory();
+            }
+            this.resetState();
+            this.__activateInventoryCallbacks();
         });
+    },
+
+    lookAtInventoryItem: function() {
+        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        if (!item) {
+            return;
+        }
+        this.clearActionCallback();
+        this.clearDirectionCallback();
+        PlayerStateMachine.switchState(PlayerStateMachine.LOOK_BOX);
+        const shown = this.__lookAtItem(item);
+        this.__lookCommandAftermath(shown);
+    },
+
+    useInventoryItem: function() {
+        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        if (!item) {
+            return;
+        }
+        this.clearActionCallback();
+        return Promise.resolve()
+        .then(() => {
+            if (item.def.useOnSelf) {
+                return { x: 0, y: 0 };
+            } else {
+                return this._selectDirection('Use');
+            }
+        }).then(dir => {
+            if (dir !== null) {
+                Inventory.currentMob.useItemOnDirection(dir.x, dir.y, item);
+            }
+            if (!item.def.useOnSelf) {
+                this.resetState();
+                this.__activateInventoryCallbacks();
+            }
+        });
+    },
+
+    __activateInventoryCallbacks() {
+        this.setActionCallback((cancelled) => {
+            this.clearActionCallback();
+            this.clearDirectionCallback();
+            Inventory.close();
+            PlayerStateMachine.switchState(PlayerStateMachine.WORLD); // TODO: Reset state instead?
+        });
+        this.setDirectionCallback(this.updateInventoryDirection.bind(this));
     },
 
     updateInventory: function() {
@@ -442,6 +735,8 @@ const PlayerStateMachine = {
     update: function() {
         if (!this.actionEnabled) { return; }
 
+        this.updateCursorPosition();
+
         switch (this.state) {
             case PlayerStateMachine.WORLD:
             case PlayerStateMachine.COMBAT:
@@ -452,11 +747,126 @@ const PlayerStateMachine = {
                 this.updateDialogAction();
                 break;
 
-            case PlayerStateMachine.INVENTORY:
-                this.updateInventory();
+            case PlayerStateMachine.MESSAGE_BOX:
                 break;
+
+            case PlayerStateMachine.INVENTORY:
+                this.updateInventoryAction();
+                break;
+            case PlayerStateMachine.MUSIC:
+                this.updateMusicAction();
+                break;
+
         }
+    },
+
+    isPartyDead: function() {
+        var partyDead = this.player.party.find(m=>m.hp.current>0) === undefined;
+
+        return this.player.hp.current <= 0 && partyDead;
+    },
+
+    getPartyBoundingBox: function() {
+        const player = this.player;
+        const party = ([player]).concat(player.party);
+
+        let bbox = { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity };
+
+        party.forEach((mob) => {
+            bbox.x1 = Math.min(bbox.x1, mob.x);
+            bbox.y1 = Math.min(bbox.y1, mob.y);
+            bbox.x2 = Math.max(bbox.x2, mob.x);
+            bbox.y2 = Math.max(bbox.y2, mob.y);
+        });
+
+        return bbox;
+    },
+
+    allowMobsActing() {
+        switch (this.state) {
+            case PlayerStateMachine.WORLD:
+            case PlayerStateMachine.COMBAT:
+            case PlayerStateMachine.COMBAT_SYNC: // Note: Must check if needed.
+                return true;
+        }
+        return false;
+    },
+
+    allowConversation() {
+        switch (this.state) {
+            case PlayerStateMachine.WORLD:
+                return true;
+        }
+        return false;
+    },
+
+    clickOnDoor(door) {
+        const {activeMob} = OAX6.UI;
+        if (this.state == PlayerStateMachine.WORLD) {
+            if (!door.inRange(activeMob)) {
+                OAX6.UI.showMessage("Too far");
+                return;
+            }
+            activeMob.useInPosition(door.x, door.y);
+        } else if (this.state == PlayerStateMachine.FLOATING_ITEM) {
+            if (!door.inRange(activeMob)) {
+                OAX6.UI.showMessage("Too far");
+                Inventory.resetFloatingItem();
+                return;
+            }
+            activeMob.useItemInPosition(door.x, door.y, Inventory.useItemOn);
+            Inventory.resetFloatingItem();
+        }
+    },
+
+    clickOnMob(mob, leftClick, rightClick) {
+        if (this.state !== PlayerStateMachine.WORLD){
+            return;
+        }
+        if (rightClick) {
+            this.lookMouseCommand({x: mob.x, y: mob.y}); 
+        } else if (leftClick) {
+            if (mob == OAX6.UI.player) {
+                this.activateInventory(0);
+            } else if (mob.isPartyMember()){
+                const partyMemberIndex = OAX6.UI.player.party.indexOf(mob);
+                this.activateInventory(partyMemberIndex + 1);
+            }
+        }
+    },
+
+    activateFloatingItem() {
+        this.switchState(PlayerStateMachine.FLOATING_ITEM);
+        this.clearActionCallback();
+        this.clearDirectionCallback();
+        this.setActionCallback((cancelled) => {
+            if (cancelled) {
+                this.clearActionCallback();
+                Inventory.resetFloatingItem();
+            }
+        });
+    },
+
+    activateSoloMode(partyMemberIndex) {
+        this.soloMode = true;
+        this.player.deactivateParty();
+        if (partyMemberIndex == 0) {
+            OAX6.UI.setActiveMob(OAX6.UI.player);
+        } else {
+            OAX6.UI.setActiveMob(OAX6.UI.player.party[partyMemberIndex - 1]);
+        }
+        OAX6.UI.showMessage("Solo Mode activated for " + OAX6.UI.activeMob.getDescription());
+        OAX6.UI.updateFOV();
+        return Promise.resolve();
+    },
+    activatePartyMode() {
+        this.soloMode = false;
+        OAX6.UI.showMessage("Party Mode activated");
+        OAX6.UI.setActiveMob(OAX6.UI.player);
+        this.player.activateParty();
+        OAX6.UI.updateFOV();
     }
+
 };
 
 module.exports = PlayerStateMachine;

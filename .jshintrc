@@ -1,6 +1,7 @@
 {
   "node": true,
   "strict": "implied",
+  "esversion": 6,
   "globals": {
     "OAX6": true,
     "Phaser": true

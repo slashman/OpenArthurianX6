@@ -1,24 +1,22 @@
 const NPCFactory = require('./NPCFactory');
 const PlayerStateMachine = require('./PlayerStateMachine');
+const PartyStatus = require('./ui/PartyStatus');
+const Constants = require('./Constants');
 
 const Container = require('./Container').Container;
 const containerSizes = require('./Container').SIZES;
 
 const PlayerFactory = {
-	buildPlayer: function(UI, game, level, x, y, z){
-		const mob = NPCFactory.buildNPC(game, "iolo", level, x, y, x);
+	buildPlayer: function(game, level, x, y, z){
+		const mob = NPCFactory.buildNPC(game, "avatar", level, x, y, x);
 		mob.canStartDialog = true;
-		UI.player = mob;
+		PlayerStateMachine.inventory = mob.inventory;
+		mob.name = "Avatar";
 		mob.backpack = new Container(game, containerSizes.medium);
 		mob.inventory = mob.backpack.inventory;
-		mob.name = "Iolo";
-		mob.alignment = 'b';
-		
-		UI.player = mob;
+		mob.alignment = Constants.Alignments.PLAYER;
 		PlayerStateMachine.player = mob;
-		
-		game.camera.follow(mob.sprite);
-
+		PartyStatus.addMob(mob);
 		return mob;
 	}
 }

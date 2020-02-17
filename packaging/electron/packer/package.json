@@ -1,0 +1,9 @@
+{
+  "name": "oax6-packer",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {},
+  "devDependencies": {
+    "electron-packager": "^14.0.4"
+  }
+}

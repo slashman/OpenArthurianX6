@@ -10,51 +10,91 @@ const Geo = require('./Geo');
 const TILE_WIDTH = 16;
 const TILE_HEIGHT = 16;
 
-const FlyType = require('./Constants').FlyType;
+const Constants = require('./Constants');
+const FlyType = Constants.FlyType;
+
+const Bus = require('./Bus');
+const SkyBox = require('./SkyBox');
+
+const PartyStatus = require('./ui/PartyStatus');
+const BookPanel = require('./ui/BookPanel');
+
+const scenarioInfo = require('./ScenarioInfo');
+
+const STRETCH = true;
 
 const Container = require('./Container').Container;
 const containerSizes = require('./Container').SIZES;
 
 const UI = {
 	launch: function(then){
-		new Phaser.Game(400, 300, Phaser.AUTO, '', this);
+		new Phaser.Game(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, Phaser.AUTO, '', this);
 		this.afterInit = then;
 	},
 	preload: function(){
 		Loader.load(this.game);
 	},
 	init: function(){
-		//this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		Timer.init(this.game);
+		if (STRETCH) {
+			this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		} else {
+			this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+			this.game.scale.setUserScale(2, 2);
+		}
+
+		this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+		this.game.scale.onFullScreenChange.add(() => {
+			OAX6.UI.showMessage(this.game.scale.isFullScreen ? "Full screen enabled" : "Full screen disabled");
+		});
+		
 		this.game.renderer.renderSession.roundPixels = true;  
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
-		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
-		this.game.scale.setUserScale(2, 2);
+
 		this.nextMove = 0;
 		this.openContainers = [];
 		this.draggingElement = null;
+		this.currentMessageIndex = 0;
+		Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
 	create: function(){
-		this.mapLayer = this.game.add.group();
-		this.floorLayer = this.game.add.group();
-		this.mobsLayer = this.game.add.group();
+		this.worldLayer = this.game.add.group();
+		this.floorLayers = [];
+		for (let i = 0; i < 3; i++) {
+			const baseGroup = this.game.add.group(this.worldLayer);
+			this.floorLayers[i] = {
+				baseGroup,
+				mapLayer: this.game.add.group(baseGroup),
+				floorLayer: this.game.add.group(baseGroup),
+				mobsLayer: this.game.add.group(baseGroup),
+				objectsLayer: this.game.add.group(baseGroup),
+			}
+		}
+		this.fovBlockLayer = this.game.add.group(this.worldLayer);
 		this.UILayer = this.game.add.group();
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
-		this.modeLabel = this.game.add.bitmapText(20, 20, 'pixeled', 'Exploration', 12, this.UILayer);
+		this.modeLabel = this.game.add.bitmapText(this.game.width - 48, 60, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
-		this.skyboxLayer = this.game.add.group(this.UILayer);
-		this.skySprite = this.game.add.sprite(0, 0, 'skies', 0, this.skyboxLayer);
-		this.skySprite.anchor.x = 0.5;
-		this.skySprite.anchor.y = 1;
 
-		this.sunSprite = this.game.add.sprite(0, 0, 'celestialBodies', 0, this.skyboxLayer);
-		this.sunSprite.anchor.x = 0.5;
-		this.sunSprite.anchor.y = 0.5;
-		this.sunSprite.visible = false;
-		this.moonSprite = this.game.add.sprite(0, 0, 'celestialBodies', 1, this.skyboxLayer);
-		this.moonSprite.anchor.x = 0.5;
-		this.moonSprite.anchor.y = 0.5;
-		this.moonSprite.visible = false;
+		this.fovMask = [];
+		this.fovBlocks = [];
+		
+		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
+			this.fovMask[x] = [];
+			this.fovBlocks[x] = [];
+			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) {
+				this.fovMask[x][y] = false;
+				this.fovBlocks[x][y] = this.game.add.sprite(x * TILE_WIDTH, y * TILE_HEIGHT, 'ui', 8, this.fovBlockLayer);
+			}
+		}
+
+		this.modeLabel.anchor.set(0.5);
+
+		SkyBox.init(this.game, this.UILayer);
+
+		PartyStatus.init(this.game, this.UILayer);
+		BookPanel.init(this.game, this.UILayer);
 
 		this.marker = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.marker.animations.add('blink', [0,1], 8);
@@ -62,9 +102,7 @@ const UI = {
 		this.floatingIcon = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.floatingIcon.visible = false;
     	this.floatingIcon.anchor.setTo(0.5);
-		this.currentMinuteOfDay = 8 * 60;
 		this.start();
-		this.timeOfDayPass();
 
 		this.draggingElement = null;
 		
@@ -77,6 +115,67 @@ const UI = {
 	},
 	update: function(){
 		PlayerStateMachine.update();
+		PartyStatus.update();
+	},
+	isFOVBlocked(x, y) {
+		return !this.fovMask[x - this.activeMob.x + Constants.FOV_RADIUS + 1][y - this.activeMob.y + Constants.FOV_RADIUS + 1];
+	},
+	updateFOV: function() {
+		/*
+		 * This function uses simple raycasting, 
+		 * use something better for longer ranges
+		 * or increased performance
+		 */
+		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++)
+			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) 
+				this.fovMask[x][y] = false;
+
+		var step = Math.PI * 2.0 / 1080;
+		for (var a = 0; a < Math.PI * 2; a += step)
+			this.shootRay(a);
+
+
+		this.fovBlockLayer.x = (this.activeMob.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
+		this.fovBlockLayer.y = (this.activeMob.y - Constants.FOV_RADIUS - 1) * TILE_HEIGHT;
+
+		// Make sure we are displaying the correct storie
+		for (let i = 0; i < 3; i++) {
+			this.floorLayers[i].baseGroup.visible = this.activeMob.z >= i;
+		}
+
+		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
+			for (let y = 0; y < Constants.FOV_RADIUS * 2 + 1; y++) {
+				if (x == Constants.FOV_RADIUS + 1 && y == Constants.FOV_RADIUS + 1) {
+					this.fovBlocks[x][y].visible = false;
+				} else {
+					this.fovBlocks[x][y].visible = !this.fovMask[x][y];
+				}
+			}
+		}
+
+		this.fovBlockLayer.updateTransform(); // We need to force this in order to prevent glitches. DONT MOVE THIS FROM HERE.
+		
+	},
+	shootRay: function (a) {
+		var step = 0.3333;
+		var maxdist = this.activeMob.sightRange < Constants.FOV_RADIUS ? this.activeMob.sightRange : Constants.FOV_RADIUS;
+		maxdist /= step;
+		var dx = Math.cos(a) * step;
+		var dy = -Math.sin(a) * step;
+		var xx = this.activeMob.x, yy = this.activeMob.y;
+		for (var i = 0; i < maxdist; ++i) {
+			var testx = Math.round(xx);
+			var testy = Math.round(yy);
+			try { 
+				this.fovMask[testx - this.activeMob.x + Constants.FOV_RADIUS + 1][testy - this.activeMob.y + Constants.FOV_RADIUS + 1] = true;
+				if (this.activeMob.level.isOpaque(testx, testy, this.activeMob.z))
+					return;
+			} catch(err) {
+				// Catch OOB
+				return; 
+			}
+			xx += dx; yy += dy;
+		}
 	},
 	start: function(){
 		this.scrollingEnabled = true;
@@ -109,8 +208,19 @@ const UI = {
 		});
 	},
 	showMessage: function(message){
-		console.log(message);
 		this.tempCombatLabel.text = message;
+		this.tempCombatLabel.font = 'pixeled';
+		this.currentMessageIndex++;
+		if (this.currentMessageIndex == 10000) {
+			this.currentMessageIndex = 0;
+		}
+		const messageIndex = this.currentMessageIndex;
+		return Timer.delay(5000).then(()=>{
+			if (messageIndex == this.currentMessageIndex) {
+				this.tempCombatLabel.font = 'grayFont';
+			}
+		});
+
 	},
 	clearMessage: function() {
 		this.tempCombatLabel.text = "";
@@ -188,50 +298,24 @@ const UI = {
     });
   },
 
-	timeOfDayPass: function(){
-		if (PlayerStateMachine.state !== PlayerStateMachine.WORLD){
-			Timer.delay(1000).then(()=>this.timeOfDayPass());
-			return;
-		}
-		this.currentMinuteOfDay += 5;
-		if (this.currentMinuteOfDay > 60*24){
-			this.currentMinuteOfDay = 0;
-		}
-		const currentHourOfDay = this.currentMinuteOfDay / 60; 
-		const skyboxRadius = 30;
-		const skyboxPosition = {
-			x: 350,
-			y: 50
-		};
-		this.skySprite.x = skyboxPosition.x;
-		this.skySprite.y = skyboxPosition.y;
-
-		const hourIncrement = (2 * Math.PI) / 24;
-		const sunRads = (currentHourOfDay + 6) * hourIncrement;
-		const moonRads = (currentHourOfDay + 6 + 12) * hourIncrement;
-		// console.log(`Current hour is ${currentHourOfDay}, radians are ${sunRads}`);
-		const xPos = Math.cos(sunRads) * skyboxRadius;
-		const yPos = Math.sin(sunRads) * skyboxRadius;
-		this.sunSprite.x = xPos + skyboxPosition.x;
-		this.sunSprite.y = yPos + skyboxPosition.y;
-		this.sunSprite.visible = true;
-		this.moonSprite.x = Math.cos(moonRads) * skyboxRadius + skyboxPosition.x;
-		this.moonSprite.y = Math.sin(moonRads) * skyboxRadius + skyboxPosition.y;
-		this.moonSprite.visible = true;
-		Timer.delay(1000).then(()=>this.timeOfDayPass());
-	},
-	addItemSprite: function(item, x, y){
+	addItemSprite: function(item, x, y, z){
 		item.x = x;
 		item.y = y;
+		item.z = z;
 		item.sprite.x = x * TILE_WIDTH;
 		item.sprite.y = y * TILE_HEIGHT;
-		this.floorLayer.add(item.sprite);
+		this.floorLayers[z].floorLayer.add(item.sprite);
 		item.sprite.visible = true;
-		console.log("item",item.sprite.x);
-		console.log("item",x);
 	},
+
+	locateEntitySpriteInWord: function(entity, layerName){
+		entity.sprite.x = entity.x * TILE_WIDTH;
+		entity.sprite.y = entity.y * TILE_HEIGHT;
+		this.floorLayers[entity.z][layerName].add(entity.sprite);
+	},
+
 	removeItemSprite: function(item) {
-		this.floorLayer.remove(item.sprite);
+		this.floorLayers[item.z].floorLayer.remove(item.sprite);
 		item.sprite.visible = false;
 	},
 
@@ -312,6 +396,89 @@ const UI = {
 		this.draggingItem.display.visible = false;
 		this.draggingItem.item = null;
 		this.draggingItem.container = null;
+  },
+
+  showScene(sceneId) {
+    const scene = scenarioInfo.scenes[sceneId];
+    this.currentScene = scene;
+    this.currentSceneIndex = -1;
+    return new Promise(outstandingPromise => {
+      this.outstandingPromise = outstandingPromise;
+      PlayerStateMachine.setActionCallback(() => {
+        this.showNextSceneFragment();
+      });
+      PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
+      this.showNextSceneFragment();
+    });
+  },
+
+  showNextSceneFragment() {
+    this.currentSceneIndex++;
+    if (this.currentSceneIndex < this.currentScene.length) {
+      Bus.emit('showMessage', this.currentScene[this.currentSceneIndex]);
+    } else {
+      Bus.emit('hideMessage');
+      PlayerStateMachine.clearActionCallback();
+      PlayerStateMachine.resetState(true);
+      if (this.outstandingPromise) {
+        this.outstandingPromise();
+      }
+    }
+  },
+  restoreComponentState() {
+  	PartyStatus.addMob(this.player);
+  	this.player.party.forEach(m => PartyStatus.addMob(m));
+	SkyBox.setMinuteOfDay(60);
+  },
+  readBook(book) {
+  	OAX6.UI.showMessage("Reading book \"" + book.def.title + "\", press Left and Right to browse.");
+  	BookPanel.show(book);
+  },
+  hideBook() {
+  	OAX6.UI.showMessage("Read book \"" + BookPanel.book.def.title + "\".");
+  	BookPanel.hide();
+  },
+  flipBook(dx) {
+  	if (dx > 0) {
+  		BookPanel.nextPages();
+  	} else {
+  		BookPanel.previousPages();
+  	}
+  },
+  setActiveMob(mob) {
+  	this.game.camera.follow(mob.sprite);
+	this.activeMob = mob;
+  },
+  getActiveMobIndex() {
+  	if (this.activeMob == this.player) {
+  		return 0;
+  	} else {
+  		return this.player.party.indexOf(this.activeMob) + 1;
+  	}
+  },
+  selectQuadrant(point) {
+  	let xvar = yvar = 0;
+  	if (point.x > this.game.width / 2 + TILE_WIDTH / 2) {
+  		xvar = 1;
+  	} else if (point.x < this.game.width / 2 - TILE_WIDTH / 2) {
+  		xvar = -1;
+  	}
+  	if (point.y > this.game.height / 2 + TILE_HEIGHT / 2) {
+  		yvar = 1;
+  	} else if (point.y < this.game.height / 2 - TILE_HEIGHT / 2) {
+  		yvar = -1;
+  	}
+  	return {
+  		x: xvar,
+  		y: yvar
+  	};
+  },
+	toggleFullScreen() {
+		if (this.game.scale.isFullScreen) {
+			this.game.scale.stopFullScreen();
+		} else {
+			this.game.scale.startFullScreen(false);
+		}
 	}
 }
 
