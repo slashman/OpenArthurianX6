@@ -20,7 +20,7 @@ const CURSOR_STATUS = {
 };
 
 /**
- * Represents a items container, it could be the player inventory,
+ * Represents an items container, it could be the player inventory,
  * the loot of a corpse or the content of a barrel
  */
 function Container(game, sizeDef) {
@@ -91,7 +91,7 @@ Container.prototype._initItemsGrid = function() {
 Container.prototype._syncInventoryIcons = function() {
     for (let i=0;i<this.length;i++) {
         if (this.inventory[i]) {
-            const appearance = this.inventory[i].appearance,
+            const appearance = this.inventory[i].getAppearance(),
                 displayItem = this.displayItems[i];
 
             displayItem.item.loadTexture(appearance.tileset, appearance.i);

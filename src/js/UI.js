@@ -368,7 +368,7 @@ const UI = {
 	},
 
 	dragItem: function(item, container) {
-		const appearance = item.appearance;
+		const appearance = item.getAppearance();
 
 		this.draggingItem.display.loadTexture(appearance.tileset, appearance.i);
 		this.draggingItem.display.bringToTop();
