@@ -23,6 +23,9 @@ const scenarioInfo = require('./ScenarioInfo');
 
 const STRETCH = true;
 
+const Container = require('./Container').Container;
+const containerSizes = require('./Container').SIZES;
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, Phaser.AUTO, '', this);
@@ -49,6 +52,8 @@ const UI = {
 		Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
 
 		this.nextMove = 0;
+		this.openContainers = [];
+		this.draggingElement = null;
 		this.currentMessageIndex = 0;
 		Bus.listen('nextMessage', () => this.showNextSceneFragment());
 	},
@@ -96,9 +101,17 @@ const UI = {
 		this.marker.visible = false;
 		this.floatingIcon = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.floatingIcon.visible = false;
-		this.floatingIcon.anchor.setTo(0.5);
-		
+    	this.floatingIcon.anchor.setTo(0.5);
 		this.start();
+
+		this.draggingElement = null;
+		
+		const display = this.game.add.image(100,100,'ui', 0);
+		display.anchor.set(0.5, 0.5);
+		display.visible = false;
+		this.UILayer.add(display);
+
+		this.draggingItem = { item: null, container: null, display: display };
 	},
 	update: function(){
 		PlayerStateMachine.update();
@@ -318,6 +331,71 @@ const UI = {
       case FlyType.STATIC:
         return this.tweenFixedProjectile(appearance, fromX, fromY, toX, toY);
     }
+	},
+	
+	addContainer: function(container) {
+		if (this.openContainers.indexOf(container) != -1) { return; }
+
+		this.openContainers.push(container);
+	},
+
+	removeContainer: function(container) {
+		const ind = this.openContainers.indexOf(container);
+
+		if (ind != -1) {
+			this.openContainers.splice(ind, 1);
+		}
+	},
+
+	getContainerAtPoint: function(mousePointer) {
+		if (this.draggingElement) { return this.draggingElement; }
+
+		let ret = null;
+
+		for (let i=0,container;container=this.openContainers[i];i++) {
+			if (container.isMouseOver(mousePointer)) {
+				if (ret == null || ret.group.z < container.group.z) {
+					ret = container;
+				}
+			}
+		}
+
+		return ret;
+	},
+
+	dragElement: function(element) {
+		this.draggingElement = element;
+	},
+
+	dragItem: function(item, container) {
+		const appearance = item.getAppearance();
+
+		this.draggingItem.display.loadTexture(appearance.tileset, appearance.i);
+		this.draggingItem.display.bringToTop();
+		this.draggingItem.display.visible = true;
+
+		this.draggingItem.item = item;
+
+		this.draggingItem.container = container;
+
+		this.updateDragItem(this.game.input.mousePointer);
+	},
+
+	isDraggingItem: function() {
+		return this.draggingItem.display.visible;
+	},
+
+	updateDragItem: function(mousePointer) {
+		this.draggingItem.display.x = mousePointer.x;
+		this.draggingItem.display.y = mousePointer.y;
+	},
+
+	releaseDrag: function() {
+		this.draggingElement = null;
+
+		this.draggingItem.display.visible = false;
+		this.draggingItem.item = null;
+		this.draggingItem.container = null;
   },
 
   showScene(sceneId) {

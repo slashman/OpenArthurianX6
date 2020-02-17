@@ -28,6 +28,9 @@ const Loader = {
 		game.load.spritesheet('portraits', 'assets/portraits.png', 20, 20);
 
 		game.load.bitmapFont('pixeled', 'assets/font.png', 'assets/font.fnt');
+
+		game.load.image('containerMedium', 'assets/containerMedium.png');
+
 		game.load.bitmapFont('grayFont', 'assets/grayFont.png', 'assets/font.fnt');
 		game.load.bitmapFont('dark', 'assets/darkFont.png', 'assets/font.fnt');
 

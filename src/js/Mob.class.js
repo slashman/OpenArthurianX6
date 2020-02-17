@@ -366,6 +366,16 @@ Mob.prototype = {
 
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
+	addItemToFreeSlot: function(item) {
+		for (let i=0,len=this.inventory.length;i<len;i++) {
+			if (!this.inventory[i]) {
+				return this.inventory[i] = item;
+			}
+		}
+
+		// TODO: Will cause issues when there are more items than the ones that can be displayed
+		this.inventory.push(item);
+	},
 	/*
 	 * Relocates the mob without a tween, for example when the level loads
 	 */
@@ -387,7 +397,7 @@ Mob.prototype = {
           this.inventory.push(item);
         }
       } else {
-        this.inventory.push(item);
+        this.addItemToFreeSlot(item);
       }
     } else {
       this.inventory.push(item);

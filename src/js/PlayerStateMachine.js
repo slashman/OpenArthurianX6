@@ -46,6 +46,8 @@ const PlayerStateMachine = {
         this.cursors.right.onDown.add(this.listenDirections, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER).onDown.add(this.listenAction, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(this.cancelAction, this);
+        this.game.input.mouse.enabled = true;
+        this.game.input.mouse.capture = true;
     },
     setCursor: function(tileset, frame) {
         this.cursorSprite.loadTexture(tileset, frame);
@@ -479,9 +481,10 @@ const PlayerStateMachine = {
         if (partyMemberIndex == undefined) {
             partyMemberIndex = OAX6.UI.getActiveMobIndex();
         }
-        // TODO: Note that this will support being called with a different index
         return new Promise((resolve) => {
-            const opened = Inventory.open(partyMemberIndex);
+            OAX6.UI.activeMob.backpack.open();
+            //const opened = Inventory.open(partyMemberIndex);
+            const opened = true; // TODO: Check cases where inventory cannot be opened?
             if (opened) {
                 PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
                 this.__activateInventoryCallbacks();
@@ -558,6 +561,41 @@ const PlayerStateMachine = {
                 return this.useInventoryItem();
             } else if (keyCode === Phaser.KeyCode.L){
                 return this.lookAtInventoryItem();
+            }
+        }
+
+        const UI = OAX6.UI,
+            mousePointer = this.game.input.mousePointer;
+
+        if (UI.isDraggingItem()) {
+            UI.updateDragItem(mousePointer);
+            if (mousePointer.leftButton.isUp) {
+                const item = UI.draggingItem.item,
+                    originalContainer = UI.draggingItem.container;
+
+                UI.releaseDrag();
+
+                const container = UI.getContainerAtPoint(mousePointer);
+                if (container) {
+                    container.addItem(item, originalContainer, mousePointer);
+                }
+            }
+
+            return;
+        }
+
+        const inventory = UI.getContainerAtPoint(mousePointer);
+        if (!inventory) { return; }
+
+        if (mousePointer.leftButton.isDown) {
+            inventory.bringToTop();
+            inventory.onMouseDown(mousePointer);
+        } else if (mousePointer.leftButton.isUp) {
+            inventory.onMouseUp();
+            
+            if (!this.player.backpack.isOpen()) {
+                PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+                this.clearDirectionCallback();
             }
         }
     },
@@ -640,7 +678,7 @@ const PlayerStateMachine = {
         return this._selectDirection('Drop').then(dir => {
             if (dir !== null) {
                 Inventory.currentMob.dropOnDirection(dir.x, dir.y, item);
-                Inventory.updateInventory();
+                Inventory.updateInventory(); //TODO: This function no longer exists. Fix
             }
             this.resetState();
             this.__activateInventoryCallbacks();
