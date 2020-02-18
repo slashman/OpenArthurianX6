@@ -15,7 +15,7 @@ const PlayerStateMachine = {
     COMBAT      : 3,
     COMBAT_SYNC : 4,
     TARGETTING  : 5,
-    INVENTORY   : 6,
+    ITEM_TRANSFERRING : 6,
     MESSAGE_BOX : 7,
     FLOATING_ITEM : 8,
     LOOK_BOX    : 9,
@@ -82,11 +82,17 @@ const PlayerStateMachine = {
         }
     },
     cancelAction: function() {
-        if (this.directionCallback) {
-            this.directionCallback(null, true);
-        }
-        if (this.actionCallback){
-            this.actionCallback(true);
+        if (this.state == PlayerStateMachine.ITEM_TRANSFERRING) {
+            OAX6.UI.closeAllContainers();
+            PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+            this.clearDirectionCallback();
+        } else {
+            if (this.directionCallback) {
+                this.directionCallback(null, true);
+            }
+            if (this.actionCallback){
+                this.actionCallback(true);
+            }
         }
     },
     checkMovement: function() {
@@ -424,9 +430,6 @@ const PlayerStateMachine = {
     __resetAfterLook() {
         this.examining = false;
         this.resetState();
-        if (this.state === PlayerStateMachine.INVENTORY){
-            this.__activateInventoryCallbacks();
-        }
         OAX6.UI.hideIcon();
     },
 
@@ -482,12 +485,17 @@ const PlayerStateMachine = {
             partyMemberIndex = OAX6.UI.getActiveMobIndex();
         }
         return new Promise((resolve) => {
-            OAX6.UI.activeMob.backpack.open();
+            let mob;
+            if (partyMemberIndex == 0) {
+                mob = OAX6.UI.player;
+            } else {
+                mob = OAX6.UI.player.party[partyMemberIndex - 1]
+            }
+            mob.backpack.open();
             //const opened = Inventory.open(partyMemberIndex);
             const opened = true; // TODO: Check cases where inventory cannot be opened?
             if (opened) {
-                PlayerStateMachine.switchState(PlayerStateMachine.INVENTORY);
-                this.__activateInventoryCallbacks();
+                PlayerStateMachine.switchState(PlayerStateMachine.ITEM_TRANSFERRING);
             }
             resolve(true);
         });
@@ -593,7 +601,7 @@ const PlayerStateMachine = {
         } else if (mousePointer.leftButton.isUp) {
             inventory.onMouseUp();
             
-            if (!this.player.backpack.isOpen()) {
+            if (!UI.hasOpenContainers()) {
                 PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
                 this.clearDirectionCallback();
             }
@@ -607,9 +615,6 @@ const PlayerStateMachine = {
                 return this.__musicManager.playNote(keyCode - Phaser.KeyCode.ONE + 1);
             } else if (keyCode === Phaser.KeyCode.ESC){
                 this.resetState();
-                if (this.state == PlayerStateMachine.INVENTORY) {
-                    this.__activateInventoryCallbacks(); // ugly as hell.
-                }
             }
         }
     },
@@ -681,7 +686,6 @@ const PlayerStateMachine = {
                 Inventory.updateInventory(); //TODO: This function no longer exists. Fix
             }
             this.resetState();
-            this.__activateInventoryCallbacks();
         });
     },
 
@@ -716,19 +720,8 @@ const PlayerStateMachine = {
             }
             if (!item.def.useOnSelf) {
                 this.resetState();
-                this.__activateInventoryCallbacks();
             }
         });
-    },
-
-    __activateInventoryCallbacks() {
-        this.setActionCallback((cancelled) => {
-            this.clearActionCallback();
-            this.clearDirectionCallback();
-            Inventory.close();
-            PlayerStateMachine.switchState(PlayerStateMachine.WORLD); // TODO: Reset state instead?
-        });
-        this.setDirectionCallback(this.updateInventoryDirection.bind(this));
     },
 
     update: function() {
@@ -749,7 +742,7 @@ const PlayerStateMachine = {
             case PlayerStateMachine.MESSAGE_BOX:
                 break;
 
-            case PlayerStateMachine.INVENTORY:
+            case PlayerStateMachine.ITEM_TRANSFERRING:
                 this.updateInventoryAction();
                 break;
             case PlayerStateMachine.MUSIC:
@@ -819,7 +812,7 @@ const PlayerStateMachine = {
     },
 
     clickOnMob(mob, leftClick, rightClick) {
-        if (this.state !== PlayerStateMachine.WORLD){
+        if (this.state !== PlayerStateMachine.WORLD && this.state !== PlayerStateMachine.ITEM_TRANSFERRING){
             return;
         }
         if (rightClick) {

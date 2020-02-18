@@ -23,9 +23,6 @@ const scenarioInfo = require('./ScenarioInfo');
 
 const STRETCH = true;
 
-const Container = require('./Container').Container;
-const containerSizes = require('./Container').SIZES;
-
 const UI = {
 	launch: function(then){
 		new Phaser.Game(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, Phaser.AUTO, '', this);
@@ -333,10 +330,29 @@ const UI = {
     }
 	},
 	
-	addContainer: function(container) {
-		if (this.openContainers.indexOf(container) != -1) { return; }
+	hasOpenContainers() {
+		return this.openContainers.length > 0;
+	},
 
+	closeAllContainers() {
+		const openContainers = this.openContainers.slice();
+		openContainers.forEach(c => c.close());
+	},
+
+	addContainer: function(container) {
+		if (this.openContainers.indexOf(container) != -1) {
+			return;
+		}
 		this.openContainers.push(container);
+		let i;
+		for (i = 0; i < this.openContainers.length; i++) {
+			const c = this.openContainers[i];
+			if (c.group.x != 32 + i * 32 || c.group.y != 32 + i * 32) {
+				break;
+			}
+		}
+		container.group.x = 32 + i * 32;
+		container.group.y = 32 + i * 32;
 	},
 
 	removeContainer: function(container) {

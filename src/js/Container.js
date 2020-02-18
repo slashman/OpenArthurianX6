@@ -221,11 +221,10 @@ Container.prototype.addItem = function(item, originalContainer, mousePointer) {
 };
 
 Container.prototype.open = function() {
+    if (this.isOpen()) {
+        return;
+    }
     this.group.visible = true;
-
-    // TODO: Look for empty position to place the container
-    this.group.x = 32;
-    this.group.y = 32;
 
     this._syncInventoryIcons();
 
