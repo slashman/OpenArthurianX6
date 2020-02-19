@@ -45,6 +45,9 @@ const ItemFactory = {
 		if (def.type == 'lightSource') {
 			item.isLit = itemData.isLit;
 		}
+		if (def.type == 'container') {
+			item.inventory = [];
+		}
 		item.sprite = this.getSpriteForItem(this.game, item);
 		return item;
 	},
@@ -57,9 +60,8 @@ const ItemFactory = {
 		sprite.visible = false;
 		sprite.inputEnabled = true;
 		sprite.events.onInputDown.add(() => { 
-			if (game.input.activePointer.rightButton.isDown) {
-				OAX6.PlayerStateMachine.lookMouseCommand({x: item.x, y: item.y}); 
-			}
+			// TODO: Only call this if the item is not obscured by the FoV mask
+			OAX6.PlayerStateMachine.itemClicked(item, game.input.activePointer.leftButton.isDown, game.input.activePointer.rightButton.isDown);
 		});
 		return sprite;
 	},

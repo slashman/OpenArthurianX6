@@ -724,6 +724,30 @@ const PlayerStateMachine = {
         });
     },
 
+    itemClicked: function (item, leftClick, rightClick) {
+        if (!this.actionEnabled) { return; }
+        switch (this.state) {
+            case PlayerStateMachine.WORLD:
+                if (rightClick) {
+                    OAX6.PlayerStateMachine.lookMouseCommand({x: item.x, y: item.y}); 
+                } else {
+                    if (item.isContainer()) {
+                        OAX6.UI.showContainerForItem(item);
+                        PlayerStateMachine.switchState(PlayerStateMachine.ITEM_TRANSFERRING);
+                    }
+                }
+                break;
+            case PlayerStateMachine.ITEM_TRANSFERRING:
+                if (item.isContainer()) {
+                    OAX6.UI.showContainerForItem(item);
+                }
+                break;
+            default:
+                break;
+
+        }
+    },
+
     update: function() {
         if (!this.actionEnabled) { return; }
 

@@ -48,6 +48,13 @@ Item.prototype = {
 			appearanceId = this.isLit ? def.appearances.lit : def.appearances.off;
 		} 
     return OAX6.AppearanceFactory.getAppearance(appearanceId)
+  },
+  isContainer() {
+    if (this.inventory != undefined) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
