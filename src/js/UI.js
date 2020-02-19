@@ -23,6 +23,9 @@ const scenarioInfo = require('./ScenarioInfo');
 
 const STRETCH = true;
 
+const Container = require('./Container').Container;
+const containerSizes = require('./Container').SIZES;
+
 const UI = {
 	launch: function(then){
 		new Phaser.Game(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, Phaser.AUTO, '', this);
@@ -495,6 +498,11 @@ const UI = {
 		} else {
 			this.game.scale.startFullScreen(false);
 		}
+	},
+	showContainerForMob(mob) {
+		// Only create the container if there isn't a container already created for the mob
+		const container = new Container(this.game, mob.inventory, containerSizes.medium);
+		container.open();
 	}
 }
 

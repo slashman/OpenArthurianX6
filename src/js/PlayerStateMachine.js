@@ -491,7 +491,7 @@ const PlayerStateMachine = {
             } else {
                 mob = OAX6.UI.player.party[partyMemberIndex - 1]
             }
-            mob.backpack.open();
+            OAX6.UI.showContainerForMob(mob);
             //const opened = Inventory.open(partyMemberIndex);
             const opened = true; // TODO: Check cases where inventory cannot be opened?
             if (opened) {

@@ -23,7 +23,7 @@ const CURSOR_STATUS = {
  * Represents an items container, it could be the player inventory,
  * the loot of a corpse or the content of a barrel
  */
-function Container(game, sizeDef) {
+function Container(game, inventory, sizeDef) {
     this.game = game;
     this.UI = OAX6.UI;
 
@@ -38,7 +38,10 @@ function Container(game, sizeDef) {
     this.group = this.game.add.group();
     this.group.add(this.sprite);
 
-    this.inventory = [];
+    this.sprite.inputEnabled = true;
+	this.sprite.events.onInputDown.add(() => {});
+
+    this.inventory = inventory;
 
     this.cursor = {
         x: 0,
@@ -234,6 +237,7 @@ Container.prototype.open = function() {
 Container.prototype.close = function() {
     this.group.visible = false;
     this.UI.removeContainer(this);
+    // TODO: Destroy the group
 };
 
 Container.prototype.isOpen = function() {

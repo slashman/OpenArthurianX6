@@ -3,8 +3,6 @@ const AppearanceFactory = require('./AppearanceFactory');
 const ItemFactory = require('./ItemFactory');
 const Stat = require('./Stat.class');
 const Constants = require('./Constants');
-const Container = require('./Container').Container;
-const containerSizes = require('./Container').SIZES;
 
 const MobFactory = {
 	init: function(mobTypeData){
@@ -32,8 +30,7 @@ const MobFactory = {
 		mob.defense = new Stat(definition.defense);
 		mob.alignment = definition.alignment || Constants.Alignments.NEUTRAL;
 
-		mob.backpack = new Container(game, containerSizes.medium);
-		mob.inventory = mob.backpack.inventory;
+		mob.inventory = [];
 
 		this.addItems(mob, definition);
 		
