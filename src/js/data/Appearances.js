@@ -74,6 +74,10 @@ const Appearances = [
 			{
 				id: 'offTorch',
 				i: 224
+			},
+			{
+				id: 'barrel',
+				i: 161
 			}
 		]
 	},

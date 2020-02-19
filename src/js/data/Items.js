@@ -200,6 +200,13 @@ const Items = [
 			
 		},
 		useOnSelf: true
+	},
+	{
+		id: 'barrel',
+		type: 'container',
+		description: 'It\'s just a barrel.',
+		name: 'Barrel',
+		appearance: 'barrel'
 	}
 ]
 
