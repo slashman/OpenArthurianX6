@@ -46,6 +46,11 @@ const ItemFactory = {
 		}
 		if (def.type == 'container') {
 			item.inventory = new Inventory();
+
+			if (itemData.initialContents && itemData.initialContents != '') {
+				const initialContents = JSON.parse(itemData.initialContents);
+				initialContents.forEach(initialItem => item.addItem(this.createItem(initialItem)));
+			}
 		}
 		item.sprite = this.getSpriteForItem(this.game, item);
 		return item;

@@ -475,14 +475,16 @@
                  "name":"Barrel 1",
                  "properties":
                     {
+                     "initialContents":"[\n  {\n    \"itemId\": \"fish\"\n },\n {\n    \"itemId\": \"ironBolt\",\n    \"quantity\": 20\n  }\n]",
                      "itemId":"barrel"
                     },
                  "propertytypes":
                     {
+                     "initialContents":"string",
                      "itemId":"string"
                     },
                  "rotation":0,
-                 "type":"Item",
+                 "type":"Container",
                  "visible":true,
                  "width":16,
                  "x":512,
