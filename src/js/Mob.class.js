@@ -6,10 +6,10 @@ const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
 const ItemFactory = require('./ItemFactory');
 const Geo = require('./Geo');
-const Line = require('./Line');
 const MessageBox = require('./MessageBox');
 const PartyStatus = require('./ui/PartyStatus');
 const Constants = require('./Constants');
+const Inventory = require('./model/Inventory.class');
 
 /**
  * Represents a being living inside a world
@@ -28,7 +28,7 @@ function Mob(level, x, y, z){
 	//TODO: FAR: Dialogs between NPCs
 	this.speed = null;
 	this.party = [];
-	this.inventory = [];
+	this.inventory = new Inventory();
 	this.flags = {};
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;
@@ -366,16 +366,7 @@ Mob.prototype = {
 
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
 	},
-	addItemToFreeSlot: function(item) {
-		for (let i=0,len=this.inventory.length;i<len;i++) {
-			if (!this.inventory[i]) {
-				return this.inventory[i] = item;
-			}
-		}
-
-		// TODO: Will cause issues when there are more items than the ones that can be displayed
-		this.inventory.push(item);
-	},
+	
 	/*
 	 * Relocates the mob without a tween, for example when the level loads
 	 */
@@ -386,22 +377,7 @@ Mob.prototype = {
 		this.sprite.y = this.y * 16;
 	},
 	addItem: function(item) {
-    if (item.def.stackLimit) {
-      const existingItem = this.inventory.find(i => i.defid === item.defid);
-      if (existingItem) {
-        if (existingItem.quantity + item.quantity <= existingItem.def.stackLimit) {
-          existingItem.quantity += item.quantity;
-        } else {
-          item.quantity = (existingItem.quantity + item.quantity) % existingItem.def.stackLimit;
-          existingItem.quantity = existingItem.def.stackLimit;
-          this.inventory.push(item);
-        }
-      } else {
-        this.addItemToFreeSlot(item);
-      }
-    } else {
-      this.inventory.push(item);
-    }
+		this.inventory.addItem(item);
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy, this.z);
@@ -509,7 +485,7 @@ Mob.prototype = {
 		}
 		if (used) {
 			if (item.def.spendable) {
-				this.reduceItemQuantity(item);
+				this.inventory.reduceItemQuantity(item);
 			}
 			OAX6.Inventory.updateInventory();
 		}
@@ -520,8 +496,7 @@ Mob.prototype = {
 			y = this.y + dy;
 
 		if (!this.level.isSolid(x, y, this.z) && !this.level.getItemAt(x, y, this.z)) {
-			var ind = this.inventory.indexOf(item);
-			this.inventory.splice(ind, 1);
+			this.inventory.removeItem(item);
 			this.level.addItem(item, x, y, this.z);
 		} else {
 			this.reportAction("Can't drop it there!");
@@ -549,7 +524,7 @@ Mob.prototype = {
         this.reportAction("Attack - No Ammo.");
         return Promise.resolve(false);
 	  }
-	  this.reduceItemQuantity(ammo);
+	  this.inventory.reduceItemQuantity(ammo);
       if (ammo === this.weapon) {
         this.weapon = undefined;
       }
@@ -574,25 +549,11 @@ Mob.prototype = {
 			return Promise.resolve();
 		}
 	},
-	// TODO: Move to model/Inventory once it's refactored.
-	reduceItemQuantity(item, variation) {
-		variation = variation || 1;
-		if (item.quantity) {
-			if (item.quantity > variation) {
-				item.quantity -= variation;
-			} else if (item.quantity < variation) {
-				throw new Error('Not enough quantity of item ' + item.name + ' to reduce by ' + quantity);
-			} else {
-				this.inventory.splice(this.inventory.findIndex(i => i.defid === item.defid), 1);
-			}
-		} else {
-			this.inventory.splice(this.inventory.findIndex(i => i.defid === item.defid), 1);
-		}
-	},
+	
   getAmmunitionFor: function(weapon) {
     const ammoType = weapon.def.usesProjectileType;
     if (ammoType) {
-      const onInventory = this.inventory.find(i => i.defid === ammoType);
+      const onInventory = this.inventory.getItemById(ammoType);
       return onInventory;
     } else {
       // No ammo, throw the weapon!

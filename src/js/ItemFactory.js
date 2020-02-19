@@ -4,8 +4,7 @@ const Stat = require('./Stat.class');
 const AppearanceFactory = require('./AppearanceFactory');
 const Item = require('./Item.class');
 const Door = require('./Door.class');
-const MobDescription = require('./MobDescription');
-const PlayerStateMachine = require('./PlayerStateMachine');
+const Inventory = require('./model/Inventory.class');
 
 const ItemFactory = {
 	init: function(itemData){
@@ -46,7 +45,7 @@ const ItemFactory = {
 			item.isLit = itemData.isLit;
 		}
 		if (def.type == 'container') {
-			item.inventory = [];
+			item.inventory = new Inventory();
 		}
 		item.sprite = this.getSpriteForItem(this.game, item);
 		return item;

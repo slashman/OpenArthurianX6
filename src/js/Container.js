@@ -41,7 +41,7 @@ function Container(game, inventory, sizeDef) {
     this.sprite.inputEnabled = true;
 	this.sprite.events.onInputDown.add(() => {});
 
-    this.inventory = inventory;
+    this.inventory = inventory.items; // TODO: Don't expose items list
 
     this.cursor = {
         x: 0,

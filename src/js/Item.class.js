@@ -55,6 +55,9 @@ Item.prototype = {
     } else {
       return false;
     }
+  },
+  addItem(item) {
+    this.inventory.addItem(item);
   }
 }
 
