@@ -2,7 +2,6 @@ const Bus = require('./Bus');
 const Timer = require('./Timer');
 const Geo = require('./Geo');
 const Random = require('./Random');
-const Inventory = require('./Inventory');
 const Storage = require('./Storage');
 const MobDescription = require('./MobDescription');
 const MusicManager = require('./manager/MusicManager.class');

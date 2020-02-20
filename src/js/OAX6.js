@@ -28,8 +28,6 @@ const Bus = require('./Bus');
 const Dialogs = require('./Dialogs');
 const MessageBox = require('./MessageBox');
 const MobDescription = require('./MobDescription');
-const Inventory = require('./Inventory');
-
 const scenarioInfo = require('./ScenarioInfo');
 
 const OAX6 = {
@@ -48,7 +46,6 @@ const OAX6 = {
 		ObjectFactory.setGame(game);
 		Dialogs.init(game);
 		MessageBox.init(game);
-		Inventory.init(game);
 		MobDescription.init(game);
 		LevelLoader.init(game, scenarioInfo.maps);
 
@@ -110,8 +107,7 @@ window.OAX6 = {
 	ItemFactory,
 	AppearanceFactory,
 	PlayerStateMachine,
-	ObjectFactory,
-	Inventory
+	ObjectFactory
 };
 
 module.exports = OAX6;

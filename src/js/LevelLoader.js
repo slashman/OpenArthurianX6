@@ -3,9 +3,6 @@ const NPCFactory = require('./NPCFactory');
 const MobFactory = require('./MobFactory');
 const ItemFactory = require('./ItemFactory');
 const ObjectFactory = require('./factories/ObjectFactory');
-const PlayerStateMachine = require('./PlayerStateMachine');
-const Inventory = require('./Inventory');
-const MobDescription = require('./MobDescription');
 
 const MAX_TILE_LAYERS_PER_FLOOR = 10;
 
