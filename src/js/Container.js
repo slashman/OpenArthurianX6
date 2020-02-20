@@ -1,3 +1,5 @@
+const Timer = require('./Timer');
+
 /**
  * Properties definitions for the container sizes
  */
@@ -14,9 +16,10 @@ const SIZES = {
 };
 
 const CURSOR_STATUS = {
-    IDDLE: 0,
+    IDLE: 0,
     DRAGGING: 1,
-    RELEASED: 2
+    RELEASED: 2,
+    DELAY: 3 // Waiting to see if this is a click or a drag
 };
 
 /**
@@ -46,7 +49,7 @@ function Container(game, inventory, sizeDef) {
     this.cursor = {
         x: 0,
         y: 0,
-        status: CURSOR_STATUS.IDDLE,
+        status: CURSOR_STATUS.IDLE,
         dragAnchor: { x: 0, y: 0 }
     };
 
@@ -71,9 +74,9 @@ Container.prototype._initItemsGrid = function() {
             x = size.itemsGrid.x + size.itemsGrid.slotW/2 + cellX * (i % this.columns),
             y = size.itemsGrid.y + size.itemsGrid.slotH/2 + cellY * Math.floor(i / this.columns);
 
-        const item = this.game.add.image(x,y,'ui');
-        item.anchor.set(0.5, 0.5);
-        item.visible = false;
+        const itemSprite = this.game.add.image(x,y,'ui');
+        itemSprite.anchor.set(0.5, 0.5);
+        itemSprite.visible = false;
 
         const tx = size.itemsGrid.x + size.itemsGrid.slotW + cellX * (i % this.columns),
             ty = size.itemsGrid.y + size.itemsGrid.slotH + cellY * Math.floor(i / this.columns);
@@ -83,22 +86,29 @@ Container.prototype._initItemsGrid = function() {
         quantityLabel.anchor.visible = false;
 
         this.displayItems.push({
-            item: item,
-            quantityLabel: quantityLabel
+            itemSprite,
+            quantityLabel
         });
-        this.group.add(item);
+        this.group.add(itemSprite);
         this.group.add(quantityLabel);
     }
 };
 
 Container.prototype._syncInventoryIcons = function() {
-    for (let i=0;i<this.length;i++) {
+    for (let i=0; i<this.length; i++) {
         if (this.inventory[i]) {
+            const item = this.inventory[i];
             const appearance = this.inventory[i].getAppearance(),
                 displayItem = this.displayItems[i];
 
-            displayItem.item.loadTexture(appearance.tileset, appearance.i);
-            displayItem.item.visible = true;
+            displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
+            displayItem.itemSprite.visible = true;
+            displayItem.itemSprite.inputEnabled = true;
+            displayItem.itemSprite.events.onInputUp.add((game, pointer, isOver) => {
+                if (isOver) {
+                    item.clicked();
+                }
+            });
 
             if (this.inventory[i].quantity !== undefined && this.inventory[i].quantity > 1){
                 displayItem.quantityLabel.visible = true;
@@ -107,8 +117,10 @@ Container.prototype._syncInventoryIcons = function() {
                 displayItem.quantityLabel.visible = false;
             }
         } else {
-            this.displayItems[i].item.visible = false;
+            this.displayItems[i].itemSprite.visible = false;
             this.displayItems[i].quantityLabel.visible = false;
+            this.displayItems[i].itemSprite.inputEnabled = false;
+            this.displayItems[i].itemSprite.events.onInputUp.removeAll();
         }
     }
 };
@@ -135,9 +147,6 @@ Container.prototype._getItemIndexAtPoint = function(point) {
 
 Container.prototype._updateDragging = function(mousePointer) {
     if (this.cursor.status == CURSOR_STATUS.DRAGGING) {
-        const width = this.game.width - this.sizeDef.size.w,
-            height = this.game.height - this.sizeDef.size.h;
-            
         const x = mousePointer.x - this.cursor.dragAnchor.x,
             y = mousePointer.y - this.cursor.dragAnchor.y;
 
@@ -154,6 +163,29 @@ Container.prototype.onMouseDown = function(mousePointer) {
         return this._updateDragging(mousePointer);
     }
 
+    if (this.cursor.status == CURSOR_STATUS.DELAY) {
+        return;
+    }
+
+    this.cursor.status = CURSOR_STATUS.DELAY;
+
+    if (this._pointInRect(this.cursor, this.sizeDef.topBar)) {
+        // Click on top bar, no dragging delay since it cannot be clicked.
+        this.__startDragging(mousePointer);
+    } else {
+        // Introduce dragging delay
+        Timer.delay(100).then(() => {
+            this.__startDragging(mousePointer);
+        });
+    }
+};
+
+Container.prototype.__startDragging = function(mousePointer) {
+    if (!mousePointer.leftButton.isDown) {
+        // No dragging, just clicking
+        this.cursor.status = CURSOR_STATUS.IDLE;
+        return;
+    }
     if (this._pointInRect(this.cursor, this.sizeDef.topBar)) {
         this.cursor.status = CURSOR_STATUS.DRAGGING;
         this.cursor.dragAnchor.x = this.cursor.x;
@@ -175,7 +207,7 @@ Container.prototype.onMouseDown = function(mousePointer) {
         }
     }
     
-    this.cursor.status = CURSOR_STATUS.IDDLE;
+    this.cursor.status = CURSOR_STATUS.IDLE;
 };
 
 Container.prototype.onMouseUp = function() {
