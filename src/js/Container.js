@@ -26,9 +26,10 @@ const CURSOR_STATUS = {
  * Represents an items container, it could be the player inventory,
  * the loot of a corpse or the content of a barrel
  */
-function Container(game, inventory, sizeDef) {
+function Container(game, containerId, inventory, sizeDef) {
     this.game = game;
     this.UI = OAX6.UI;
+    this.id = containerId;
 
     this.sizeDef = sizeDef;
 

@@ -500,14 +500,22 @@ const UI = {
 		}
 	},
 	showContainerForMob(mob) {
-		// Only create the container if there isn't a container already created for the mob
-		const container = new Container(this.game, mob.inventory, containerSizes.medium);
-		container.open();
+		const container = this.openContainers.find(container => container.id == mob.getContainerId());
+		if (container){
+			container.bringToTop();
+		} else {
+			const container = new Container(this.game, mob.getContainerId(), mob.inventory, containerSizes.medium);
+			container.open();
+		}
 	},
 	showContainerForItem(item) {
-		// Only create the container if there isn't a container already created for the mob
-		const container = new Container(this.game, item.inventory, containerSizes.medium);
-		container.open();
+		const container = this.openContainers.find(container => container.id == item.getContainerId());
+		if (container){
+			container.bringToTop();
+		} else {
+			const container = new Container(this.game, item.getContainerId(), item.inventory, containerSizes.medium);
+			container.open();
+		}
 	}
 }
 

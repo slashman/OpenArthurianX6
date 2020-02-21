@@ -62,7 +62,10 @@ Item.prototype = {
   clicked() {
     // TODO: Only call this if the item is not obscured by the FoV mask
     OAX6.PlayerStateMachine.itemClicked(this, this.sprite.game.input.activePointer.leftButton.isDown, this.sprite.game.input.activePointer.rightButton.isDown);
-  }
+  },
+	getContainerId() {
+		return "item" + this._c.uid;
+	}
 }
 
 module.exports = Item;

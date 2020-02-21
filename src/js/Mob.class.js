@@ -684,6 +684,9 @@ Mob.prototype = {
 		const dy = Math.sign(mob.y - this.y);
 		this.lookAt(dx, dy);
 		mob.lookAt(-dx, -dy);
+	},
+	getContainerId() {
+		return "mob" + this._c.uid;
 	}
 };
 
