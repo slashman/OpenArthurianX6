@@ -23,8 +23,8 @@ const scenarioInfo = require('./ScenarioInfo');
 
 const STRETCH = true;
 
-const Container = require('./Container').Container;
-const containerSizes = require('./Container').SIZES;
+const Container = require('./ui/Container').Container;
+const containerSizes = require('./ui/Container').SIZES;
 
 const UI = {
 	launch: function(then){
