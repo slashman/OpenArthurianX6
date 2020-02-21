@@ -7,6 +7,7 @@ const SIZES = {
     medium: {
         columns: 6,
         rows: 5,
+        containerCapacity: 40,
         spriteId: 'containerMedium',
         size: { w: 136, h: 136 },
         itemsGrid: { x: 10, y: 23, w: 116, h: 96, slotW: 16, slotH: 16, marginR: 4, marginB: 4 },
@@ -35,6 +36,7 @@ function Container(game, containerId, inventory, sizeDef) {
 
     this.columns = sizeDef.columns;
     this.rows = sizeDef.rows;
+    this.containerCapacity = sizeDef.containerCapacity;
     this.length = this.columns * this.rows;
 
     this.sprite = this.game.add.image(0, 0, sizeDef.spriteId);
@@ -45,7 +47,21 @@ function Container(game, containerId, inventory, sizeDef) {
     this.sprite.inputEnabled = true;
 	this.sprite.events.onInputDown.add(() => {});
 
-    this.inventory = inventory.items; // TODO: Don't expose items list
+    this.inventory = inventory.items.slice(); // TODO: Don't expose items list
+
+    const downArrow = this.game.add.sprite(104, 128, 'ui', 9, this.fovBlockLayer);
+    const upArrow = this.game.add.sprite(104 + 16, 128, 'ui', 10, this.fovBlockLayer);
+    downArrow.anchor.set(0.5);
+    upArrow.anchor.set(0.5);
+
+    downArrow.inputEnabled = true;
+    upArrow.inputEnabled = true;
+
+    downArrow.events.onInputDown.add(() => this.scrollDown());
+    upArrow.events.onInputDown.add(() => this.scrollUp());
+
+    this.group.add(downArrow);
+    this.group.add(upArrow);
 
     this.cursor = {
         x: 0,
@@ -60,6 +76,9 @@ function Container(game, containerId, inventory, sizeDef) {
     
     this.UI.UILayer.add(this.group);
 
+    this.scroll = 0;
+    this.maxScroll = Math.ceil(this.containerCapacity / this.columns);
+
     this.close();
 }
 
@@ -68,7 +87,7 @@ Container.prototype._initItemsGrid = function() {
 
     this.displayItems = [];
 
-    for (let i=0;i<this.length;i++) {
+    for (let i = 0; i < this.length; i++) {
         const cellX = size.itemsGrid.slotW + size.itemsGrid.marginR,
             cellY = size.itemsGrid.slotH + size.itemsGrid.marginB,
 
@@ -96,11 +115,12 @@ Container.prototype._initItemsGrid = function() {
 };
 
 Container.prototype._syncInventoryIcons = function() {
-    for (let i=0; i<this.length; i++) {
+    const start = this.scroll * this.columns;
+    for (let i = start; i < start + this.length; i++) {
+        const displayItem = this.displayItems[i - start];
         if (this.inventory[i]) {
             const item = this.inventory[i];
-            const appearance = this.inventory[i].getAppearance(),
-                displayItem = this.displayItems[i];
+            const appearance = this.inventory[i].getAppearance();
 
             displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
             displayItem.itemSprite.visible = true;
@@ -118,10 +138,10 @@ Container.prototype._syncInventoryIcons = function() {
                 displayItem.quantityLabel.visible = false;
             }
         } else {
-            this.displayItems[i].itemSprite.visible = false;
-            this.displayItems[i].quantityLabel.visible = false;
-            this.displayItems[i].itemSprite.inputEnabled = false;
-            this.displayItems[i].itemSprite.events.onInputUp.removeAll();
+            displayItem.itemSprite.visible = false;
+            displayItem.quantityLabel.visible = false;
+            displayItem.itemSprite.inputEnabled = false;
+            displayItem.itemSprite.events.onInputUp.removeAll();
         }
     }
 };
@@ -279,6 +299,22 @@ Container.prototype.isOpen = function() {
 
 Container.prototype.bringToTop = function() {
     this.UI.UILayer.bringToTop(this.group);
+}
+
+Container.prototype.scrollDown = function() {
+    this.scroll++;
+    if (this.scroll > this.maxScroll) {
+        this.scroll = this.maxScroll;
+    }
+    this._syncInventoryIcons();
+}
+
+Container.prototype.scrollUp = function() {
+    this.scroll--;
+    if (this.scroll < 0) {
+        this.scroll = 0;
+    }
+    this._syncInventoryIcons();
 }
 
 module.exports = {
