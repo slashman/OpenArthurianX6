@@ -34,14 +34,21 @@ const MobFactory = {
 		
 		mob.speed = new Stat(definition.speed)
 		mob.intent = definition.intent || 'wander';
+		mob.bodySlots = this.createBodySlotsByAnatomy(definition);
 		return mob;
+	},
+	createBodySlotsByAnatomy: function() {
+		return {
+			rightHand: undefined,
+			torso: undefined
+		};
 	},
 	addItems(mob, definition) {
 		if (definition.weapon) {
-			mob.weapon = ItemFactory.createItem({ itemId: definition.weapon });
+			mob.setWeapon(ItemFactory.createItem({ itemId: definition.weapon }));
 		}
 		if (definition.armor) {
-			mob.armor = ItemFactory.createItem({ itemId: definition.armor });
+			mob.setArmor(ItemFactory.createItem({ itemId: definition.armor }));
 		}
 		if (definition.items) {
 			definition.items.forEach(item => {

@@ -25,6 +25,7 @@ const STRETCH = true;
 
 const Container = require('./ui/Container').Container;
 const containerSizes = require('./ui/Container').SIZES;
+const MobInventory = require('./ui/MobInventory.class');
 
 const UI = {
 	launch: function(then){
@@ -500,20 +501,20 @@ const UI = {
 		}
 	},
 	showContainerForMob(mob) {
-		const container = this.openContainers.find(container => container.id == mob.getContainerId());
+		let container = this.openContainers.find(container => container.id == mob.getContainerId());
 		if (container){
 			container.bringToTop();
 		} else {
-			const container = new Container(this.game, mob.getContainerId(), mob.inventory, containerSizes.medium);
+			container = new MobInventory(this.game, mob.getContainerId(), mob);
 			container.open();
 		}
 	},
 	showContainerForItem(item) {
-		const container = this.openContainers.find(container => container.id == item.getContainerId());
+		let container = this.openContainers.find(container => container.id == item.getContainerId());
 		if (container){
 			container.bringToTop();
 		} else {
-			const container = new Container(this.game, item.getContainerId(), item.inventory, containerSizes.medium);
+			container = new Container(this.game, item.getContainerId(), item.inventory, containerSizes.medium);
 			container.open();
 		}
 	}

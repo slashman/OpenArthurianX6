@@ -30,6 +30,8 @@ const Loader = {
 		game.load.bitmapFont('pixeled', 'assets/font.png', 'assets/font.fnt');
 
 		game.load.image('containerMedium', 'assets/containerMedium.png');
+		game.load.image('mobContainer', 'assets/mobContainer.png');
+		
 
 		game.load.bitmapFont('grayFont', 'assets/grayFont.png', 'assets/font.fnt');
 		game.load.bitmapFont('dark', 'assets/darkFont.png', 'assets/font.fnt');

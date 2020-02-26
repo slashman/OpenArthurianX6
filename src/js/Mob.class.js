@@ -28,7 +28,8 @@ function Mob(level, x, y, z){
 	//TODO: FAR: Dialogs between NPCs
 	this.speed = null;
 	this.party = [];
-	this.inventory = new Inventory();
+	this.inventory = new Inventory(); // To be replaced by the backpack item (), but then have to find a solution for ammunition.
+	this.bodySlots = {};
 	this.flags = {};
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;
@@ -158,9 +159,10 @@ Mob.prototype = {
 				return Timer.delay(1000);
 			}
 		} else {
-			if (this.weapon && 
-				this.weapon.def.range && 
-				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= this.weapon.def.range &&
+			const weapon = this.getWeapon();
+			if (weapon && 
+				weapon.def.range && 
+				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= weapon.def.range &&
 				this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y, this.z)
 				) {
 				return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
@@ -503,7 +505,7 @@ Mob.prototype = {
 		}
 	},
 	attackToPosition: function(x, y){
-		const weapon = this.weapon;
+		const weapon = this.getWeapon();
 		const range = weapon ? (weapon.def.range || 1) : 1;
 		const dist = Geo.flatDist(this.x, this.y, x, y);
 		if (dist > range){
@@ -525,8 +527,8 @@ Mob.prototype = {
         return Promise.resolve(false);
 	  }
 	  this.inventory.reduceItemQuantity(ammo);
-      if (ammo === this.weapon) {
-        this.weapon = undefined;
+      if (ammo === this.getWeapon()) {
+        this.removeWeapon();
       }
       // Here we must check in advance if this attack will trigger the combat mode!
       // We cannot wait til the projectile animation is over!
@@ -587,8 +589,10 @@ Mob.prototype = {
 		if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
 			PlayerStateMachine.startCombat(true);
 		}
-		const combinedDamage = this.damage.current + (this.weapon ? this.weapon.damage.current : 0);
-		const combinedDefense = mob.defense.current + (mob.armor ? mob.armor.defense.current : 0);
+		const weapon = this.getWeapon();
+		const armor = this.getArmor();
+		const combinedDamage = this.damage.current + (weapon ? weapon.damage.current : 0);
+		const combinedDefense = mob.defense.current + (armor ? armor.defense.current : 0);
 		let damage = combinedDamage - combinedDefense;
 		if (damage < 0)
 			damage = 0;
@@ -646,8 +650,9 @@ Mob.prototype = {
 		} else {
 			desc = this.definition.name;
 		}
-		if (this.weapon){
-			desc += " armed with "+this.weapon.def.name;
+		const weapon = this.getWeapon();
+		if (weapon){
+			desc += " armed with " + weapon.def.name;
 		}
 		return desc;
 	},
@@ -687,6 +692,34 @@ Mob.prototype = {
 	},
 	getContainerId() {
 		return "mob" + this._c.uid;
+	},
+	getItemAtSlot(slotId) {
+		return this.bodySlots[slotId];
+	},
+	setItemAtSlot(slotId, item) {
+		this.bodySlots[slotId] = item;
+		// TODO: If there is an item already, put in backpack
+	},
+	removeItemAtSlot(slotId) {
+		delete this.bodySlots[slotId];
+	},
+	getWeapon() {
+		return this.getItemAtSlot('rightHand');
+	},
+	setWeapon(item) {
+		this.setItemAtSlot('rightHand', item);
+	},
+	removeWeapon(item) {
+		this.removeItemAtSlot('rightHand');
+	},
+	getArmor() {
+		return this.getItemAtSlot('torso');
+	},
+	setArmor(item) {
+		this.setItemAtSlot('torso', item);
+	},
+	removeArmor(item) {
+		this.removeItemAtSlot('torso');
 	}
 };
 
