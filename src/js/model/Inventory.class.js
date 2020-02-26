@@ -20,6 +20,9 @@ Inventory.prototype = {
         } else {
             this.items.push(item);
         }
+        // TODO: Check vs capacity, return false if cannot carry
+        return true;
+
     },
     addItemToFreeSlot: function(item) {
 		for (let i=0,len=this.items.length;i<len;i++) {

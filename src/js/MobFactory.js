@@ -50,6 +50,9 @@ const MobFactory = {
 		if (definition.armor) {
 			mob.setArmor(ItemFactory.createItem({ itemId: definition.armor }));
 		}
+		if (definition.backpack) {
+			mob.setBackpack(ItemFactory.createItem({ itemId: definition.backpack }));
+		}
 		if (definition.items) {
 			definition.items.forEach(item => {
 				if (typeof item === 'string') {

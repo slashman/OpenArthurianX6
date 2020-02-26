@@ -14,6 +14,11 @@ const BODY_TYPES = {
                 y: 32
             },
             {
+                id: 'back',
+                x: 96 - 8,
+                y: 32
+            },
+            {
                 id: 'leftHand',
                 x: 32 - 8,
                 y: 64

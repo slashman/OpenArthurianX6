@@ -8,6 +8,7 @@ const NPCs = [
 		alignment: 'player',
 		armor: 'chainMail',
 		weapon: 'magicAxe',
+		backpack: 'barrel',
 		items: [
 			{ itemId: 'journalOfTheQuest', quantity: 1 }
 		],

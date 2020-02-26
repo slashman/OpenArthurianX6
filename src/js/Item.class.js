@@ -57,7 +57,7 @@ Item.prototype = {
     }
   },
   addItem(item) {
-    this.inventory.addItem(item);
+    return this.inventory.addItem(item);
   },
   clicked() {
     // TODO: Only call this if the item is not obscured by the FoV mask

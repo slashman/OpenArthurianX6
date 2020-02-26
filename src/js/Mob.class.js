@@ -28,7 +28,6 @@ function Mob(level, x, y, z){
 	//TODO: FAR: Dialogs between NPCs
 	this.speed = null;
 	this.party = [];
-	this.inventory = new Inventory(); // To be replaced by the backpack item (), but then have to find a solution for ammunition.
 	this.bodySlots = {};
 	this.flags = {};
 	this.flags._c = circular.setSafe();
@@ -379,20 +378,33 @@ Mob.prototype = {
 		this.sprite.y = this.y * 16;
 	},
 	addItem: function(item) {
-		this.inventory.addItem(item);
+		const backpack = this.getBackpack();
+		if (backpack) {
+			backpack.addItem(item);
+		} else if (!this.getItemAtSlot("rightHand")) {
+			this.setItemAtSlot("rightHand", item);
+		} else if (!this.getItemAtSlot("leftHand")) {
+			this.setItemAtSlot("leftHand", item);
+		} else {
+			return false;
+		}
+		return true;
 	},
 	getOnDirection: function(dx, dy) {
 		var item = this.level.getItemAt(this.x + dx, this.y + dy, this.z);
 		if (item) {
 			const pickedQuantity = item.quantity;
-			this.addItem(item);
-			this.level.removeItem(item);
-      if (item.quantity === 1) {
-        this.reportAction("Got a " + item.def.name);  
-      } else {
-        this.reportAction("Got " + pickedQuantity + " " + item.def.name);  
-      }
-			
+			const added = this.addItem(item);
+			if (added) {
+				this.level.removeItem(item);
+				if (item.quantity === 1) {
+					this.reportAction("Got a " + item.def.name);  
+				} else {
+					this.reportAction("Got " + pickedQuantity + " " + item.def.name);  
+				}
+			} else {
+				this.reportAction("Get - Cannot carry!");
+			}
 		} else {
 			this.reportAction("Get - Nothing there!");
 		}
@@ -720,6 +732,12 @@ Mob.prototype = {
 	},
 	removeArmor(item) {
 		this.removeItemAtSlot('torso');
+	},
+	getBackpack() {
+		return this.getItemAtSlot('back');
+	},
+	setBackpack(item) {
+		this.setItemAtSlot('back', item);
 	}
 };
 
