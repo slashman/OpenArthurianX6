@@ -522,7 +522,7 @@ Mob.prototype = {
 		const dist = Geo.flatDist(this.x, this.y, x, y);
 		if (dist > range){
 			this.reportAction("Attack - Out of range!");
-      return Promise.resolve(false);
+			return Promise.resolve(false);
 		}
 		const isRangedAttack = dist > 1; 
 		//TODO: Handle case of diagonals (cannot use simple flatDist, diff geometry)
@@ -533,27 +533,25 @@ Mob.prototype = {
 		 * For now, we'll do a melee attack if too close
 		 */
 		if (isRangedAttack){
-      const ammo = this.getAmmunitionFor(weapon);
-      if (!ammo) {
-        this.reportAction("Attack - No Ammo.");
-        return Promise.resolve(false);
-	  }
-	  this.inventory.reduceItemQuantity(ammo);
-      if (ammo === this.getWeapon()) {
-        this.removeWeapon();
-      }
-      // Here we must check in advance if this attack will trigger the combat mode!
-      // We cannot wait til the projectile animation is over!
-      var mob = this.level.getMobAt(x, y, this.z);
-      if (mob && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
+			const ammoInfo = this.getAmmunitionFor(weapon);
+			if (!ammoInfo) {
+				this.reportAction("Attack - No Ammo.");
+				return Promise.resolve(false);
+			}
+			const ammo = ammoInfo.ammo;
+			this.consumeAmmunition(ammoInfo);
+			// Here we must check in advance if this attack will trigger the combat mode!
+			// We cannot wait til the projectile animation is over!
+			var mob = this.level.getMobAt(x, y, this.z);
+			if (mob && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
 				PlayerStateMachine.startCombat(true);
 			}
-      return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
-        if (ammo.def.throwable) {
-          this.level.addItem(ammo, x, y, this.z);
-        }
-        return this._attackPosition(x, y);
-      });
+			return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
+				if (ammo.def.throwable) {
+					this.level.addItem(ammo, x, y, this.z);
+				}
+				return this._attackPosition(x, y);
+			});
 		} else if (dist <= 1){
 			// Simple melee attack? but use the weapon's melee mode instead of ranged
 			// Or may be prevent attack from happening, depends on the weapon
@@ -564,16 +562,68 @@ Mob.prototype = {
 		}
 	},
 	
-  getAmmunitionFor: function(weapon) {
-    const ammoType = weapon.def.usesProjectileType;
-    if (ammoType) {
-      const onInventory = this.inventory.getItemById(ammoType);
-      return onInventory;
-    } else {
-      // No ammo, throw the weapon!
-      return weapon;
-    }
-  },
+	getAmmunitionFor: function(weapon) {
+		const ammoType = weapon.def.usesProjectileType;
+		if (ammoType) {
+			const backItem = this.getBackpack();
+			if (backItem) {
+				if (backItem.inventory) {
+					return {
+						ammo: backItem.inventory.getItemById(ammoType),
+						container: backItem
+					};
+				} else if (backItem.defid == ammoType) {
+					return {
+						ammo: backItem,
+						slotId: 'back'
+					}
+				}
+			} else {
+				const leftItem = this.getItemAtSlot('leftHand');
+				if (leftItem && leftItem.defid == ammoType) {
+					return {
+						ammo: leftItem,
+						slotId: 'leftHand'
+					}
+				}
+			}
+			return false;
+		} else {
+			// No ammo, throw the weapon!
+			return {
+				ammo: weapon,
+				slotId: 'rightHand'
+			}
+		}
+	},
+
+	consumeAmmunition: function (ammoInfo) {
+		const { slotId, container, ammo } = ammoInfo;
+		if (slotId) {
+			this.reduceItemQuantityAtSlot(slotId);
+		} else if (container) {
+			container.inventory.reduceItemQuantity(ammo);
+		} else {
+			throw new Error("Invalid consumeAmmunition operation."); // Shouldn't happen, ammo can only be on the backpack, or weapon for now
+		}
+	},
+
+	reduceItemQuantityAtSlot(slotId, variation) {
+		variation = variation || 1;
+		const item = this.getItemAtSlot(slotId);
+		if (item.quantity) {
+			if (item.quantity > variation) {
+				item.quantity -= variation;
+			} else if (item.quantity < variation) {
+				throw new Error('Not enough quantity of item ' + item.name + ' to reduce by ' + quantity);
+			} else {
+				this.removeItemAtSlot(slotId);
+			}
+		} else {
+			this.removeItemAtSlot(slotId);
+		}
+	},
+
 	attackOnDirection: function(dx, dy){
 		return this._attackPosition(this.x + dx, this.y + dy);
 	},

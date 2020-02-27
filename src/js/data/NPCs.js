@@ -7,10 +7,12 @@ const NPCs = [
 		type: 'avatar',
 		alignment: 'player',
 		armor: 'chainMail',
-		weapon: 'magicAxe',
+		weapon: 'crossbow',
 		backpack: 'barrel',
 		items: [
-			{ itemId: 'journalOfTheQuest', quantity: 1 }
+			{ itemId: 'journalOfTheQuest', quantity: 1 },
+			{ itemId: 'magicAxe', quantity: 1 },
+			{ itemId: 'ironBolt', quantity: 50 }
 		],
 	},
 	{
