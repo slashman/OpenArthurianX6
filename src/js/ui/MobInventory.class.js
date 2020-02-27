@@ -86,9 +86,7 @@ MobInventory.prototype._initSlots = function() {
         const slotSprite = this.game.add.sprite(x, y, 'ui', 7);
         const itemSprite = this.game.add.image(x,y,'ui');
         itemSprite.visible = false;
-        const tx = itemSprite.x - 8, ty = itemSprite.y - 8;
-        const quantityLabel = this.game.add.bitmapText(tx, ty, 'pixeled', '0', 12);
-        quantityLabel.anchor.set(1.0, 0.7);
+        const quantityLabel = this.game.add.bitmapText(x + 8, y + 8, 'pixeled', '0', 12);
         quantityLabel.anchor.visible = false;
         this.displayItems[slot.id] = {
             itemSprite,
