@@ -379,10 +379,10 @@ Mob.prototype = {
 	},
 	addItem: function(item) {
 		const backpack = this.getBackpack();
-		if (backpack) {
-			backpack.addItem(item);
-		} else if (!this.getItemAtSlot("rightHand")) {
+		if (!this.getItemAtSlot("rightHand")) {
 			this.setItemAtSlot("rightHand", item);
+		} else if (backpack) {
+			backpack.addItem(item);
 		} else if (!this.getItemAtSlot("leftHand")) {
 			this.setItemAtSlot("leftHand", item);
 		} else {
