@@ -1,4 +1,5 @@
 const Timer = require('../Timer');
+const DoubleTapBehavior = require('./DoubleTapBehavior');
 
 /**
  * Properties definitions for the container sizes
@@ -124,13 +125,7 @@ Container.prototype._syncInventoryIcons = function() {
 
             displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
             displayItem.itemSprite.visible = true;
-            displayItem.itemSprite.inputEnabled = true;
-            displayItem.itemSprite.events.onInputUp.add((game, pointer, isOver) => {
-                if (isOver) {
-                    item.clicked();
-                }
-            });
-
+            displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
             if (this.inventory[i].quantity !== undefined && this.inventory[i].quantity > 1){
                 displayItem.quantityLabel.visible = true;
                 displayItem.quantityLabel.text = this.inventory[i].quantity;
@@ -141,7 +136,8 @@ Container.prototype._syncInventoryIcons = function() {
             displayItem.itemSprite.visible = false;
             displayItem.quantityLabel.visible = false;
             displayItem.itemSprite.inputEnabled = false;
-            displayItem.itemSprite.events.onInputUp.removeAll();
+            delete displayItem.doubleTapBehavior; // TODO: Dispose better
+            //displayItem.itemSprite.events.onInputUp.removeAll();
         }
     }
 };

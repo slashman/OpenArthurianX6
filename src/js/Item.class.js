@@ -59,9 +59,13 @@ Item.prototype = {
   addItem(item) {
     return this.inventory.addItem(item);
   },
-  clicked() {
-    // TODO: Only call this if the item is not obscured by the FoV mask
-    OAX6.PlayerStateMachine.itemClicked(this, this.sprite.game.input.activePointer.leftButton.isDown, this.sprite.game.input.activePointer.rightButton.isDown);
+  clicked(leftButton, rightButton) {
+    // TODO: Only call this if the item is not obscured by the FoV mask and not in a visible container
+    OAX6.PlayerStateMachine.itemClicked(this, leftButton, rightButton);
+  },
+  doubleClicked(leftButton, rightButton) {
+    // TODO: Only call this if the item is not obscured by the FoV mask and not in a visible container
+    OAX6.PlayerStateMachine.itemDoubleClicked(this, leftButton, rightButton);
   },
 	getContainerId() {
 		return "item" + this._c.uid;

@@ -706,6 +706,10 @@ const PlayerStateMachine = {
             return;
         }
         this.clearActionCallback();
+        return this.useItem(Inventory.currentMob, item);
+    },
+
+    useItem: function (mob, item) {
         return Promise.resolve()
         .then(() => {
             if (item.def.useOnSelf) {
@@ -715,7 +719,7 @@ const PlayerStateMachine = {
             }
         }).then(dir => {
             if (dir !== null) {
-                Inventory.currentMob.useItemOnDirection(dir.x, dir.y, item);
+                mob.useItemOnDirection(dir.x, dir.y, item);
             }
             if (!item.def.useOnSelf) {
                 this.resetState();
@@ -744,6 +748,19 @@ const PlayerStateMachine = {
             default:
                 break;
 
+        }
+    },
+
+    itemDoubleClicked: function (item, leftClick, rightClick) {
+        if (!this.actionEnabled) { return; }
+        switch (this.state) {
+            case PlayerStateMachine.WORLD: case PlayerStateMachine.ITEM_TRANSFERRING:
+                if (leftClick) {
+                    this.useItem(OAX6.UI.activeMob, item); // TODO: Who is using it?
+                }
+                break;
+            default:
+                break;
         }
     },
 

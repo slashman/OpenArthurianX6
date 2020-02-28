@@ -5,6 +5,7 @@ const AppearanceFactory = require('./AppearanceFactory');
 const Item = require('./Item.class');
 const Door = require('./Door.class');
 const Inventory = require('./model/Inventory.class');
+const DoubleTapBehavior = require('./ui/DoubleTapBehavior');
 
 const ItemFactory = {
 	init: function(itemData){
@@ -62,10 +63,7 @@ const ItemFactory = {
 		const appearance = item.getAppearance();
 		const sprite = game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		sprite.visible = false;
-		sprite.inputEnabled = true;
-		sprite.events.onInputDown.add(() => { 
-			item.clicked();
-		});
+		sprite.doubleTapBehavior = new DoubleTapBehavior(sprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
 		return sprite;
 	},
 	// TODO: Move this to ObjectFactory, the Door class has nothing to do with Item. Move the definitions too?
@@ -83,12 +81,11 @@ const ItemFactory = {
 		const appearance = AppearanceFactory.getAppearance(door.open ? door.def.openAppearance : door.def.closedAppearance);
 		const sprite = game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		// door.sprite.visible = false; ???
-		sprite.inputEnabled = true;
-		sprite.events.onInputDown.add(() => { 
-			if (game.input.activePointer.leftButton.isDown) {
+		sprite.doubleTapBehavior = new DoubleTapBehavior(sprite, (l, r) => {
+			if (l) {
 				OAX6.PlayerStateMachine.clickOnDoor(door);
 			}
-		});
+		}, () => {});
 		return sprite;
 	}
 };
