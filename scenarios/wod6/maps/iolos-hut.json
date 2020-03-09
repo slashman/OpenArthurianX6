@@ -489,6 +489,26 @@
                  "width":16,
                  "x":512,
                  "y":432
+                }, 
+                {
+                 "gid":443,
+                 "height":16,
+                 "id":81,
+                 "name":"Harpsichord",
+                 "properties":
+                    {
+                     "itemId":"harpsichord"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":544,
+                 "y":224
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1064,7 +1084,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":77,
+ "nextobjectid":82,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

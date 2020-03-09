@@ -278,6 +278,10 @@ const Appearances = [
 			{
 				id: 'wLeverOff',
 				i: 4 * 33 + 19
+			},
+			{
+				id: 'harpsichord',
+				i: 13 * 33 + 13
 			}
 
 		]

@@ -36,7 +36,9 @@ const Loader = {
 		game.load.bitmapFont('grayFont', 'assets/grayFont.png', 'assets/font.fnt');
 		game.load.bitmapFont('dark', 'assets/darkFont.png', 'assets/font.fnt');
 
-		game.load.audio('notes', ['assets/keys.mp3']);
+		// game.load.audio('notes-piano', ['assets/keys.mp3']);
+		game.load.audio('notes-lute', ['assets/lute.ogg']);
+		game.load.audio('notes-harpsichord', ['assets/harpsichord.ogg']);
 	}
 }
 

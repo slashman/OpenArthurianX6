@@ -181,7 +181,50 @@ const Items = [
 		name: 'Lute',
 		effect: {
 			type: 'playMusic',
-			sounds: 'lute'
+			audioAssetKey: 'notes-lute',
+			offset: 0,
+			timingType: 'manual', // This could be fixed with 2400 segment length, but leaving like this to test manual support
+			fragments: [
+				0,
+				2400,
+				4807,
+				7210,
+				9613,
+				12009,
+				14414,
+				16812,
+				18872
+			]
+		},
+		useOnSelf: true
+	},
+	{
+		id: 'harpsichord',
+		appearance: 'harpsichord',
+		description: 'You can play music with it.',
+		name: 'Harpsichord',
+		effect: {
+			type: 'playMusic',
+			audioAssetKey: 'notes-harpsichord',
+			offset: 0,
+			timingType: 'fixed',
+			fragmentLength: 2400,
+			keys: 8,
+		},
+		useOnSelf: true
+	},
+	{
+		id: 'piano',
+		appearance: 'lute',
+		description: 'You can play music with it.',
+		name: 'Piano',
+		effect: {
+			type: 'playMusic',
+			audioAssetKey: 'notes',
+			timingType: 'fixed',
+			fragmentLength: 1500,
+			keys: 88, 
+			offset: 2 + 3 * 12
 		},
 		useOnSelf: true
 	},
