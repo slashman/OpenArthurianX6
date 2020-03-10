@@ -48,7 +48,8 @@ function Container(game, containerId, inventory, sizeDef) {
     this.sprite.inputEnabled = true;
 	this.sprite.events.onInputDown.add(() => {});
 
-    this.inventory = inventory.items.slice(); // TODO: Don't expose items list
+    this.inventory = inventory.items;
+    inventory.currentContainerWindow = this;
 
     const downArrow = this.game.add.sprite(104, 128, 'ui', 9, this.fovBlockLayer);
     const upArrow = this.game.add.sprite(104 + 16, 128, 'ui', 10, this.fovBlockLayer);

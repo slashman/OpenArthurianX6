@@ -499,9 +499,9 @@ Mob.prototype = {
 		}
 		if (used) {
 			if (item.def.spendable) {
-				this.inventory.reduceItemQuantity(item);
+				item.container.reduceItemQuantity(item);
 			}
-			OAX6.Inventory.updateInventory();
+			item.container.currentContainerWindow._syncInventoryIcons();
 		}
 		
 	},

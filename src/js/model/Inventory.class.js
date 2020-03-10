@@ -4,6 +4,7 @@ function Inventory () {
 
 Inventory.prototype = {
     addItem: function(item) {
+        item.container = this;
         if (item.def.stackLimit) {
             const existingItem = this.items.find(i => i.defid === item.defid);
             if (existingItem) {
@@ -22,12 +23,12 @@ Inventory.prototype = {
         }
         // TODO: Check vs capacity, return false if cannot carry
         return true;
-
     },
     addItemToFreeSlot: function(item) {
 		for (let i=0,len=this.items.length;i<len;i++) {
 			if (!this.items[i]) {
-				return this.items[i] = item;
+                this.items[i] = item;
+                return;
 			}
 		}
 
