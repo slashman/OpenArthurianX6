@@ -48,7 +48,7 @@ function Container(game, containerId, inventory, sizeDef) {
     this.sprite.inputEnabled = true;
 	this.sprite.events.onInputDown.add(() => {});
 
-    this.inventory = inventory.items;
+    this.inventory = inventory;
     inventory.currentContainerWindow = this;
 
     const downArrow = this.game.add.sprite(104, 128, 'ui', 9, this.fovBlockLayer);
@@ -71,8 +71,6 @@ function Container(game, containerId, inventory, sizeDef) {
         status: CURSOR_STATUS.IDLE,
         dragAnchor: { x: 0, y: 0 }
     };
-
-    this.lastItemIndex = -1;
 
     this._initItemsGrid();
     
@@ -120,10 +118,10 @@ Container.prototype._syncInventoryIcons = function() {
     const start = this.scroll * this.columns;
     for (let i = start; i < start + this.length; i++) {
         const displayItem = this.displayItems[i - start];
-        if (this.inventory[i]) {
-            const item = this.inventory[i];
-            const appearance = this.inventory[i].getAppearance();
-
+        const inventoryItems = this.inventory.items;
+        if (inventoryItems[i]) {
+            const item = inventoryItems[i];
+            const appearance = inventoryItems[i].getAppearance();
             displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
             displayItem.itemSprite.visible = true;
             if (displayItem.doubleTapBehavior) {
@@ -131,8 +129,9 @@ Container.prototype._syncInventoryIcons = function() {
             } else {
                 displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
             }
+            if (inventoryItems[i].quantity !== undefined && inventoryItems[i].quantity > 1){
                 displayItem.quantityLabel.visible = true;
-                displayItem.quantityLabel.text = this.inventory[i].quantity;
+                displayItem.quantityLabel.text = inventoryItems[i].quantity;
             } else {
                 displayItem.quantityLabel.visible = false;
             }
@@ -144,6 +143,7 @@ Container.prototype._syncInventoryIcons = function() {
                 displayItem.doubleTapBehavior.destroy();
                 delete displayItem.doubleTapBehavior;
             }
+        }
     }
 };
 
@@ -218,11 +218,10 @@ Container.prototype.__startDragging = function(mousePointer) {
         return;
     } else {
         const index = this._getItemIndexAtPoint(this.cursor),
-            item = this.inventory[index];
+            item = this.inventory.items[index];
 
         if (item) {
-            this.inventory[index] = null;
-            this.lastItemIndex = index;
+            this.inventory.removeItem(item);
             this._syncInventoryIcons();
 
             this.UI.dragItem(item, this);
@@ -254,26 +253,12 @@ Container.prototype.isMouseOver = function(mousePointer) {
 };
 
 Container.prototype.returnItem = function(item) {
-    this.inventory[this.lastItemIndex] = item;
+    this.inventory.addItem(item);
     this._syncInventoryIcons();
 };
 
-Container.prototype.addItem = function(item, originalContainer, mousePointer) {
-    this.cursor.x = mousePointer.x - this.group.x;
-    this.cursor.y = mousePointer.y - this.group.y;
-
-    const index = this._getItemIndexAtPoint(this.cursor);
-
-    if (index == null) {
-        return originalContainer.returnItem(item);
-    }
-
-    if (this.inventory[index]) {
-        const replacementItem = this.inventory[index];
-        originalContainer.returnItem(replacementItem);
-    }
-
-    this.inventory[index] = item;
+Container.prototype.addItem = function(item) {
+    this.inventory.addItem(item);
     this._syncInventoryIcons();
 };
 
