@@ -613,6 +613,7 @@ const PlayerStateMachine = {
             if (keyCode >= Phaser.KeyCode.ONE && keyCode <= Phaser.KeyCode.NINE){
                 return this.__musicManager.playNote(keyCode - Phaser.KeyCode.ONE + 1);
             } else if (keyCode === Phaser.KeyCode.ESC){
+                OAX6.UI.showMessage("You stop playing.");
                 this.resetState();
             }
         }
