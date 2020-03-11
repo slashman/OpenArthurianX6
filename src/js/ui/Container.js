@@ -126,8 +126,11 @@ Container.prototype._syncInventoryIcons = function() {
 
             displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
             displayItem.itemSprite.visible = true;
-            displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
-            if (this.inventory[i].quantity !== undefined && this.inventory[i].quantity > 1){
+            if (displayItem.doubleTapBehavior) {
+                displayItem.doubleTapBehavior.reset(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
+            } else {
+                displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
+            }
                 displayItem.quantityLabel.visible = true;
                 displayItem.quantityLabel.text = this.inventory[i].quantity;
             } else {
@@ -137,9 +140,10 @@ Container.prototype._syncInventoryIcons = function() {
             displayItem.itemSprite.visible = false;
             displayItem.quantityLabel.visible = false;
             displayItem.itemSprite.inputEnabled = false;
-            delete displayItem.doubleTapBehavior; // TODO: Dispose better
-            //displayItem.itemSprite.events.onInputUp.removeAll();
-        }
+            if (displayItem.doubleTapBehavior) {
+                displayItem.doubleTapBehavior.destroy();
+                delete displayItem.doubleTapBehavior;
+            }
     }
 };
 
