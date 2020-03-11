@@ -517,6 +517,15 @@ const UI = {
 			container = new Container(this.game, item.getContainerId(), item.inventory, containerSizes.medium);
 			container.open();
 		}
+	},
+	getWorldPosition(mousePointer) {
+		const mouseX = mousePointer.x;
+		const mouseY = mousePointer.y;
+		const playerScreenX = (this.game.width / 2) - 8;
+		const playerScreenY = (this.game.height / 2) - 8;
+		const xDiff = Math.floor((mouseX - playerScreenX) / 16);
+		const yDiff = Math.floor((mouseY - playerScreenY) / 16);
+		return { x: this.activeMob.x + xDiff, y: this.activeMob.y + yDiff };
 	}
 }
 
