@@ -722,7 +722,7 @@ const PlayerStateMachine = {
             if (dir !== null) {
                 mob.useItemOnDirection(dir.x, dir.y, item);
             }
-            if (!item.def.useOnSelf) {
+            if (this.state == PlayerStateMachine.TARGETTING) {
                 this.resetState();
             }
         });
