@@ -586,15 +586,13 @@ const PlayerStateMachine = {
                 if (container) {
                     container.addItem(item, originalContainer, mousePointer);
                 } else {
-                    const positionInWorld = UI.getWorldPosition(mousePointer);
-                    if (false) { // TODO: Check distance and obstacles.
+                    const activeMob = OAX6.UI.activeMob || this.player;
+                    const dropped = activeMob.tryDrop(item, UI.getWorldPosition(mousePointer));
+                    if (!dropped) {
                         originalContainer.returnItem(item);
-                    } else {
-                        this.player.level.addItem(item, positionInWorld.x, positionInWorld.y, this.player.z);
                     }
                 }
             }
-
             return;
         }
 

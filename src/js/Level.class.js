@@ -155,12 +155,7 @@ Level.prototype = {
 		}
 		this.objectsMap[z][x][y] = object;
 	},
-	findPathTo: function(to, from, z, includeMobsOfAlignment){
-		//TODO: Single finder object?
-		const finder = new PF.AStarFinder({
-		    allowDiagonal: true,
-    		dontCrossCorners: false
-		});
+	findPathThruMobs: function(to, from, z, includeMobsOfAlignment){
 		const gridClone = this.pfGrids[z].clone();
 		
 		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
@@ -174,10 +169,19 @@ Level.prototype = {
 				});
 			}
 		});
-
-		const path = finder.findPath(from.x, from.y, to.x, to.y, gridClone);
+		return this.findPath(from, to, z, gridClone)
+	},
+	findPath(from, to, z, grid) {
+		if (!grid) {
+			grid = this.pfGrids[z].clone();
+		}
+		//TODO: Single finder object?
+		const finder = new PF.AStarFinder({
+		    allowDiagonal: true,
+    		dontCrossCorners: false
+		});
+		const path = finder.findPath(from.x, from.y, to.x, to.y, grid);
 		if (path.length == 0){
-			console.log(`Someone is trapped at ${from.x}, ${from.y})`)
 			return {dx:0, dy:0};
 		}
 		return {

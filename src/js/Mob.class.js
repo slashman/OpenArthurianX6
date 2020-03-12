@@ -171,7 +171,7 @@ Mob.prototype = {
 		} 
 	},
 	bumpTowards: function (targetMob) {
-		const nextStep = this.level.findPathTo(targetMob, this, this.z, this.alignment);
+		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
 		const mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
@@ -788,6 +788,19 @@ Mob.prototype = {
 	},
 	setBackpack(item) {
 		this.setItemAtSlot('back', item);
+	},
+	tryDrop(item, position) {
+		if (Geo.flatDist(this.x, this.y, position.x, position.y) > 2) {
+			OAX6.UI.showMessage("Too far");
+			return false;
+		}
+		const path = this.level.findPath(this, position, this.z);
+		if (path.dx == 0 && path.dy == 0) {
+			OAX6.UI.showMessage("Unreachable");
+			return false;
+		}
+		this.level.addItem(item, position.x, position.y, this.z);
+		return true;
 	}
 };
 
