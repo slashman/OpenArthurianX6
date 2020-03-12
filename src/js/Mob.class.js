@@ -510,7 +510,11 @@ Mob.prototype = {
 			y = this.y + dy;
 
 		if (!this.level.isSolid(x, y, this.z) && !this.level.getItemAt(x, y, this.z)) {
-			this.inventory.removeItem(item);
+			if (item.container) {
+				item.container.removeItem(item);
+			} else {
+				this.removeItemAtSlot(item.currentSlotId);
+			}
 			this.level.addItem(item, x, y, this.z);
 		} else {
 			this.reportAction("Can't drop it there!");
@@ -760,9 +764,16 @@ Mob.prototype = {
 	},
 	setItemAtSlot(slotId, item) {
 		this.bodySlots[slotId] = item;
+		if (item) {
+			item.currentSlotId = slotId;
+		}
 		// TODO: If there is an item already, put in backpack
 	},
 	removeItemAtSlot(slotId) {
+		const currentItem = this.bodySlots[slotId];
+		if (currentItem) {
+			currentItem.currentSlotId = false;
+		}
 		delete this.bodySlots[slotId];
 	},
 	getWeapon() {

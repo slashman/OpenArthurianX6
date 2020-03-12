@@ -262,6 +262,13 @@ Container.prototype.addItem = function(item) {
     this._syncInventoryIcons();
 };
 
+/**
+ * Used when the item list was modified externally
+ */
+Container.prototype.refresh = function() {
+    this._syncInventoryIcons();
+};
+
 Container.prototype.open = function() {
     if (this.isOpen()) {
         return;

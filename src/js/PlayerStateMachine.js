@@ -680,15 +680,20 @@ const PlayerStateMachine = {
     },
 
     dropItem: function() {
-        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        var item = this.selectedItem;
         if (!item) {
             return;
         }
         this.clearActionCallback();
         return this._selectDirection('Drop').then(dir => {
             if (dir !== null) {
-                Inventory.currentMob.dropOnDirection(dir.x, dir.y, item);
-                Inventory.updateInventory(); //TODO: This function no longer exists. Fix
+                const activeMob = OAX6.UI.activeMob || this.player;
+                activeMob.dropOnDirection(dir.x, dir.y, item);
+                if (item.container) {
+                    item.container.currentContainerWindow.refresh();
+                } else {
+                    item.currentMobInventoryWindow.refresh();
+                }
             }
             this.resetState();
         });
@@ -747,6 +752,7 @@ const PlayerStateMachine = {
                 }
                 break;
             case PlayerStateMachine.ITEM_TRANSFERRING:
+                this.selectedItem = item;
                 if (item.isContainer()) {
                     OAX6.UI.showContainerForItem(item);
                 }

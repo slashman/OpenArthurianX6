@@ -99,11 +99,16 @@ MobInventory.prototype._initSlots = function() {
     });
 };
 
+MobInventory.prototype.refresh = function() {
+    this._syncInventoryIcons();
+}
+
 MobInventory.prototype._syncInventoryIcons = function() {
     Object.keys(this.displayItems).forEach(key => {
         const displayItem = this.displayItems[key];
         const item = this.mob.getItemAtSlot(key);
         if (item) {
+            item.currentMobInventoryWindow = this;
             const appearance = item.getAppearance();
             displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
             displayItem.itemSprite.visible = true;
