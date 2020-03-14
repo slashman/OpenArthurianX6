@@ -72,13 +72,17 @@ function Container(game, containerId, inventory, sizeDef) {
         dragAnchor: { x: 0, y: 0 }
     };
 
+    this.marker = this.game.add.sprite(0, 0, 'ui', 0, this.group);
+    this.marker.visible = false;
+    this.marker.anchor.set(0.5);
+
     this._initItemsGrid();
     
     this.UI.UILayer.add(this.group);
 
     this.scroll = 0;
     this.maxScroll = Math.ceil(this.containerCapacity / this.columns);
-
+    
     this.close();
 }
 
@@ -114,7 +118,12 @@ Container.prototype._initItemsGrid = function() {
     }
 };
 
+Container.prototype.hideMarker = function () {
+    this.marker.visible = false;
+};
+
 Container.prototype._syncInventoryIcons = function() {
+    this.marker.visible = false;
     const start = this.scroll * this.columns;
     for (let i = start; i < start + this.length; i++) {
         const displayItem = this.displayItems[i - start];
@@ -124,10 +133,18 @@ Container.prototype._syncInventoryIcons = function() {
             const appearance = inventoryItems[i].getAppearance();
             displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
             displayItem.itemSprite.visible = true;
+            const clickCallback = (l, r) => {
+                OAX6.UI.hideAllMarkersOnContainers();
+                this.marker.x = displayItem.itemSprite.x;
+                this.marker.y = displayItem.itemSprite.y;
+                this.marker.visible = true;
+                item.clicked(l, r);
+            }
+            const doubleClickCallback = (l, r) => item.doubleClicked(l, r);
             if (displayItem.doubleTapBehavior) {
-                displayItem.doubleTapBehavior.reset(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
+                displayItem.doubleTapBehavior.reset(displayItem.itemSprite, clickCallback, doubleClickCallback);
             } else {
-                displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
+                displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, clickCallback, doubleClickCallback);
             }
             if (inventoryItems[i].quantity !== undefined && inventoryItems[i].quantity > 1){
                 displayItem.quantityLabel.visible = true;
@@ -283,6 +300,9 @@ Container.prototype.open = function() {
 Container.prototype.close = function() {
     this.group.visible = false;
     this.UI.removeContainer(this);
+    if (this.marker.visible) {
+        OAX6.PlayerStateMachine.selectedItem = false;
+    }
     // TODO: Destroy the group
 };
 

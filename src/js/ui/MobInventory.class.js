@@ -73,6 +73,10 @@ function MobInventory(game, containerId, mob) {
     this.lastItemSlot = undefined;
 
     this._initSlots();
+
+    this.marker = this.game.add.sprite(0, 0, 'ui', 0, this.group);
+    this.marker.visible = false;
+    // this.marker.anchor.set(0.5);
     
     this.UI.UILayer.add(this.group);
 
@@ -103,7 +107,12 @@ MobInventory.prototype.refresh = function() {
     this._syncInventoryIcons();
 }
 
+MobInventory.prototype.hideMarker = function () {
+    this.marker.visible = false;
+}
+
 MobInventory.prototype._syncInventoryIcons = function() {
+    this.marker.visible = false;
     Object.keys(this.displayItems).forEach(key => {
         const displayItem = this.displayItems[key];
         const item = this.mob.getItemAtSlot(key);
@@ -112,13 +121,19 @@ MobInventory.prototype._syncInventoryIcons = function() {
             const appearance = item.getAppearance();
             displayItem.itemSprite.loadTexture(appearance.tileset, appearance.i);
             displayItem.itemSprite.visible = true;
-
-            if (displayItem.doubleTapBehavior) {
-                displayItem.doubleTapBehavior.reset(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
-            } else {
-                displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
+            const clickCallback = (l, r) => {
+                OAX6.UI.hideAllMarkersOnContainers();
+                this.marker.x = displayItem.itemSprite.x;
+                this.marker.y = displayItem.itemSprite.y;
+                this.marker.visible = true;
+                item.clicked(l, r);
             }
-
+            const doubleClickCallback = (l, r) => item.doubleClicked(l, r);
+            if (displayItem.doubleTapBehavior) {
+                displayItem.doubleTapBehavior.reset(displayItem.itemSprite, clickCallback, doubleClickCallback);
+            } else {
+                displayItem.doubleTapBehavior = new DoubleTapBehavior(displayItem.itemSprite, clickCallback, doubleClickCallback);
+            }
             if (item.quantity !== undefined && item.quantity > 1){
                 displayItem.quantityLabel.visible = true;
                 displayItem.quantityLabel.text = item.quantity;
@@ -280,6 +295,9 @@ MobInventory.prototype.open = function() {
 MobInventory.prototype.close = function() {
     this.group.visible = false;
     this.UI.removeContainer(this);
+    if (this.marker.visible) {
+        OAX6.PlayerStateMachine.selectedItem = false;
+    }
     // TODO: Destroy the group
 };
 

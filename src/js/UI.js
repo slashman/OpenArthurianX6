@@ -343,6 +343,10 @@ const UI = {
 		openContainers.forEach(c => c.close());
 	},
 
+	hideAllMarkersOnContainers() {
+		this.openContainers.forEach(c => c.hideMarker());
+	},
+
 	addContainer: function(container) {
 		if (this.openContainers.indexOf(container) != -1) {
 			return;
