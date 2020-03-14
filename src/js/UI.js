@@ -23,8 +23,8 @@ const scenarioInfo = require('./ScenarioInfo');
 
 const STRETCH = true;
 
-const Container = require('./ui/Container').Container;
-const containerSizes = require('./ui/Container').SIZES;
+const GridContainer = require('./ui/GridContainer.class').GridContainer;
+const containerSizes = require('./ui/GridContainer.class').SIZES;
 const MobInventory = require('./ui/MobInventory.class');
 
 const UI = {
@@ -518,7 +518,7 @@ const UI = {
 		if (container){
 			container.bringToTop();
 		} else {
-			container = new Container(this.game, item.getContainerId(), item.inventory, containerSizes.medium);
+			container = new GridContainer(this.game, item.getContainerId(), item.inventory, containerSizes.medium);
 			container.open();
 		}
 	},
