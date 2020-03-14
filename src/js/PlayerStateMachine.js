@@ -694,6 +694,7 @@ const PlayerStateMachine = {
                 } else {
                     item.currentMobInventoryWindow.refresh();
                 }
+                this.selectedItem = false;
             }
             this.resetState();
         });
