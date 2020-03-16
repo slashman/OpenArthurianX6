@@ -13,10 +13,11 @@ const SIZES = {
     }
 };
 
-function GridContainer(game, containerId, inventory, sizeDef) {
+function GridContainer(game, containerId, containerItem, sizeDef) {
     Container.call(this, game, containerId, sizeDef.spriteId);
-    this.inventory = inventory;
-    inventory.currentContainerWindow = this;
+    this.containerItem = containerItem;
+    this.inventory = containerItem.inventory;
+    this.inventory.currentContainerWindow = this;
     this.sizeDef = sizeDef;
     this.columns = sizeDef.columns;
     this.rows = sizeDef.rows;
@@ -122,9 +123,12 @@ GridContainer.prototype.scrollUp = function() {
     this._syncInventoryIcons();
 }
 
-GridContainer.prototype.addItem = function(item) {
-    this.inventory.addItem(item);
-    this._syncInventoryIcons();
+GridContainer.prototype.addItem = function(item, originalContainer) {
+    if (this.containerItem.addItem(item)) {
+        this._syncInventoryIcons();
+    } else {
+        originalContainer.returnItem(item);
+    }
 };
 
 GridContainer.prototype._syncInventoryIcons = function() {

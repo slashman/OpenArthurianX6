@@ -57,6 +57,9 @@ Item.prototype = {
     }
   },
   addItem(item) {
+    if (item == this) {
+      return false;
+    }
     return this.inventory.addItem(item);
   },
   clicked(leftButton, rightButton) {

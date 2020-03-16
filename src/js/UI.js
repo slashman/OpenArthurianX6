@@ -518,7 +518,7 @@ const UI = {
 		if (container){
 			container.bringToTop();
 		} else {
-			container = new GridContainer(this.game, item.getContainerId(), item.inventory, containerSizes.medium);
+			container = new GridContainer(this.game, item.getContainerId(), item, containerSizes.medium);
 			container.open();
 		}
 	},
