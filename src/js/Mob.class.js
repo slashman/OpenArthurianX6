@@ -810,12 +810,17 @@ Mob.prototype = {
 			OAX6.UI.showMessage("Too far");
 			return false;
 		}
-		const path = this.level.findPath(this, position, this.z);
-		if (path.dx == 0 && path.dy == 0) {
-			OAX6.UI.showMessage("Unreachable");
-			return false;
+		if (this.x != position.x || this.y != position.y || this.z != position.z) {
+			const path = this.level.findPath(this, position, this.z);
+			if (path.dx == 0 && path.dy == 0) {
+				OAX6.UI.showMessage("Unreachable");
+				return false;
+			}
 		}
-		// TODO: If there's a being here, add item to him
+		const mob = this.level.getMobAt(position.x, position.y, position.z);
+		if (mob) {
+			return mob.addItem(item);
+		}
 		const worldItem = this.level.getItemAt(position.x, position.y, position.z);
 		if (worldItem) {
 			if (worldItem.isContainer()) {
