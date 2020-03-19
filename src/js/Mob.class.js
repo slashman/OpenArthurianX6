@@ -805,11 +805,17 @@ Mob.prototype = {
 	setBackpack(item) {
 		this.setItemAtSlot('back', item);
 	},
-	tryDrop(item, position) {
-		if (Geo.flatDist(this.x, this.y, position.x, position.y) > 2) {
-			OAX6.UI.showMessage("Too far");
-			return false;
+	canDrag(item) {
+		if (this.x != item.x || this.y != item.y || this.z != item.z) {
+			const path = this.level.findPath(this, item, this.z);
+			if (path.dx == 0 && path.dy == 0) {
+				OAX6.UI.showMessage("Unreachable");
+				return false;
+			}
 		}
+		return true;
+	},
+	tryDrop(item, position) {
 		if (this.x != position.x || this.y != position.y || this.z != position.z) {
 			const path = this.level.findPath(this, position, this.z);
 			if (path.dx == 0 && path.dy == 0) {

@@ -532,6 +532,10 @@ const UI = {
 		const xDiff = Math.floor((mouseX - playerScreenX) / 16);
 		const yDiff = Math.floor((mouseY - playerScreenY) / 16);
 		return { x: this.activeMob.x + xDiff, y: this.activeMob.y + yDiff, z: this.activeMob.z };
+	},
+	// Called when drag was put into delay but then was aborted
+	cancelDrag() {
+		this.dragStatus = 'idle';
 	}
 }
 

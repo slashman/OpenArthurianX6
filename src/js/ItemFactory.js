@@ -67,10 +67,14 @@ const ItemFactory = {
 			(l, r) => item.clicked(l, r),
 			(l, r) => item.doubleClicked(l, r),
 			() => {
-				OAX6.PlayerStateMachine.switchState(OAX6.PlayerStateMachine.ITEM_TRANSFERRING);
 				const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
-				activeMob.level.removeItem(item);
-				OAX6.UI.dragItem(item, activeMob.level);
+				if (activeMob.canDrag(item)) {
+					OAX6.PlayerStateMachine.switchState(OAX6.PlayerStateMachine.ITEM_TRANSFERRING);
+					activeMob.level.removeItem(item);
+					OAX6.UI.dragItem(item, activeMob.level);
+				} else {
+					OAX6.UI.cancelDrag();
+				}
 			}
 		);
 		return sprite;
