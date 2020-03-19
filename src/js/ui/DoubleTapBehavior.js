@@ -9,9 +9,10 @@ DoubleTapBehavior.prototype = {
     __startDragging(pointer, onDragStart) {
         if (!pointer.isDown) {
             // No dragging, just clicking
-            this.cursor.status = CURSOR_STATUS.IDLE;
+            OAX6.UI.dragStatus = 'idle';
             return;
         }
+        OAX6.UI.dragStatus = 'dragging';
         onDragStart();
     },
     reset(component, singleTapCallback, doubleTapCallback, onDragStart) {
@@ -24,6 +25,7 @@ DoubleTapBehavior.prototype = {
         if (onDragStart) {
             component.events.onInputDown.removeAll();
             component.events.onInputDown.add((sprite, pointer, isOver) => {
+                OAX6.UI.dragStatus = 'delay';
                 Timer.delay(100).then(() => {
                     this.__startDragging(pointer, onDragStart);
                 });

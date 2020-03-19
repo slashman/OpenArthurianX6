@@ -57,6 +57,7 @@ const UI = {
 		this.draggingElement = null;
 		this.currentMessageIndex = 0;
 		Bus.listen('nextMessage', () => this.showNextSceneFragment());
+		this.dragStatus = 'idle';
 	},
 	create: function(){
 		this.worldLayer = this.game.add.group();
@@ -420,6 +421,7 @@ const UI = {
 		this.draggingItem.display.visible = false;
 		this.draggingItem.item = null;
 		this.draggingItem.container = null;
+		OAX6.UI.dragStatus = 'idle';
   },
 
   showScene(sceneId) {
