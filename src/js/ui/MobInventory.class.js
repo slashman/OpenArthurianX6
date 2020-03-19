@@ -127,12 +127,13 @@ MobInventory.prototype.addItem = function(item, originalContainer, mousePointer)
         return originalContainer.returnItem(item);
     }
 
-    if (this.mob.getItemAtSlot(slotId)) {
-        if (originalContainer.isLevelContainer) {
+    const replacementItem = this.mob.getItemAtSlot(slotId);
+    if (replacementItem) {
+        if (originalContainer.isLevelContainer || replacementItem.isContainer()) {
             return originalContainer.returnItem(item);
         } else {
-            const replacementItem = this.mob.getItemAtSlot(slotId);
-            originalContainer.returnItem(replacementItem);
+            // Swap
+            originalContainer.returnItem(replacementItem); // We are not really returning an item here, we are adding it!
         }
     }
     this.mob.setItemAtSlot(slotId, item);
