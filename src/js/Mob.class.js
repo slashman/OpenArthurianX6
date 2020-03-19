@@ -815,6 +815,11 @@ Mob.prototype = {
 			OAX6.UI.showMessage("Unreachable");
 			return false;
 		}
+		const worldItem = this.level.getItemAt(position.x, position.y, position.z);
+		if (worldItem) {
+			OAX6.UI.showMessage("Blocked");
+			return false;
+		}
 		this.level.addItem(item, position.x, position.y, this.z);
 		return true;
 	}
