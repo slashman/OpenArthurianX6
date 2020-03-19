@@ -108,11 +108,14 @@ const PlayerStateMachine = {
             varx = 1;
         }
 
-        if (this.game.input.activePointer.isDown) {
+        if (this.game.input.activePointer.isDown ) {
+            // Should only do this if we didn't click on an item,
+            // and consider the dragging delay too.
+            /*
             const pointer = this.game.input.activePointer;
             const varObj = OAX6.UI.selectQuadrant(pointer.position);
             varx = varObj.x;
-            vary = varObj.y;
+            vary = varObj.y;*/
         }
 
         if (varx !== 0 || vary !== 0){
@@ -589,7 +592,11 @@ const PlayerStateMachine = {
                     const activeMob = OAX6.UI.activeMob || this.player;
                     const dropped = activeMob.tryDrop(item, UI.getWorldPosition(mousePointer));
                     if (!dropped) {
-                        originalContainer.returnItem(item);
+                        /*if (originalContainer.type == 'level') {
+                            originalContainer.level.addItem(item, originalContainer.x, originalContainer.y, originalContainer.z);
+                        } else {*/
+                            originalContainer.returnItem(item);
+                        //}
                     }
                 }
             }
@@ -689,9 +696,9 @@ const PlayerStateMachine = {
             if (dir !== null) {
                 const activeMob = OAX6.UI.activeMob || this.player;
                 activeMob.dropOnDirection(dir.x, dir.y, item);
-                if (item.container) {
+                if (item.container.currentContainerWindow) {
                     item.container.currentContainerWindow.refresh();
-                } else {
+                } else if (item.currentMobInventoryWindow){
                     item.currentMobInventoryWindow.refresh();
                 }
                 this.selectedItem = false;

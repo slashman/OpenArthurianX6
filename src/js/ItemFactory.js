@@ -63,7 +63,16 @@ const ItemFactory = {
 		const appearance = item.getAppearance();
 		const sprite = game.add.sprite(0, 0, appearance.tileset, appearance.i);
 		sprite.visible = false;
-		sprite.doubleTapBehavior = new DoubleTapBehavior(sprite, (l, r) => item.clicked(l, r), (l, r) => item.doubleClicked(l, r));
+		sprite.doubleTapBehavior = new DoubleTapBehavior(sprite,
+			(l, r) => item.clicked(l, r),
+			(l, r) => item.doubleClicked(l, r),
+			() => {
+				OAX6.PlayerStateMachine.switchState(OAX6.PlayerStateMachine.ITEM_TRANSFERRING);
+				const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
+				activeMob.level.removeItem(item);
+				OAX6.UI.dragItem(item, activeMob.level);
+			}
+		);
 		return sprite;
 	},
 	// TODO: Move this to ObjectFactory, the Door class has nothing to do with Item. Move the definitions too?

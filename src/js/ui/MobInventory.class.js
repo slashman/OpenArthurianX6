@@ -128,8 +128,12 @@ MobInventory.prototype.addItem = function(item, originalContainer, mousePointer)
     }
 
     if (this.mob.getItemAtSlot(slotId)) {
-        const replacementItem = this.mob.getItemAtSlot(slotId);
-        originalContainer.returnItem(replacementItem);
+        if (originalContainer.isLevelContainer) {
+            return originalContainer.returnItem(item);
+        } else {
+            const replacementItem = this.mob.getItemAtSlot(slotId);
+            originalContainer.returnItem(replacementItem);
+        }
     }
     this.mob.setItemAtSlot(slotId, item);
     this._syncInventoryIcons();

@@ -20,6 +20,7 @@ function Level(){
 	this.opaqueMasks = null;
 	this.pfGrids = [];
 	this.currentTurnCounter = 0;
+	this.isLevelContainer = true;
 	this._c = circular.register('Level');
 }
 
@@ -134,6 +135,13 @@ Level.prototype = {
 	},
 	addItem: function(item, x, y, z) {
 		OAX6.UI.addItemSprite(item, x, y, z);
+		item.x = x;
+		item.y = y;
+		item.z = z;
+		this.items.push(item);
+	},
+	returnItem (item) {
+		OAX6.UI.addItemSprite(item, item.x, item.y, item.z);
 		this.items.push(item);
 	},
 	addDoor: function(door, x, y, z) {
@@ -324,6 +332,9 @@ Level.prototype = {
 		const solidMask = this.solidMasks[z];
 		const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
 		this.pfGrids[z]= new PF.Grid(pfMask);
+	},
+	reduceItemQuantity(item) {
+		// Must implement, for the case of items used in the map
 	}
 };
 

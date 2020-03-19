@@ -501,7 +501,9 @@ Mob.prototype = {
 			if (item.def.spendable) {
 				item.container.reduceItemQuantity(item);
 			}
-			item.container.currentContainerWindow._syncInventoryIcons();
+			if (item.container.currentContainerWindow) {
+				item.container.currentContainerWindow._syncInventoryIcons();
+			}
 		}
 		
 	},
@@ -766,6 +768,9 @@ Mob.prototype = {
 		this.bodySlots[slotId] = item;
 		if (item) {
 			item.currentSlotId = slotId;
+			delete item.x;
+			delete item.y;
+			delete item.z;
 		}
 		// TODO: If there is an item already, put in backpack
 	},
