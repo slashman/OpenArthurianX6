@@ -36,22 +36,8 @@ Inventory.prototype = {
 		this.items.push(item);
     },
     removeItem: function(item) {
-        var ind = this.items.indexOf(item); // DOes this even work?
+        var ind = this.items.indexOf(item);
 		this.items.splice(ind, 1);
-    },
-    reduceItemQuantity(item, variation) {
-		variation = variation || 1;
-		if (item.quantity) {
-			if (item.quantity > variation) {
-				item.quantity -= variation;
-			} else if (item.quantity < variation) {
-				throw new Error('Not enough quantity of item ' + item.name + ' to reduce by ' + quantity);
-			} else {
-				this.items.splice(this.items.findIndex(i => i.defid === item.defid), 1);
-			}
-		} else {
-			this.items.splice(this.items.findIndex(i => i.defid === item.defid), 1);
-		}
     },
     getItemById(itemId) {
         return this.items.find(i => i.defid === itemId);

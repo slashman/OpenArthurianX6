@@ -499,7 +499,7 @@ Mob.prototype = {
 		}
 		if (used) {
 			if (item.def.spendable) {
-				item.container.reduceItemQuantity(item);
+				item.reduceItemQuantity();
 			}
 			if (item.container.currentContainerWindow) {
 				item.container.currentContainerWindow._syncInventoryIcons();
@@ -608,7 +608,7 @@ Mob.prototype = {
 		if (slotId) {
 			this.reduceItemQuantityAtSlot(slotId);
 		} else if (container) {
-			container.inventory.reduceItemQuantity(ammo);
+			ammo.reduceItemQuantity();
 		} else {
 			throw new Error("Invalid consumeAmmunition operation."); // Shouldn't happen, ammo can only be on the backpack, or weapon for now
 		}

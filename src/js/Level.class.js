@@ -135,6 +135,7 @@ Level.prototype = {
 	},
 	addItem: function(item, x, y, z) {
 		OAX6.UI.addItemSprite(item, x, y, z);
+		item.container = this;
 		item.x = x;
 		item.y = y;
 		item.z = z;
@@ -332,9 +333,6 @@ Level.prototype = {
 		const solidMask = this.solidMasks[z];
 		const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
 		this.pfGrids[z]= new PF.Grid(pfMask);
-	},
-	reduceItemQuantity(item) {
-		// Must implement, for the case of items used in the map
 	}
 };
 

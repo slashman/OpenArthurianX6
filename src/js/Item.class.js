@@ -72,7 +72,21 @@ Item.prototype = {
   },
 	getContainerId() {
 		return "item" + this._c.uid;
-	}
+	},
+  reduceItemQuantity(variation) {
+    variation = variation || 1;
+    if (this.quantity) {
+      if (this.quantity > variation) {
+        this.quantity -= variation;
+      } else if (this.quantity < variation) {
+        throw new Error('Not enough quantity of item ' + this.name + ' to reduce by ' + quantity);
+      } else {
+        this.container.removeItem(this);
+      }
+    } else {
+      this.container.removeItem(this);
+    }
+  }
 }
 
 module.exports = Item;
