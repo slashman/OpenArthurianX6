@@ -696,11 +696,13 @@ const PlayerStateMachine = {
         return this._selectDirection('Drop').then(dir => {
             if (dir !== null) {
                 const activeMob = OAX6.UI.activeMob || this.player;
+                const previousContainer = item.container;
+                const previousMobInventoryWindow = item.currentMobInventoryWindow;
                 activeMob.dropOnDirection(dir.x, dir.y, item);
-                if (item.container.currentContainerWindow) {
-                    item.container.currentContainerWindow.refresh();
-                } else if (item.currentMobInventoryWindow){
-                    item.currentMobInventoryWindow.refresh();
+                if (previousContainer && previousContainer.currentContainerWindow) {
+                    previousContainer.currentContainerWindow.refresh();
+                } else if (previousMobInventoryWindow){
+                    previousMobInventoryWindow.refresh();
                 }
                 this.selectedItem = false;
             }
