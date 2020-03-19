@@ -815,10 +815,19 @@ Mob.prototype = {
 			OAX6.UI.showMessage("Unreachable");
 			return false;
 		}
+		// TODO: If there's a being here, add item to him
 		const worldItem = this.level.getItemAt(position.x, position.y, position.z);
 		if (worldItem) {
-			OAX6.UI.showMessage("Blocked");
-			return false;
+			if (worldItem.isContainer()) {
+				worldItem.addItem(item);
+				if (item.container.currentContainerWindow) {
+					item.container.currentContainerWindow._syncInventoryIcons();
+				}
+				return true;
+			} else {
+				OAX6.UI.showMessage("Blocked");
+				return false;
+			}
 		}
 		this.level.addItem(item, position.x, position.y, this.z);
 		return true;
