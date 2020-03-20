@@ -103,6 +103,16 @@ MobInventory.prototype._getSlotIdAtPoint = function(point) {
     }
 };
 
+MobInventory.prototype.isCursorOnItem = function () {
+    const slotId = this._getSlotIdAtPoint(this.cursor);
+    const item = this.mob.getItemAtSlot(slotId);
+    if (item) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
 MobInventory.prototype.__startDraggingItem = function() {
     const slotId = this._getSlotIdAtPoint(this.cursor),
         item = this.mob.getItemAtSlot(slotId);

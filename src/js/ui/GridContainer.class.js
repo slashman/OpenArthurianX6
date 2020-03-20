@@ -20,7 +20,6 @@ const SIZES = {
         spriteId: 'backpackContainer',
         size: { w: 111, h: 101 },
         itemsGrid: { x: 22, y: 36, w: 61, h: 39, slotW: 16, slotH: 16, marginR: 3, marginB: 3 },
-        topBar: { x: 0, y: 0, w: 136, h: 14 }, // ??
         closeButton: { x: 0, y: 27, w: 16, h: 16 },
         scrollUpButton: {x: 75, y: 89 },
         scrollDownButton: {x: 86, y: 89}
@@ -86,6 +85,16 @@ GridContainer.prototype._initItemsGrid = function() {
         });
         this.group.add(itemSprite);
         this.group.add(quantityLabel);
+    }
+};
+
+GridContainer.prototype.isCursorOnItem = function () {
+    const index = this._getItemIndexAtPoint(this.cursor);
+    const item = this.inventory.items[index];
+    if (item) {
+        return true;
+    } else {
+        return false;
     }
 };
 

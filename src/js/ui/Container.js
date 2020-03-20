@@ -106,7 +106,7 @@ Container.prototype.onMouseDown = function(mousePointer) {
 
     this.cursor.status = CURSOR_STATUS.DELAY;
 
-    if (this._pointInRect(this.cursor, this.sizeDef.topBar)) {
+    if (this.sizeDef.topBar && this._pointInRect(this.cursor, this.sizeDef.topBar)) {
         // Click on top bar, no dragging delay since it cannot be clicked.
         this.__startDragging(mousePointer);
     } else {
@@ -123,13 +123,11 @@ Container.prototype.__startDragging = function(mousePointer) {
         this.cursor.status = CURSOR_STATUS.IDLE;
         return;
     }
-    if (this._pointInRect(this.cursor, this.sizeDef.topBar)) {
+    if (!this.isCursorOnItem() && (!this.sizeDef.topBar || this._pointInRect(this.cursor, this.sizeDef.topBar))) {
         this.cursor.status = CURSOR_STATUS.DRAGGING;
         this.cursor.dragAnchor.x = this.cursor.x;
         this.cursor.dragAnchor.y = this.cursor.y;
-
         this.UI.dragElement(this);
-        
         return;
     } else {
         this.__startDraggingItem()
