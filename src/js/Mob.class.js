@@ -507,21 +507,6 @@ Mob.prototype = {
 		}
 		
 	},
-	dropOnDirection: function(dx, dy, item) {
-		var x = this.x + dx,
-			y = this.y + dy;
-
-		if (!this.level.isSolid(x, y, this.z) && !this.level.getItemAt(x, y, this.z)) {
-			if (item.container) {
-				item.container.removeItem(item);
-			} else {
-				this.removeItemAtSlot(item.currentSlotId);
-			}
-			this.level.addItem(item, x, y, this.z);
-		} else {
-			this.reportAction("Can't drop it there!");
-		}
-	},
 	attackToPosition: function(x, y){
 		const weapon = this.getWeapon();
 		const range = weapon ? (weapon.def.range || 1) : 1;
