@@ -711,7 +711,7 @@ const PlayerStateMachine = {
     },
 
     lookAtInventoryItem: function() {
-        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        var item = this.selectedItem;
         if (!item) {
             return;
         }
@@ -723,12 +723,12 @@ const PlayerStateMachine = {
     },
 
     useInventoryItem: function() {
-        var item = Inventory.currentMob.inventory[Inventory.cursorSlot];
+        var item = this.selectedItem;
         if (!item) {
             return;
         }
         this.clearActionCallback();
-        return this.useItem(Inventory.currentMob, item);
+        return this.useItem(OAX6.UI.activeMob, item);
     },
 
     useItem: function (mob, item) {
