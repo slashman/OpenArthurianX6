@@ -920,8 +920,10 @@ const PlayerStateMachine = {
         OAX6.UI.setActiveMob(OAX6.UI.player);
         this.player.activateParty();
         OAX6.UI.updateFOV();
+    },
+    canDragItems() {
+        return this.state == PlayerStateMachine.WORLD || this.state == PlayerStateMachine.ITEM_TRANSFERRING;
     }
-
 };
 
 module.exports = PlayerStateMachine;

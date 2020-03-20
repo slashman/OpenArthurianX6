@@ -1,8 +1,8 @@
 const Timer = require('../Timer');
 
-function DoubleTapBehavior(component, singleTapCallback, doubleTapCallback, onDragStart) {
+function DoubleTapBehavior(component, singleTapCallback, doubleTapCallback, canDragFunction, onDragStart) {
     component.inputEnabled = true;
-    this.reset(component, singleTapCallback, doubleTapCallback, onDragStart);
+    this.reset(component, singleTapCallback, doubleTapCallback, canDragFunction, onDragStart);
 }
 
 DoubleTapBehavior.prototype = {
@@ -15,20 +15,22 @@ DoubleTapBehavior.prototype = {
         OAX6.UI.dragStatus = 'dragging';
         onDragStart();
     },
-    reset(component, singleTapCallback, doubleTapCallback, onDragStart) {
+    reset(component, singleTapCallback, doubleTapCallback, canDragFunction, onDragStart) {
         let clickCount = 0;
         let leftButton, rightButton;
         if (this.singleClickTimer) {
             clearTimeout(this.singleClickTimer);
         }
         component.events.onInputUp.removeAll();
-        if (onDragStart) {
+        if (canDragFunction) {
             component.events.onInputDown.removeAll();
             component.events.onInputDown.add((sprite, pointer, isOver) => {
-                OAX6.UI.dragStatus = 'delay';
-                Timer.delay(100).then(() => {
-                    this.__startDragging(pointer, onDragStart);
-                });
+                if (canDragFunction()) {
+                    OAX6.UI.dragStatus = 'delay';
+                    Timer.delay(100).then(() => {
+                        this.__startDragging(pointer, onDragStart);
+                    });
+                }
             });
         }
         component.events.onInputUp.add((sprite, pointer, isOver) => {

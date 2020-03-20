@@ -66,6 +66,7 @@ const ItemFactory = {
 		sprite.doubleTapBehavior = new DoubleTapBehavior(sprite,
 			(l, r) => item.clicked(l, r),
 			(l, r) => item.doubleClicked(l, r),
+			() => OAX6.PlayerStateMachine.canDragItems(),
 			() => {
 				const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
 				if (activeMob.canDrag(item)) {
