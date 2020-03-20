@@ -5,28 +5,28 @@ const BODY_TYPES = {
         slots: [
             {
                 id: 'head',
-                x: 64 - 8,
-                y: 24
+                x: 64,
+                y: 32
             },
             {
                 id: 'torso',
-                x: 32 - 8,
-                y: 32
+                x: 32,
+                y: 40
             },
             {
                 id: 'back',
-                x: 96 - 8,
-                y: 32
+                x: 96,
+                y: 40
             },
             {
                 id: 'leftHand',
-                x: 32 - 8,
-                y: 64
+                x: 32,
+                y: 72
             },
             {
                 id: 'rightHand',
-                x: 96 - 8,
-                y: 64
+                x: 96,
+                y: 72
             }
         ],
         spriteId: 'mobContainer',
@@ -46,6 +46,7 @@ function MobInventory(game, containerId, mob) {
     this.mob = mob;
     this.lastItemSlot = undefined;
     this._initSlots();
+    this.marker.bringToTop();
 }
 
 MobInventory.prototype = Object.create(Container.prototype);
@@ -56,7 +57,9 @@ MobInventory.prototype._initSlots = function() {
         x = slot.x;
         y = slot.y;
         const slotSprite = this.game.add.sprite(x, y, 'ui', 7);
+        slotSprite.anchor.set(0.5);
         const itemSprite = this.game.add.image(x,y,'ui');
+        itemSprite.anchor.set(0.5);
         itemSprite.visible = false;
         const quantityLabel = this.game.add.bitmapText(x + 8, y + 8, 'pixeled', '0', 12);
         quantityLabel.anchor.visible = false;
@@ -89,7 +92,7 @@ MobInventory.prototype._getSlotIdAtPoint = function(point) {
     const x = point.x;
     const y = point.y;
     const slot = this.slots.find(slot => {
-        if (x >= slot.x && x <= slot.x + 16 && y >= slot.y && y <= slot.y + 16) {
+        if (x >= slot.x - 8 && x <= slot.x + 8 && y >= slot.y - 8 && y <= slot.y + 8) {
             return true;
         }
     });
