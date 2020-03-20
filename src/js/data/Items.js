@@ -250,6 +250,14 @@ const Items = [
 		description: 'It\'s just a barrel.',
 		name: 'Barrel',
 		appearance: 'barrel'
+	},
+	{
+		id: 'backpack',
+		type: 'container',
+		description: 'A pack that is carried in the back.',
+		name: 'Backpack',
+		appearance: 'barrel',
+		containerType: 'backpack'
 	}
 ]
 

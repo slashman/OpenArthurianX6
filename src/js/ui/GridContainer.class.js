@@ -9,7 +9,21 @@ const SIZES = {
         size: { w: 136, h: 136 },
         itemsGrid: { x: 10, y: 23, w: 116, h: 96, slotW: 16, slotH: 16, marginR: 4, marginB: 4 },
         topBar: { x: 0, y: 0, w: 136, h: 14 },
-        closeButton: { x: 125, y: 3, w: 8, h: 7 }
+        closeButton: { x: 125, y: 3, w: 8, h: 7 },
+        scrollUpButton: {x: 120, y: 128},
+        scrollDownButton: {x: 104, y: 128}
+    },
+    backpack: {
+        columns: 4,
+        rows: 2,
+        containerCapacity: 40, // ??
+        spriteId: 'backpackContainer',
+        size: { w: 111, h: 101 },
+        itemsGrid: { x: 22, y: 36, w: 61, h: 39, slotW: 16, slotH: 16, marginR: 3, marginB: 3 },
+        topBar: { x: 0, y: 0, w: 136, h: 14 }, // ??
+        closeButton: { x: 0, y: 27, w: 16, h: 16 },
+        scrollUpButton: {x: 75, y: 89 },
+        scrollDownButton: {x: 86, y: 89}
     }
 };
 
@@ -24,8 +38,8 @@ function GridContainer(game, containerId, containerItem, sizeDef) {
     this.containerCapacity = sizeDef.containerCapacity;
     this.length = this.columns * this.rows;
 
-    const downArrow = this.game.add.sprite(104, 128, 'ui', 9, this.fovBlockLayer);
-    const upArrow = this.game.add.sprite(104 + 16, 128, 'ui', 10, this.fovBlockLayer);
+    const downArrow = this.game.add.sprite(sizeDef.scrollDownButton.x, sizeDef.scrollDownButton.y, 'ui', 9, this.fovBlockLayer);
+    const upArrow = this.game.add.sprite(sizeDef.scrollUpButton.x, sizeDef.scrollUpButton.y, 'ui', 10, this.fovBlockLayer);
     downArrow.anchor.set(0.5);
     upArrow.anchor.set(0.5);
     downArrow.inputEnabled = true;

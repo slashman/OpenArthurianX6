@@ -31,6 +31,7 @@ const Loader = {
 
 		game.load.image('containerMedium', 'assets/containerMedium.png');
 		game.load.image('mobContainer', 'assets/mobContainer.png');
+		game.load.image('backpackContainer', 'assets/backpack_test.png');
 		
 
 		game.load.bitmapFont('grayFont', 'assets/grayFont.png', 'assets/font.fnt');

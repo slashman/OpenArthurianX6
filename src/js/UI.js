@@ -520,7 +520,8 @@ const UI = {
 		if (container){
 			container.bringToTop();
 		} else {
-			container = new GridContainer(this.game, item.getContainerId(), item, containerSizes.medium);
+			const containerType = item.def.containerType ? containerSizes[item.def.containerType] : containerSizes.medium;
+			container = new GridContainer(this.game, item.getContainerId(), item, containerType);
 			container.open();
 		}
 	},
