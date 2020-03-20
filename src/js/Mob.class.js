@@ -767,6 +767,7 @@ Mob.prototype = {
 	setItemAtSlot(slotId, item) {
 		this.bodySlots[slotId] = item;
 		if (item) {
+			item.container = this;
 			item.currentSlotId = slotId;
 			delete item.x;
 			delete item.y;
@@ -787,7 +788,7 @@ Mob.prototype = {
 	setWeapon(item) {
 		this.setItemAtSlot('rightHand', item);
 	},
-	removeWeapon(item) {
+	removeWeapon() {
 		this.removeItemAtSlot('rightHand');
 	},
 	getArmor() {
@@ -842,6 +843,14 @@ Mob.prototype = {
 		}
 		this.level.addItem(item, position.x, position.y, this.z);
 		return true;
+	},
+	removeItem(item) {
+		if (item.currentSlotId) {
+			this.removeItemAtSlot(item.currentSlotId);
+			if (item.currentMobInventoryWindow) {
+				item.currentMobInventoryWindow.refresh();
+			}
+		}
 	}
 };
 
