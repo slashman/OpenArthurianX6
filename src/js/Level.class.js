@@ -43,9 +43,9 @@ Level.prototype = {
 	isOpaque: function(x, y, z){
 		return this.opaqueMasks[z][x][y];
 	},
-	setSolidAndOpaque: function(x, y, z, solid) {
+	setSolidAndOpaque: function(x, y, z, solid, opaque) {
 		this.solidMasks[z][x][y] = solid;
-		this.opaqueMasks[z][x][y] = solid;
+		this.opaqueMasks[z][x][y] = opaque;
 		this.updatePathfindingGrid(z);
 	},
 	getMobAt: function(x, y, z){
@@ -139,6 +139,9 @@ Level.prototype = {
 		item.x = x;
 		item.y = y;
 		item.z = z;
+		if (item.def.solid) {
+			this.setSolidAndOpaque(x, y, z, true, false);
+		}
 		this.items.push(item);
 	},
 	returnItem (item) {
@@ -209,6 +212,9 @@ Level.prototype = {
 		}
 	},
 	removeItem: function(item) {
+		if (item.def.solid) {
+			this.setSolidAndOpaque(item.x, item.y, item.z, false, false);
+		}
 		this.items.splice(this.items.indexOf(item), 1);
 		OAX6.UI.removeItemSprite(item);
 	},

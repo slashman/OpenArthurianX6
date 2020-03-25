@@ -171,7 +171,7 @@ const LevelLoader = {
 		Object.assign(door, doorData.properties);
 
 		level.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z);
-		level.setSolidAndOpaque(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z, true);
+		level.setSolidAndOpaque(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z, true, true);
 	},
 	loadObject: function(map, objectData, level) {
 		const object = ObjectFactory.createObject(objectData);

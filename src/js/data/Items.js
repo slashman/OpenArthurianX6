@@ -249,7 +249,8 @@ const Items = [
 		type: 'container',
 		description: 'It\'s just a barrel.',
 		name: 'Barrel',
-		appearance: 'barrel'
+		appearance: 'barrel',
+		solid: true
 	},
 	{
 		id: 'backpack',
