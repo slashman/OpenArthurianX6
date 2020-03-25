@@ -183,9 +183,13 @@ Level.prototype = {
 		});
 		return this.findPath(from, to, z, gridClone)
 	},
-	findPath(from, to, z, grid) {
+	findPath(from, to, z, grid, openEnded) {
 		if (!grid) {
 			grid = this.pfGrids[z].clone();
+		}
+		if (openEnded) {
+			grid.setWalkableAt(from.x, from.y, true);
+			grid.setWalkableAt(to.x, to.y, true);
 		}
 		//TODO: Single finder object?
 		const finder = new PF.AStarFinder({

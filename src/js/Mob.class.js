@@ -793,19 +793,21 @@ Mob.prototype = {
 	},
 	canDrag(item) {
 		if (this.x != item.x || this.y != item.y || this.z != item.z) {
-			const path = this.level.findPath(this, item, this.z);
+			const path = this.level.findPath(this, item, this.z, undefined, true);
 			if (path.dx == 0 && path.dy == 0) {
-				OAX6.UI.showMessage("Unreachable");
+				OAX6.UI.showMessage("Unreachable - Cannot Fetch");
 				return false;
 			}
 		}
 		return true;
 	},
 	tryDrop(item, position) {
+		const worldItem = this.level.getItemAt(position.x, position.y, position.z);
 		if (this.x != position.x || this.y != position.y || this.z != position.z) {
-			const path = this.level.findPath(this, position, this.z);
+			const containerAtTarget = worldItem && worldItem.isContainer();
+			const path = this.level.findPath(this, position, this.z, undefined, containerAtTarget);
 			if (path.dx == 0 && path.dy == 0) {
-				OAX6.UI.showMessage("Unreachable");
+				OAX6.UI.showMessage("Unreachable - Cannot Drop");
 				return false;
 			}
 		}
@@ -813,7 +815,6 @@ Mob.prototype = {
 		if (mob) {
 			return mob.addItem(item);
 		}
-		const worldItem = this.level.getItemAt(position.x, position.y, position.z);
 		if (worldItem) {
 			if (worldItem.isContainer()) {
 				worldItem.addItem(item);
