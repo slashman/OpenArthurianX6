@@ -57,10 +57,18 @@ Item.prototype = {
     }
   },
   addItem(item) {
-    if (item == this) {
+    if (this.isContainedBy(item)) {
       return false;
     }
+    item.containerItem = this;
     return this.inventory.addItem(item);
+  },
+  isContainedBy(item) {
+    if (item == this)
+      return true;
+    else if (this.containerItem) {
+      return this.containerItem.isContainedBy(item);
+    }
   },
   clicked(leftButton, rightButton) {
     // TODO: Only call this if the item is not obscured by the FoV mask and not in a visible container

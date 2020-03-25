@@ -37,7 +37,8 @@ Inventory.prototype = {
     },
     removeItem: function(item) {
         var ind = this.items.indexOf(item);
-		this.items.splice(ind, 1);
+        this.items.splice(ind, 1);
+        delete item.containerItem;
     },
     getItemById(itemId) {
         return this.items.find(i => i.defid === itemId);
