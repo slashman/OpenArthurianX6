@@ -697,6 +697,7 @@ const PlayerStateMachine = {
             if (dir !== null) {
                 const activeMob = OAX6.UI.activeMob || this.player;
                 const previousContainer = item.container;
+                previousContainer.removeItem(item);
                 const previousMobInventoryWindow = item.currentMobInventoryWindow;
                 const dropped = activeMob.tryDrop(item, {x: activeMob.x + dir.x, y: activeMob.y + dir.y });
                 if (dropped) {
