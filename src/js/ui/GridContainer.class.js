@@ -19,7 +19,7 @@ const SIZES = {
         containerCapacity: 40, // ??
         spriteId: 'backpackContainer',
         size: { w: 111, h: 101 },
-        itemsGrid: { x: 22, y: 36, w: 61, h: 39, slotW: 16, slotH: 16, marginR: 3, marginB: 3 },
+        itemsGrid: { x: 22, y: 36, w: 72, h: 40, slotW: 16, slotH: 16, marginR: 3, marginB: 3 },
         closeButton: { x: 0, y: 27, w: 16, h: 16 },
         scrollUpButton: {x: 75, y: 89 },
         scrollDownButton: {x: 86, y: 89}
