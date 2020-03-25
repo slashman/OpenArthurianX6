@@ -388,6 +388,10 @@ Mob.prototype = {
 		} else {
 			return false;
 		}
+		item.refreshVisualContainer();
+		if (this.currentMobInventoryWindow) {
+			this.currentMobInventoryWindow.refresh();
+		}
 		return true;
 	},
 	getOnDirection: function(dx, dy) {
@@ -501,9 +505,7 @@ Mob.prototype = {
 			if (item.def.spendable) {
 				item.reduceItemQuantity();
 			}
-			if (item.container.currentContainerWindow) {
-				item.container.currentContainerWindow._syncInventoryIcons();
-			}
+			item.refreshVisualContainer();
 		}
 		
 	},
@@ -818,9 +820,7 @@ Mob.prototype = {
 		if (worldItem) {
 			if (worldItem.isContainer()) {
 				worldItem.addItem(item);
-				if (item.container.currentContainerWindow) {
-					item.container.currentContainerWindow._syncInventoryIcons();
-				}
+				item.refreshVisualContainer();
 				return true;
 			} else {
 				OAX6.UI.showMessage("Blocked");
@@ -833,8 +833,8 @@ Mob.prototype = {
 	removeItem(item) {
 		if (item.currentSlotId) {
 			this.removeItemAtSlot(item.currentSlotId);
-			if (item.currentMobInventoryWindow) {
-				item.currentMobInventoryWindow.refresh();
+			if (this.currentMobInventoryWindow) {
+				this.currentMobInventoryWindow.refresh();
 			}
 		}
 	}

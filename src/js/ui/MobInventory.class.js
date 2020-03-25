@@ -43,6 +43,7 @@ function MobInventory(game, containerId, mob) {
     this.sizeDef = mob.bodyType ? BODY_TYPES[mob.bodyType] : BODY_TYPES.normal;
     this.slots = this.sizeDef.slots;
     Container.call(this, game, containerId, this.sizeDef.spriteId);
+    mob.currentMobInventoryWindow = this;
     this.mob = mob;
     this.lastItemSlot = undefined;
     this._initSlots();

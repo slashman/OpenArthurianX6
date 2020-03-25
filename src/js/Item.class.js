@@ -94,6 +94,17 @@ Item.prototype = {
     } else {
       this.container.removeItem(this);
     }
+  },
+  refreshVisualContainer() {
+    if (!this.container) {
+      return;
+    }
+    if (this.container.currentContainerWindow) {
+      this.container.currentContainerWindow.refresh();
+    }
+    if (this.currentMobInventoryWindow) {
+      this.currentMobInventoryWindow.refresh();
+		}
   }
 }
 
