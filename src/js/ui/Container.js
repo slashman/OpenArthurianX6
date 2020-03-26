@@ -20,6 +20,7 @@ function Container(game, containerId, backgroundSpriteId) {
 
     this.group = this.game.add.group();
     this.group.add(this.sprite);
+    this.group.visible = false;
 
     this.sprite.inputEnabled = true;
 	this.sprite.events.onInputDown.add(() => {});
@@ -36,7 +37,6 @@ function Container(game, containerId, backgroundSpriteId) {
     this.marker.anchor.set(0.5);
 
     this.UI.UILayer.add(this.group);
-    this.close();
 }
 
 Container.prototype.hideMarker = function () {

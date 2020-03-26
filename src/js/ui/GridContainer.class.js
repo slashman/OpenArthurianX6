@@ -169,6 +169,11 @@ GridContainer.prototype._syncInventoryIcons = function() {
     }
 };
 
+GridContainer.prototype.close = function() {
+    delete this.inventory.currentContainerWindow;
+    Container.prototype.close.call(this);
+}
+
 module.exports = {
     GridContainer: GridContainer,
     SIZES: SIZES

@@ -154,4 +154,15 @@ MobInventory.prototype.addItem = function(item, originalContainer, mousePointer)
     this._syncInventoryIcons();
 };
 
+MobInventory.prototype.close = function() {
+    delete this.mob.currentMobInventoryWindow;
+    Object.keys(this.displayItems).forEach(key => {
+        const item = this.mob.getItemAtSlot(key);
+        if (item) {
+            delete item.currentMobInventoryWindow;
+        }
+    });
+    Container.prototype.close.call(this);
+}
+
 module.exports = MobInventory;
