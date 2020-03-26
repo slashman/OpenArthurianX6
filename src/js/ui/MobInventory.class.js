@@ -5,34 +5,33 @@ const BODY_TYPES = {
         slots: [
             {
                 id: 'head',
-                x: 64,
-                y: 32
+                x: 35,
+                y: 23
             },
             {
                 id: 'torso',
-                x: 32,
-                y: 40
+                x: 15,
+                y: 27
             },
             {
                 id: 'back',
-                x: 96,
-                y: 40
+                x: 57,
+                y: 27
             },
             {
                 id: 'leftHand',
-                x: 32,
-                y: 72
+                x: 59,
+                y: 50
             },
             {
                 id: 'rightHand',
-                x: 96,
-                y: 72
+                x: 13,
+                y: 50
             }
         ],
         spriteId: 'mobContainer',
-        size: { w: 136, h: 136 },
-        topBar: { x: 0, y: 0, w: 136, h: 14 },
-        closeButton: { x: 125, y: 3, w: 8, h: 7 }
+        size: { w: 70, h: 84 },
+        closeButton: { x: 57, y: 0, w: 13, h: 13 }
     }
 };
 
