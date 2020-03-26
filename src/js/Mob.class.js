@@ -28,7 +28,7 @@ function Mob(level, x, y, z){
 	//TODO: FAR: Dialogs between NPCs
 	this.speed = null;
 	this.party = [];
-	this.bodySlots = {};
+	this.bodySlots = null;
 	this.flags = {};
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;

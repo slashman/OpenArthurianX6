@@ -1,3 +1,5 @@
+const circular = require('circular-functions');
+
 const Mob = require('./Mob.class');
 const AppearanceFactory = require('./AppearanceFactory');
 const ItemFactory = require('./ItemFactory');
@@ -40,7 +42,8 @@ const MobFactory = {
 	createBodySlotsByAnatomy: function() {
 		return {
 			rightHand: undefined,
-			torso: undefined
+			torso: undefined,
+			_c: circular.register('Mob.bodySlots')
 		};
 	},
 	addItems(mob, definition) {
