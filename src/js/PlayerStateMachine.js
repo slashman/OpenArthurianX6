@@ -768,7 +768,7 @@ const PlayerStateMachine = {
                 break;
             case PlayerStateMachine.ITEM_TRANSFERRING:
                 this.selectedItem = item;
-                if (item.isContainer() && activeMob.canReach(item)) {
+                if (item.isContainer() && (item.container != activeMob.level || activeMob.canReach(item))) {
                     OAX6.UI.showContainerForItem(item);
                 }
                 break;
