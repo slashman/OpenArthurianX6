@@ -509,6 +509,26 @@
                  "width":16,
                  "x":544,
                  "y":224
+                }, 
+                {
+                 "gid":2161,
+                 "height":16,
+                 "id":82,
+                 "name":"Bag",
+                 "properties":
+                    {
+                     "itemId":"bag"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":480,
+                 "y":304
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1084,7 +1104,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":82,
+ "nextobjectid":83,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",
