@@ -78,6 +78,14 @@ const Appearances = [
 			{
 				id: 'barrel',
 				i: 161
+			},
+			{
+				id: 'backpack',
+				i: 162
+			},
+			{
+				id: 'bag',
+				i: 163
 			}
 		]
 	},
