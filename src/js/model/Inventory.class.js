@@ -1,6 +1,11 @@
+const circular = require('circular-functions');
+
 function Inventory () {
     this.items = [];
+    this._c = circular.register('Inventory');
 }
+
+circular.registerClass('Inventory', Inventory);
 
 Inventory.prototype = {
     addItem: function(item) {
