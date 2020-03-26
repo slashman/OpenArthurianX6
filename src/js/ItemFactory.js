@@ -69,7 +69,7 @@ const ItemFactory = {
 			() => OAX6.PlayerStateMachine.canDragItems(),
 			() => {
 				const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
-				if (activeMob.canDrag(item)) {
+				if (activeMob.canReach(item)) {
 					OAX6.PlayerStateMachine.switchState(OAX6.PlayerStateMachine.ITEM_TRANSFERRING);
 					activeMob.level.removeItem(item);
 					OAX6.UI.dragItem(item, activeMob.level);

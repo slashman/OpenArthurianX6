@@ -793,11 +793,11 @@ Mob.prototype = {
 	setBackpack(item) {
 		this.setItemAtSlot('back', item);
 	},
-	canDrag(item) {
+	canReach(item) {
 		if (this.x != item.x || this.y != item.y || this.z != item.z) {
 			const path = this.level.findPath(this, item, this.z, undefined, true);
 			if (path.dx == 0 && path.dy == 0) {
-				OAX6.UI.showMessage("Unreachable - Cannot Fetch");
+				OAX6.UI.showMessage("Unreachable.");
 				return false;
 			}
 		}

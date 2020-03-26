@@ -754,12 +754,13 @@ const PlayerStateMachine = {
 
     itemClicked: function (item, leftClick, rightClick) {
         if (!this.actionEnabled) { return; }
+        const activeMob = OAX6.UI.activeMob || this.player;
         switch (this.state) {
             case PlayerStateMachine.WORLD:
                 if (rightClick) {
                     OAX6.PlayerStateMachine.lookMouseCommand({x: item.x, y: item.y}); 
                 } else {
-                    if (item.isContainer()) {
+                    if (item.isContainer() && activeMob.canReach(item)) {
                         OAX6.UI.showContainerForItem(item);
                         PlayerStateMachine.switchState(PlayerStateMachine.ITEM_TRANSFERRING);
                     }
@@ -767,7 +768,7 @@ const PlayerStateMachine = {
                 break;
             case PlayerStateMachine.ITEM_TRANSFERRING:
                 this.selectedItem = item;
-                if (item.isContainer()) {
+                if (item.isContainer() && activeMob.canReach(item)) {
                     OAX6.UI.showContainerForItem(item);
                 }
                 break;
