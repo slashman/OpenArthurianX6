@@ -135,6 +135,9 @@ const PlayerStateMachine = {
 
     switchState: function(stateId) {
         //TODO: Maybe restrict switches, like don't switch to dialog from combat
+        if (stateId == this.stateStack[this.stateStack.length - 1]) {
+            return;
+        }
         this.stateStack.push(this.state);
         this.state = stateId;
         OAX6.UI.stateLabel.text = 'State ' + this.state;
