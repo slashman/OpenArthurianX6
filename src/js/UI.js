@@ -29,6 +29,7 @@ const STRETCH = true;
 const GridContainer = require('./ui/GridContainer.class').GridContainer;
 const containerSizes = require('./ui/GridContainer.class').SIZES;
 const MobInventory = require('./ui/MobInventory.class');
+const TitleScreen = require('./ui/TitleScreen');
 
 const UI = {
 	launch: function(then){
@@ -77,6 +78,7 @@ const UI = {
 		 dialogUI (Dialogs.js)
 		 dialogUI (MessageBox.js)
 		 descriptionUI (MobDescription.js)
+		 titleLayer
 		floatingUILayer
 	*/
 	create: function(){
@@ -144,6 +146,9 @@ const UI = {
 		display.anchor.set(0.5, 0.5);
 		display.visible = false;
 		this.UILayer.add(display);
+
+		this.titleScreen = TitleScreen;
+		TitleScreen.init(this.game, this.UILayer);
 
 		this.draggingItem = { item: null, container: null, display: display };
 	},

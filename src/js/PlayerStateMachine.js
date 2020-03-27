@@ -19,12 +19,13 @@ const PlayerStateMachine = {
     FLOATING_ITEM : 8,
     LOOK_BOX    : 9,
     MUSIC       : 10,
+    TITLE       : 11,
 
     init: function(game) {
         this.game = game;
         this.cursors = this.game.input.keyboard.createCursorKeys();
 
-        this.state = PlayerStateMachine.WORLD;
+        this.state = PlayerStateMachine.NOTHING;
         this.previousState = this.state;
         this.actionEnabled = true;
 
@@ -509,6 +510,13 @@ const PlayerStateMachine = {
         });
     },
     
+    updateTitleAction: function() {
+        const keyCode = this._inkey();
+        if (keyCode) {
+            OAX6.UI.titleScreen.input(keyCode);
+        }
+    },
+
     updateWorldAction: function() {
         Promise.resolve()
         .then(()=>{
@@ -789,6 +797,9 @@ const PlayerStateMachine = {
         this.updateCursorPosition();
 
         switch (this.state) {
+            case PlayerStateMachine.TITLE:
+                this.updateTitleAction();
+                break;
             case PlayerStateMachine.WORLD:
             case PlayerStateMachine.COMBAT:
                 this.updateWorldAction();

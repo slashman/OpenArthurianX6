@@ -45,12 +45,7 @@ const OAX6 = {
 
 		this.playerStateMachine = PlayerStateMachine;
 
-		if (Storage.saveGameExists()) {
-			this.loadGame(game);
-		} else {
-			this.newGame(game);
-		}
-		UI.showMessage("Welcome to OAX6 - Press F for Fullscreen");
+		this.playerStateMachine.switchState(PlayerStateMachine.TITLE);
 
 		game.canvas.oncontextmenu = function (e) {
 			e.preventDefault();
