@@ -83,8 +83,7 @@ const PlayerStateMachine = {
     cancelAction: function() {
         if (this.state == PlayerStateMachine.ITEM_TRANSFERRING) {
             OAX6.UI.closeAllContainers();
-            PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
-            this.clearDirectionCallback();
+            PlayerStateMachine.resetState();
         } else {
             if (this.directionCallback) {
                 this.directionCallback(null, true);
@@ -502,7 +501,6 @@ const PlayerStateMachine = {
                 mob = OAX6.UI.player.party[partyMemberIndex - 1]
             }
             OAX6.UI.showContainerForMob(mob);
-            //const opened = Inventory.open(partyMemberIndex);
             const opened = true; // TODO: Check cases where inventory cannot be opened?
             if (opened) {
                 PlayerStateMachine.switchState(PlayerStateMachine.ITEM_TRANSFERRING);
@@ -604,8 +602,7 @@ const PlayerStateMachine = {
                     }
                 }
                 if (!UI.hasOpenContainers()) {
-                    PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
-                    this.clearDirectionCallback();
+                    PlayerStateMachine.resetState();
                 }
             }
             return;
@@ -621,8 +618,7 @@ const PlayerStateMachine = {
             inventory.onMouseUp();
             
             if (!UI.hasOpenContainers()) {
-                PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
-                this.clearDirectionCallback();
+                PlayerStateMachine.resetState();
             }
         }
     },
@@ -681,17 +677,6 @@ const PlayerStateMachine = {
         this.player.level.activateAll();
         OAX6.UI.activeMob = this.player;
         this.enableAction();
-    },
-
-    updateInventoryDirection: function(dir, cancelled) {
-        if (cancelled) {
-            Inventory.close();
-            PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
-            this.clearDirectionCallback();
-        }
-        if (dir !== null) {
-            Inventory.moveCursor(dir.x, dir.y);
-        }
     },
 
     dropItem: function() {
