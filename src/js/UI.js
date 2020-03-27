@@ -430,9 +430,6 @@ const UI = {
     this.currentSceneIndex = -1;
     return new Promise(outstandingPromise => {
       this.outstandingPromise = outstandingPromise;
-      PlayerStateMachine.setActionCallback(() => {
-        this.showNextSceneFragment();
-      });
       PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
       this.showNextSceneFragment();
     });
@@ -444,7 +441,6 @@ const UI = {
       Bus.emit('showMessage', this.currentScene[this.currentSceneIndex]);
     } else {
       Bus.emit('hideMessage');
-      PlayerStateMachine.clearActionCallback();
       PlayerStateMachine.resetState(true);
       if (this.outstandingPromise) {
         this.outstandingPromise();

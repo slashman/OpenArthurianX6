@@ -186,6 +186,13 @@ const PlayerStateMachine = {
         }
     },
 
+    updateMessageBoxAction: function() {
+        const keyCode = this._inkey();
+        if (keyCode == Phaser.KeyCode.SPACEBAR || keyCode == Phaser.KeyCode.ENTER) {
+            Bus.emit('nextMessage');
+        }
+    },
+
     updateDialogAction: function() {
         var key = this.game.input.keyboard.lastKey;
         if (key && key.isDown && key.repeats == 1) {
@@ -807,6 +814,7 @@ const PlayerStateMachine = {
                 break;
 
             case PlayerStateMachine.MESSAGE_BOX:
+                this.updateMessageBoxAction();
                 break;
 
             case PlayerStateMachine.ITEM_TRANSFERRING:
