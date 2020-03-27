@@ -1,6 +1,6 @@
 {
   "name": "OpenArthurianX6",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A classic cRPG game engine",
   "main": "index.js",
   "scripts": {
