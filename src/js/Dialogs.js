@@ -3,7 +3,7 @@ const Timer = require('./Timer');
 const PlayerStateMachine = require('./PlayerStateMachine');
 
 module.exports = {
-	init: function(game){
+	init: function(game, parent){
 		this.game = game;
 		this.blinkOut = true;
 		this.maxWidth = 265;
@@ -23,7 +23,8 @@ module.exports = {
 		this.dialogLines = [];
 		
 		//TODO: Create a scene scheme and order the ui and the game there
-		this.dialogUI = game.add.group();
+		this.dialogUI = game.add.group(parent);
+		this.dialogUI.name = 'Dialogs.dialogUI';
 		this.dialogUI.add(this.background);
 		this.dialogUI.add(this.name);
 		this.dialogUI.add(this.playerInput);
@@ -36,7 +37,6 @@ module.exports = {
 			this.dialogLines.push(line);
 		}
 
-		this.dialogUI.fixedToCamera = true;
 		this.dialogUI.visible = false;
 
 		this.blinkingCursor(); //TODO: Change this to animate a sprite alternating with blank, instead of using timer

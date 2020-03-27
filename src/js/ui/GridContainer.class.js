@@ -26,8 +26,8 @@ const SIZES = {
     }
 };
 
-function GridContainer(game, containerId, containerItem, sizeDef) {
-    Container.call(this, game, containerId, sizeDef.spriteId);
+function GridContainer(game, parent, containerId, containerItem, sizeDef) {
+    Container.call(this, game, parent, containerId, sizeDef.spriteId);
     this.containerItem = containerItem;
     this.inventory = containerItem.inventory;
     this.inventory.currentContainerWindow = this;

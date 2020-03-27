@@ -7,6 +7,7 @@ const PartyStatus = {
     init(game, layer) {
         this.game = game;
         this.layer = this.game.add.group(layer);
+        this.layer.name = 'PartyStatus.layer';
         this.party = [];
     },
 

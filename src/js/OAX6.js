@@ -25,9 +25,6 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const Timer = require('./Timer');
 const Bus = require('./Bus');
 
-const Dialogs = require('./Dialogs');
-const MessageBox = require('./MessageBox');
-const MobDescription = require('./MobDescription');
 const scenarioInfo = require('./ScenarioInfo');
 
 const OAX6 = {
@@ -44,9 +41,6 @@ const OAX6 = {
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);
 		ObjectFactory.setGame(game);
-		Dialogs.init(game);
-		MessageBox.init(game);
-		MobDescription.init(game);
 		LevelLoader.init(game, scenarioInfo.maps);
 
 		this.playerStateMachine = PlayerStateMachine;

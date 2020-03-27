@@ -1,8 +1,9 @@
 const AppearanceFactory = require('./AppearanceFactory');
 
 module.exports = {
-  init: function(game) {
+  init: function(game, parent) {
     this.game = game;
+    this.parent = parent;
 
     this.background = game.add.image(48, 48, "mobDescription");
 
@@ -14,8 +15,8 @@ module.exports = {
     this.description = game.add.bitmapText(53, 85, 'pixeled', '', 12);
     this.description.maxWidth = 90;
 
-    this.descriptionUI = game.add.group();
-    this.descriptionUI.fixedToCamera = true;
+    this.descriptionUI = game.add.group(parent);
+    this.descriptionUI.name = 'MobDescription.descriptionUI';
 
     this.descriptionUI.add(this.background);
     this.descriptionUI.add(this.sprite);
@@ -60,6 +61,7 @@ module.exports = {
     this.description.text = item.def.description || '';
 
     this.descriptionUI.visible = true;
+    this.parent.bringToTop(this.descriptionUI);
   },
 
   hide() {

@@ -18,6 +18,9 @@ const SkyBox = require('./SkyBox');
 
 const PartyStatus = require('./ui/PartyStatus');
 const BookPanel = require('./ui/BookPanel');
+const Dialogs = require('./Dialogs');
+const MessageBox = require('./MessageBox');
+const MobDescription = require('./MobDescription');
 
 const scenarioInfo = require('./ScenarioInfo');
 
@@ -59,11 +62,30 @@ const UI = {
 		Bus.listen('nextMessage', () => this.showNextSceneFragment());
 		this.dragStatus = 'idle';
 	},
+
+	/*
+		worldLayer
+		 baseGroup* (floorLayers, one layer per "floor", 3 in total)
+		  mapLayer*
+		  floorLayer*
+		  mobsLayer*
+		  objectsLayer*
+		 fovBlockLayer
+		UILayer
+		 layer (BookPanel.js)
+		 layer (PartyStatus.js)
+		 dialogUI (Dialogs.js)
+		 dialogUI (MessageBox.js)
+		 descriptionUI (MobDescription.js)
+		floatingUILayer
+	*/
 	create: function(){
 		this.worldLayer = this.game.add.group();
+		this.worldLayer.name = 'worldLayer';
 		this.floorLayers = [];
 		for (let i = 0; i < 3; i++) {
 			const baseGroup = this.game.add.group(this.worldLayer);
+			baseGroup.name = 'baseGroup_' + i;
 			this.floorLayers[i] = {
 				baseGroup,
 				mapLayer: this.game.add.group(baseGroup),
@@ -71,11 +93,18 @@ const UI = {
 				mobsLayer: this.game.add.group(baseGroup),
 				objectsLayer: this.game.add.group(baseGroup),
 			}
+			this.floorLayers[i].mapLayer.name = 'mapLayer_' + i;
+			this.floorLayers[i].floorLayer.name = 'floorLayer_' + i;
+			this.floorLayers[i].mobsLayer.name = 'mobsLayer_' + i;
+			this.floorLayers[i].objectsLayer.name = 'objectsLayer_' + i;
 		}
 		this.fovBlockLayer = this.game.add.group(this.worldLayer);
+		this.fovBlockLayer.name = 'fovBlockLayer';
 		this.UILayer = this.game.add.group();
+		this.UILayer.name = 'UILayer';
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
+		this.floatingUILayer.name = 'floatingUILayer';
 		this.modeLabel = this.game.add.bitmapText(this.game.width - 48, 60, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
 
@@ -97,6 +126,9 @@ const UI = {
 
 		PartyStatus.init(this.game, this.UILayer);
 		BookPanel.init(this.game, this.UILayer);
+		Dialogs.init(this.game, this.UILayer);
+		MessageBox.init(this.game, this.UILayer);
+		MobDescription.init(this.game, this.UILayer);
 
 		this.marker = this.game.add.sprite(0, 0, 'ui', 1, this.floatingUILayer);
 		this.marker.animations.add('blink', [0,1], 8);
@@ -429,8 +461,9 @@ const UI = {
     this.currentScene = scene;
     this.currentSceneIndex = -1;
     return new Promise(outstandingPromise => {
-      this.outstandingPromise = outstandingPromise;
-      PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
+	  this.outstandingPromise = outstandingPromise;
+	  PlayerStateMachine.switchState(PlayerStateMachine.MESSAGE_BOX);
+	  PlayerStateMachine.enableAction();
       this.showNextSceneFragment();
     });
   },
@@ -507,7 +540,7 @@ const UI = {
 		if (container){
 			container.bringToTop();
 		} else {
-			container = new MobInventory(this.game, mob.getContainerId(), mob);
+			container = new MobInventory(this.game, this.UILayer, mob.getContainerId(), mob);
 			container.open();
 		}
 	},
@@ -517,7 +550,7 @@ const UI = {
 			container.bringToTop();
 		} else {
 			const containerType = item.def.containerType ? containerSizes[item.def.containerType] : containerSizes.medium;
-			container = new GridContainer(this.game, item.getContainerId(), item, containerType);
+			container = new GridContainer(this.game, this.UILayer, item.getContainerId(), item, containerType);
 			container.open();
 		}
 	},

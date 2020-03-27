@@ -9,7 +9,7 @@ const PlayerStateMachine = require('./PlayerStateMachine');
  * - Autocenter? Vertically and horizontally
  */
 module.exports = {
-  init: function(game){
+  init: function(game, parent){
     this.game = game;
     this.blinkOut = true;
     this.maxWidth = 225;
@@ -20,7 +20,8 @@ module.exports = {
     this.measureTool = game.add.bitmapText(0, 0, 'pixeled', '', this.fontSize);
     this.dialogLines = [];
     
-    this.dialogUI = game.add.group();
+    this.dialogUI = game.add.group(parent);
+    this.dialogUI.name = 'MessageBox.dialogUI';
     this.dialogUI.add(background);
     
     for (var i=0;i<this.maxLines;i++) {
@@ -29,7 +30,6 @@ module.exports = {
       this.dialogLines.push(line);
     }
 
-    this.dialogUI.fixedToCamera = true;
     this.dialogUI.visible = false;
 
     Bus.listen('showMessage', this.showMessage, this);

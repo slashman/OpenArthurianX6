@@ -38,10 +38,10 @@ const BODY_TYPES = {
 /**
  * Represents a window with a mob and its body slots
  */
-function MobInventory(game, containerId, mob) {
+function MobInventory(game, parent, containerId, mob) {
     this.sizeDef = mob.bodyType ? BODY_TYPES[mob.bodyType] : BODY_TYPES.normal;
     this.slots = this.sizeDef.slots;
-    Container.call(this, game, containerId, this.sizeDef.spriteId);
+    Container.call(this, game, parent, containerId, this.sizeDef.spriteId);
     mob.currentMobInventoryWindow = this;
     this.mob = mob;
     this.lastItemSlot = undefined;

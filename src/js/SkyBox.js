@@ -13,6 +13,7 @@ const SkyBox = {
   init(game, layer) {
     this.game = game;
     this.skyboxLayer = this.game.add.group(layer);
+    this.skyboxLayer.name = 'Skybox.skyboxLayer';
     this.skyBack = this.game.add.graphics(skyboxPosition.x, skyboxPosition.y, this.skyboxLayer);
     this.skyBack.anchor.x = 0.5;
     this.skyBack.anchor.y = 1;

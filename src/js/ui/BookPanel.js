@@ -13,6 +13,7 @@ const BookPanel = {
     init(game, layer) {
         this.game = game;
         this.layer = this.game.add.group(layer);
+        this.layer.name = 'BookPanel.layer';
         this.layer.x = BOOK_LOCATION_X;
         this.layer.y = BOOK_LOCATION_Y;
         this.background = game.add.image(0, 0, "bookBack");

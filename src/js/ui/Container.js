@@ -12,13 +12,14 @@ const CURSOR_STATUS = {
  * Represents an abstract items container, it could be the player inventory,
  * the loot of a corpse or the content of a barrel.
  */
-function Container(game, containerId, backgroundSpriteId) {
+function Container(game, parent, containerId, backgroundSpriteId) {
     this.game = game;
     this.UI = OAX6.UI;
     this.id = containerId;
     this.sprite = this.game.add.image(0, 0, backgroundSpriteId);
 
-    this.group = this.game.add.group();
+    this.group = this.game.add.group(parent);
+    this.group.name = 'Container.' + containerId;
     this.group.add(this.sprite);
     this.group.visible = false;
 
