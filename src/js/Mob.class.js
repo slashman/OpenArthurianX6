@@ -561,10 +561,13 @@ Mob.prototype = {
 			const backItem = this.getBackpack();
 			if (backItem) {
 				if (backItem.inventory) {
-					return {
-						ammo: backItem.inventory.getItemById(ammoType),
-						container: backItem
-					};
+					const ammo = backItem.inventory.getItemById(ammoType);
+					if (ammo) {
+						return {
+							ammo,
+							container: backItem
+						};
+					}
 				} else if (backItem.defid == ammoType) {
 					return {
 						ammo: backItem,
