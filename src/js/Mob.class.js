@@ -381,7 +381,7 @@ Mob.prototype = {
 		const backpack = this.getBackpack();
 		if (!this.getItemAtSlot("rightHand")) {
 			this.setItemAtSlot("rightHand", item);
-		} else if (backpack) {
+		} else if (backpack && backpack.isContainer()) {
 			backpack.addItem(item);
 		} else if (!this.getItemAtSlot("leftHand")) {
 			this.setItemAtSlot("leftHand", item);
