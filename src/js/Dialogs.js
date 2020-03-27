@@ -259,7 +259,7 @@ module.exports = {
 		//TODO: Show the name, job, bye options
 	},
 	endDialog: function() {
-		PlayerStateMachine.switchState(PlayerStateMachine.WORLD);
+		PlayerStateMachine.resetState();
 		PlayerStateMachine.clearInputDialogCallback();
 
 		this.chat.mob.isTalking = false;

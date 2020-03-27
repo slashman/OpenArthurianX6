@@ -109,6 +109,7 @@ const UI = {
 		this.floatingUILayer.name = 'floatingUILayer';
 		this.modeLabel = this.game.add.bitmapText(this.game.width - 48, 60, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
+		this.stateLabel = this.game.add.bitmapText(this.game.width - 48, this.game.height - 60, 'pixeled', 'State', 12, this.UILayer);
 
 		this.fovMask = [];
 		this.fovBlocks = [];

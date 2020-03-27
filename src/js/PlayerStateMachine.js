@@ -26,7 +26,7 @@ const PlayerStateMachine = {
         this.cursors = this.game.input.keyboard.createCursorKeys();
 
         this.state = PlayerStateMachine.NOTHING;
-        this.previousState = this.state;
+        this.stateStack = [];
         this.actionEnabled = true;
 
         PlayerStateMachine.inventory = [];
@@ -135,8 +135,9 @@ const PlayerStateMachine = {
 
     switchState: function(stateId) {
         //TODO: Maybe restrict switches, like don't switch to dialog from combat
-        this.previousState = this.state;
+        this.stateStack.push(this.state);
         this.state = stateId;
+        OAX6.UI.stateLabel.text = 'State ' + this.state;
     },
 
     switchToMusicState: function(instrument) {
@@ -147,7 +148,12 @@ const PlayerStateMachine = {
     },
 
     resetState: function(holdAction) {
-        this.switchState(this.previousState);
+        let previousState = this.stateStack.pop();
+        if (!previousState) {
+            previousState = PlayerStateMachine.NOTHING;
+        }
+        this.state = previousState;
+        OAX6.UI.stateLabel.text = 'State ' + this.state;
         if (!holdAction) {
             this.actionEnabled = true;
         }
