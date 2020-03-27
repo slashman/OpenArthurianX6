@@ -27,7 +27,7 @@ DoubleTapBehavior.prototype = {
             component.events.onInputDown.add((sprite, pointer, isOver) => {
                 if (canDragFunction()) {
                     OAX6.UI.dragStatus = 'delay';
-                    Timer.delay(100).then(() => {
+                    Timer.delay(200).then(() => {
                         this.__startDragging(pointer, onDragStart);
                     });
                 }
@@ -49,7 +49,7 @@ DoubleTapBehavior.prototype = {
                 this.singleClickTimer = setTimeout(function() {
                     clickCount = 0;
                     singleTapCallback(leftButton, rightButton);
-                }, 200);
+                }, 300);
             } else if (clickCount === 2) {
                 clickCount = 0;
                 doubleTapCallback(leftButton, rightButton);
