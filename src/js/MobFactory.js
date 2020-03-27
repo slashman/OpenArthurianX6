@@ -32,11 +32,12 @@ const MobFactory = {
 		mob.defense = new Stat(definition.defense);
 		mob.alignment = definition.alignment || Constants.Alignments.NEUTRAL;
 
-		this.addItems(mob, definition);
-		
 		mob.speed = new Stat(definition.speed)
 		mob.intent = definition.intent || 'wander';
 		mob.bodySlots = this.createBodySlotsByAnatomy(definition);
+
+		this.addItems(mob, definition);
+		
 		return mob;
 	},
 	createBodySlotsByAnatomy: function() {
