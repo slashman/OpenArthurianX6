@@ -33,6 +33,7 @@ function Mob(level, x, y, z){
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;
 	this.sightRange = 15;
+	this.hunger = 0;
 	this._c = circular.register('Mob');
 }
 
@@ -839,6 +840,12 @@ Mob.prototype = {
 			if (this.currentMobInventoryWindow) {
 				this.currentMobInventoryWindow.refresh();
 			}
+		}
+	},
+	increaseHunger() {
+		this.hunger++;
+		if (this.hunger > 100) {
+			this.hunger = 100;
 		}
 	}
 };

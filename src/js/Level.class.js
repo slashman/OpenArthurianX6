@@ -343,6 +343,12 @@ Level.prototype = {
 		const solidMask = this.solidMasks[z];
 		const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
 		this.pfGrids[z]= new PF.Grid(pfMask);
+	},
+
+	hourly() {
+		OAX6.UI.player.party.forEach(function(partyMember) {
+			partyMember.increaseHunger();
+		});
 	}
 };
 

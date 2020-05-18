@@ -53,6 +53,9 @@ const SkyBox = {
     if (currentMinuteOfHour === 100) {
       currentMinuteOfHour = 0;
     }
+    if (currentMinuteOfHour == 0) {
+      this.hourlyNotification();
+    }
     const currentHHMM = Math.floor(currentHourOfDay) * 100 + currentMinuteOfHour;
     this.skyBack.beginFill(SkyColor.getColor(currentHHMM));
     this.skyBack.drawCircle(0, 0, 2 * skyboxRadius);
@@ -73,6 +76,10 @@ const SkyBox = {
   setMinuteOfDay(minuteOfDay) {
     this.currentMinuteOfDay = minuteOfDay;
     this.updateTimeOfDay();
+  },
+
+  hourlyNotification () {
+    OAX6.UI.player.level.hourly();
   }
 }
 
