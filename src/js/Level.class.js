@@ -347,7 +347,7 @@ Level.prototype = {
 
 	hourly() {
 		OAX6.UI.player.party.forEach(function(partyMember) {
-			partyMember.increaseHunger();
+			partyMember.hunger.increase(1);
 		});
 	}
 };

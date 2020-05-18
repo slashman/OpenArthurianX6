@@ -33,7 +33,6 @@ function Mob(level, x, y, z){
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;
 	this.sightRange = 15;
-	this.hunger = 0;
 	this._c = circular.register('Mob');
 }
 
@@ -492,6 +491,14 @@ Mob.prototype = {
 					this.reportAction("Use - Noone there!");
 				}
 				break;
+			case 'reduceHunger': 
+				if (mob) {
+					item.recoverHunger(mob);
+					used = true;
+				} else {
+					this.reportAction("Use - Noone there!");
+				}
+			break;
 			case 'playMusic': 
 				OAX6.UI.showMessage("Playing " + item.def.name + ', press 1 - 9 to play, ESC to finish.');
 				PlayerStateMachine.switchToMusicState(item);
@@ -840,12 +847,6 @@ Mob.prototype = {
 			if (this.currentMobInventoryWindow) {
 				this.currentMobInventoryWindow.refresh();
 			}
-		}
-	},
-	increaseHunger() {
-		this.hunger++;
-		if (this.hunger > 100) {
-			this.hunger = 100;
 		}
 	}
 };

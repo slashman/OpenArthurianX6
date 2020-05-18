@@ -30,6 +30,8 @@ const MobFactory = {
 		mob.hp = new Stat(definition.hp);
 		mob.damage = new Stat(definition.damage);
 		mob.defense = new Stat(definition.defense);
+		mob.hunger = new Stat(100);
+		mob.hunger.currentValue = 0;
 		mob.alignment = definition.alignment || Constants.Alignments.NEUTRAL;
 
 		mob.speed = new Stat(definition.speed)

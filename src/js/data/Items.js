@@ -280,7 +280,18 @@ const Items = [
 		name: 'Oak Tree',
 		appearance: 'oakTree',
 		solid: true
-	}
+	},
+	{
+		id: 'carrot',
+		appearance: 'carrot',
+		description: 'It\'s a carrot, it\'s orange.',
+		name: 'Carrot',
+		effect: {
+			type: 'reduceHunger',
+			hungerRecovery: 10
+		},
+		spendable: true
+	},
 ]
 
 module.exports = Items;

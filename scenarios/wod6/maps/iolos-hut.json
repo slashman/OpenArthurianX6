@@ -475,7 +475,7 @@
                  "name":"Barrel 1",
                  "properties":
                     {
-                     "initialContents":"[\n  {\n    \"itemId\": \"fish\"\n },\n {\n    \"itemId\": \"ironBolt\",\n    \"quantity\": 20\n  }\n]",
+                     "initialContents":"[\n  {\n    \"itemId\": \"fish\"\n },\n {\n    \"itemId\": \"carrot\"\n },\n {\n    \"itemId\": \"ironBolt\",\n    \"quantity\": 20\n  }\n]",
                      "itemId":"barrel"
                     },
                  "propertytypes":
@@ -1144,7 +1144,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":86,
+ "nextobjectid":87,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

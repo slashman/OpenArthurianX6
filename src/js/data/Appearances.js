@@ -86,6 +86,10 @@ const Appearances = [
 			{
 				id: 'bag',
 				i: 163
+			},
+			{
+				id: 'carrot',
+				i: 16 * 2 + 7
 			}
 		]
 	},

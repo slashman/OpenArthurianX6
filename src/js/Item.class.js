@@ -22,6 +22,11 @@ Item.prototype = {
   	const flyAppearance = OAX6.AppearanceFactory.getAppearance(projectile.def.flyAppearance);
     return OAX6.UI.playProjectileAnimation(this.def.flyType, flyAppearance, fromX, fromY, toX, toY);
   },
+  recoverHunger(mob) {
+    const hungerRecovery = this.def.effect.hungerRecovery;
+    mob.hunger.reduce(hungerRecovery);
+    OAX6.UI.showMessage(mob.name + " recovers " + hungerRecovery + " hunger");
+  },
   recoverHP(mob) {
     mob.hp.increase(5);
     OAX6.UI.showMessage(mob.name + " recovers 5 HP");
