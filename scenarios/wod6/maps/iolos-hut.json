@@ -529,6 +529,46 @@
                  "width":16,
                  "x":480,
                  "y":304
+                }, 
+                {
+                 "gid":373,
+                 "height":16,
+                 "id":83,
+                 "name":"Rock",
+                 "properties":
+                    {
+                     "itemId":"rock"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":448,
+                 "y":576
+                }, 
+                {
+                 "gid":266,
+                 "height":16,
+                 "id":85,
+                 "name":"Oak Tree",
+                 "properties":
+                    {
+                     "itemId":"oakTree"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":448,
+                 "y":592
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1104,7 +1144,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":83,
+ "nextobjectid":86,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

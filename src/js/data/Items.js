@@ -267,6 +267,19 @@ const Items = [
 		name: 'Bag',
 		appearance: 'bag',
 		containerType: 'backpack'
+	},
+	{
+		id: 'rock',
+		appearance: 'rock',
+		description: 'It\'s a rock.',
+		name: 'Rock'
+	},
+	{
+		id: 'oakTree',
+		description: 'It\'s an Oak tree.',
+		name: 'Oak Tree',
+		appearance: 'oakTree',
+		solid: true
 	}
 ]
 

@@ -290,7 +290,15 @@ const Appearances = [
 			{
 				id: 'harpsichord',
 				i: 13 * 33 + 13
-			}
+			},
+			{
+				id: 'rock',
+				i: 11 * 33 + 9
+			},
+			{
+				id: 'oakTree',
+				i: 8 * 33 + 3
+			},
 
 		]
 	},
