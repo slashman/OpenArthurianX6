@@ -302,7 +302,12 @@ const Items = [
 		id: 'milkBucket',
 		appearance: 'milkBucket',
 		description: 'It\'s a bucket, filled with cow\'s milk.',
-		name: 'Bucket (Milk)'
+		name: 'Bucket (Milk)',
+		effect: {
+			type: 'reduceHunger',
+			hungerRecovery: 10,
+			transformTo: 'emptyBucket'
+		}
 	},
 ]
 

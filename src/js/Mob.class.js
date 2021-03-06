@@ -569,6 +569,9 @@ Mob.prototype = {
 			if (item.def.spendable) {
 				item.reduceItemQuantity();
 			}
+			if (itemEffect.transformTo) {
+				item.switchItemDefinition(itemEffect.transformTo);
+			}
 			item.refreshVisualContainer();
 		}
 		
