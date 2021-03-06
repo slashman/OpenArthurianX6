@@ -73,8 +73,11 @@ const MobTypes = [
 		damage: 4,
 		defense: 0,
 		speed: 2,
-		corpse: 'cowCorpse'
-	},	
+		corpse: 'cowCorpse',
+		useEffect: {
+			type: 'milk'
+		}
+	},
 	{
 		id: 'skeleton',
 		appearance: 'skeleton',

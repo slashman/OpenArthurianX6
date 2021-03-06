@@ -90,6 +90,14 @@ const Appearances = [
 			{
 				id: 'carrot',
 				i: 16 * 2 + 7
+			},
+			{
+				id: 'milkBucket',
+				i: 10
+			},
+			{
+				id: 'emptyBucket',
+				i: 11
 			}
 		]
 	},

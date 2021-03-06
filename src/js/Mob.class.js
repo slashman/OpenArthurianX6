@@ -10,6 +10,7 @@ const MessageBox = require('./MessageBox');
 const PartyStatus = require('./ui/PartyStatus');
 const Constants = require('./Constants');
 const Inventory = require('./model/Inventory.class');
+const { Time } = require('phaser-ce');
 
 /**
  * Represents a being living inside a world
@@ -424,7 +425,10 @@ Mob.prototype = {
 		var door = this.level.getDoorAt(x, y, this.z);
 		var object = this.level.getObjectAt(x, y, this.z);
 		var item = this.level.getItemAt(x, y, this.z);
-		if (door) {
+		var mob = this.level.getMobAt(x, y, this.z);
+		if (mob) {
+			return this.useMobInPosition(x, y, mob);
+		} else if (door) {
 			if (door.isLocked()) {
 				OAX6.UI.showMessage("Locked!");
 			} else {
@@ -443,6 +447,58 @@ Mob.prototype = {
 		} else {
 			this.reportAction("Use - Nothing there!");
 		}
+	},
+	useMobInPosition(x, y, mob) {
+		const mobEffect = mob.definition.useEffect
+		if (!mobEffect) {
+			OAX6.UI.showMessage("Cannot be used");
+			return;
+		}
+		switch (mobEffect.type) {
+			case 'milk':
+			this.tryMilk(mob);
+			break;
+		}
+	},
+	tryMilk (cow) {
+		const bucket = this.findBucket();
+		if (!bucket) {
+			OAX6.UI.showMessage("You need an empty bucket to milk the cow.");
+			return;
+		}
+		OAX6.UI.showMessage("You milk the cow.");
+		bucket.switchItemDefinition('milkBucket');
+	},
+	findBucket () {
+		const emptyBucketDefId = 'emptyBucket';
+		let bucket = this.findItemAroundById(emptyBucketDefId);
+		if (!bucket) {
+			bucket = this.getItemAtSlot("rightHand");
+			if (!bucket || bucket.defid != emptyBucketDefId) {
+				bucket = undefined;
+			}
+		}
+		if (!bucket) {
+			bucket = this.getItemAtSlot("leftHand");
+			if (!bucket || bucket.defid != emptyBucketDefId) {
+				bucket = undefined;
+			}
+		}
+		return bucket;
+	},
+	findItemAroundById (id) {
+		for (let xx = -1; xx <= 1; xx++) {
+			for (let yy = -1; yy <= 1; yy++) {
+				const item = this.level.getItemAt(this.x + xx, this.y + yy, this.z);
+				if (!item) {
+					continue;
+				}
+				if (item.defid == id) {
+					return item;
+				}
+			}
+		}
+		return undefined;
 	},
 	useItemOnDirection(dx, dy, item) {
 		return this.useItemInPosition(this.x + dx, this.y + dy, item);

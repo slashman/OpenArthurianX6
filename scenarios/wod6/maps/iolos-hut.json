@@ -6,7 +6,7 @@
          "name":"Tiles 1",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -17,7 +17,7 @@
          "name":"Tiles 2",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -28,7 +28,7 @@
          "name":"Tiles 3",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -39,7 +39,7 @@
          "name":"Tiles 4",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -90,7 +90,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 
@@ -569,6 +569,26 @@
                  "width":16,
                  "x":448,
                  "y":592
+                }, 
+                {
+                 "gid":2008,
+                 "height":16,
+                 "id":87,
+                 "name":"Bucket",
+                 "properties":
+                    {
+                     "itemId":"emptyBucket"
+                    },
+                 "propertytypes":
+                    {
+                     "itemId":"string"
+                    },
+                 "rotation":0,
+                 "type":"Item",
+                 "visible":true,
+                 "width":16,
+                 "x":352,
+                 "y":320
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -896,7 +916,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 
@@ -1144,7 +1164,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":87,
+ "nextobjectid":88,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

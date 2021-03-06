@@ -110,6 +110,15 @@ Item.prototype = {
     if (this.currentMobInventoryWindow) {
       this.currentMobInventoryWindow.refresh();
 		}
+  },
+  switchItemDefinition(id) {
+    const def = OAX6.ItemFactory.getDefinition(id);
+		if (!def) {
+			throw new Error("Invalid item id: [" + id + "]");
+		}
+    this.def = Object.assign({}, def);
+    OAX6.ItemFactory.switchSpriteForItem(this.sprite, id);
+		this.defid = def.id;
   }
 }
 

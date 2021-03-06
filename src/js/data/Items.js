@@ -292,6 +292,18 @@ const Items = [
 		},
 		spendable: true
 	},
+	{
+		id: 'emptyBucket',
+		appearance: 'emptyBucket',
+		description: 'It\'s a bucket, there\'s nothing on it.',
+		name: 'Empty Bucket'
+	},
+	{
+		id: 'milkBucket',
+		appearance: 'milkBucket',
+		description: 'It\'s a bucket, filled with cow\'s milk.',
+		name: 'Bucket (Milk)'
+	},
 ]
 
 module.exports = Items;

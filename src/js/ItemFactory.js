@@ -80,6 +80,17 @@ const ItemFactory = {
 		);
 		return sprite;
 	},
+	switchSpriteForItem: function(sprite, newItemId) {
+		const def = this.itemsMap[newItemId];
+		if (!def) {
+			throw new Error("Invalid item id: [" + newItemId + "]");
+		}
+		const appearance = AppearanceFactory.getAppearance(def.appearance);
+		if (!appearance) {
+			throw new Error("Invalid appearance for item id: [" + newItemId + "]");
+		}
+		sprite.loadTexture(appearance.tileset, appearance.i);
+	},
 	// TODO: Move this to ObjectFactory, the Door class has nothing to do with Item. Move the definitions too?
 	createDoor: function(id, level){
 		const def = this.itemsMap[id];
