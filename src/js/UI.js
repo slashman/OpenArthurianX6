@@ -18,6 +18,7 @@ const SkyBox = require('./SkyBox');
 
 const PartyStatus = require('./ui/PartyStatus');
 const BookPanel = require('./ui/BookPanel');
+const SignPanel = require('./ui/SignPanel');
 const Dialogs = require('./Dialogs');
 const MessageBox = require('./MessageBox');
 const MobDescription = require('./MobDescription');
@@ -129,6 +130,7 @@ const UI = {
 
 		PartyStatus.init(this.game, this.UILayer);
 		BookPanel.init(this.game, this.UILayer);
+		SignPanel.init(this.game, this.UILayer);
 		Dialogs.init(this.game, this.UILayer);
 		MessageBox.init(this.game, this.UILayer);
 		MobDescription.init(this.game, this.UILayer);
@@ -490,6 +492,9 @@ const UI = {
   	PartyStatus.addMob(this.player);
   	this.player.party.forEach(m => PartyStatus.addMob(m));
 	SkyBox.setMinuteOfDay(60);
+  },
+  showSign(sign) {
+	SignPanel.show(sign);
   },
   readBook(book) {
   	OAX6.UI.showMessage("Reading book \"" + book.def.title + "\", press Left and Right to browse.");

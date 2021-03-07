@@ -475,7 +475,11 @@ const PlayerStateMachine = {
                 object.reveal();
                 OAX6.UI.showMessage("Look - You find a " + object.getDescription());
             } else {
-                OAX6.UI.showMessage("Look - You see a " + object.getDescription());
+                if (object.isSign) {
+                    OAX6.UI.showSign(object);
+                } else {
+                    OAX6.UI.showMessage("Look - You see a " + object.getDescription());
+                }
             }
             return 'text';
         }

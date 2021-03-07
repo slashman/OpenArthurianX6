@@ -3,12 +3,10 @@ const circular = require('circular-functions');
 class Sign {
 	constructor() {
 		this._c = circular.register('Sign');
+		this.isSign = true;
 	}
 	getAppearanceId () {
 		return this.def.appearance;
-	}
-	getDescription() {
-		return 'sign reading: ' + this.signText;
 	}
 }
 
