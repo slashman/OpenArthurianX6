@@ -12,6 +12,15 @@ const Appearances = [
 		}]
 	},
 	{
+		tileset: 'blank',
+		items: [
+			{
+				id: 'blank',
+				i: 0
+			}
+		]
+	},
+	{
 		tileset: 'items',
 		items: [
 			{

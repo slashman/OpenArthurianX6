@@ -10,6 +10,11 @@ const ObjectTypes = [
 		id: 'wLever',
 		closedAppearance: 'wLeverOff',
 		openAppearance: 'wLever'
+	},
+	{
+		id: 'gravestone',
+		background: 'gravestone',
+		appearance: 'blank'
 	}
 ];
 

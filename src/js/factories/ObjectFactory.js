@@ -4,6 +4,7 @@ const AppearanceFactory = require('../AppearanceFactory');
 const PlayerStateMachine = require('../PlayerStateMachine');
 const Stairs = require('../objects/Stairs');
 const Lever = require('../objects/Lever');
+const Sign = require('../objects/Sign');
 
 const ObjectFactory = {
 	init(objectTypes) {
@@ -19,6 +20,8 @@ const ObjectFactory = {
 			gameObject = new Stairs();
 		} else if (objectData.type == 'Lever') {
 			gameObject = new Lever();
+		} else if (objectData.type == 'Sign') {
+			gameObject = new Sign();
 		} else {
 			gameObject = {};
 		}
