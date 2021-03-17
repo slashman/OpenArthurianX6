@@ -44,7 +44,16 @@ module.exports = {
 
     this.name.text = definition.name;
 
-    this.description.text = definition.description || '';
+    let mobDescription = '';
+    if (definition.descriptionUI) {
+      mobDescription += definition.description + "\n\n";
+    }
+
+    mobDescription += "ATK: " + mob.damage.current+ "\n";
+    mobDescription += "DEF: " + mob.defense.current+ "\n";
+    mobDescription += "HP: " + mob.hp.getText() + "\n";
+
+    this.description.text = mobDescription;
 
     this.descriptionUI.visible = true;
   },
