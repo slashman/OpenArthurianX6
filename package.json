@@ -11,7 +11,8 @@
   "dependencies": {
     "circular-functions": "0.0.4",
     "pathfinding": "^0.4.18",
-    "phaser-ce": "^2.13.2"
+    "phaser-ce": "^2.13.2",
+    "webfontloader": "^1.6.28"
   },
   "browserify-shim": {
     "phaser": "global:Phaser",

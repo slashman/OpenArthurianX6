@@ -1,4 +1,5 @@
 const Phaser = require('phaser');
+const WebFont = require('webfontloader');
 
 const Random = require('./Random');
 const Loader = require('./Loader');
@@ -52,6 +53,12 @@ const UI = {
 		this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
 		this.game.scale.onFullScreenChange.add(() => {
 			OAX6.UI.showMessage(this.game.scale.isFullScreen ? "Full screen enabled" : "Full screen disabled");
+		});
+
+		WebFont.load({
+			custom: {
+				families: ['UltimaRunes']
+			}
 		});
 		
 		this.game.renderer.renderSession.roundPixels = true;  

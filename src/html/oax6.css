@@ -7,3 +7,8 @@ canvas {
   margin-left: auto;
   margin-right: auto;
 }
+
+@font-face {
+  font-family: "UltimaRunes";
+  src: url("assets/AncientRunes.ttf");
+}

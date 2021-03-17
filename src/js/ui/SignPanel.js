@@ -16,8 +16,8 @@ const SignPanel = {
 			boundsAlignV: 'middle',
 			wordWrap: true,
 			wordWrapWidth: 202,
-			font: 'serif',
-			fontSize: 32,
+			font: 'UltimaRunes',
+			fontSize: 48,
 			fill: '#bbbbbb'
 		});
 		this.textOverlay.setTextBounds(57, 39, 202, 121);
