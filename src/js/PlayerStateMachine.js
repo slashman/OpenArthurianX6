@@ -79,6 +79,14 @@ const PlayerStateMachine = {
         } else if (this.directionCallback) {
             // For actions such as pick item in place
             return this.directionCallback({x: 0, y: 0});
+        } else if (this.state == PlayerStateMachine.DIALOG) {
+            if (this.inputDialogCallback) {
+                this.inputDialogCallback();
+            } else {
+                Bus.emit('sendInput', this.inputDialog);
+                this.inputDialog = '';
+                Bus.emit('updateDialogInput', this.inputDialog);
+            }
         }
     },
     cancelAction: function() {
@@ -206,15 +214,6 @@ const PlayerStateMachine = {
         var key = this.game.input.keyboard.lastKey;
         if (key && key.isDown && key.repeats == 1) {
             var keyCode = key.keyCode;
-
-            if (this.inputDialogCallback !== null) {
-                // TODO: Maybe refactor to not do this on the update cycle, instead have a key listener
-                if (keyCode == Phaser.KeyCode.ENTER) {
-                    this.inputDialogCallback();
-                }
-                return;
-            }
-
             if ((keyCode >= Phaser.KeyCode.A && keyCode <= Phaser.KeyCode.Z) || (keyCode >= Phaser.KeyCode.ZERO && keyCode <= Phaser.KeyCode.NINE) || keyCode == Phaser.KeyCode.SPACEBAR) {
                 if (this.inputDialog.length < 20) { // Not measured anywhere but why would you put more than 20 characters
                     var keyChar = String.fromCharCode(keyCode);
@@ -223,11 +222,6 @@ const PlayerStateMachine = {
                 }
             } else if (keyCode == Phaser.KeyCode.BACKSPACE) {
                 this.inputDialog = this.inputDialog.substring(0, this.inputDialog.length - 1);
-                Bus.emit('updateDialogInput', this.inputDialog);
-            } else if (keyCode == Phaser.KeyCode.ENTER) {
-                Bus.emit('sendInput', this.inputDialog);
-                
-                this.inputDialog = '';
                 Bus.emit('updateDialogInput', this.inputDialog);
             }
         }
