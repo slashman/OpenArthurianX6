@@ -6,22 +6,22 @@ module.exports = {
   startingState: {
     minuteOfDay: 1380,
     map: 'forest1',
+    party: [],
+    scene: 'intro'
+  },
+/* Iolo's starting test state 
+  startingState: {
+    minuteOfDay: 1380,
+    map: 'iolos',
     party: [
-    /*
       {
         id: 'shamino',
         x: 13,
         y: 16
-      },
-      {
-        id: 'dupre',
-        x: 26,
-        y: 26
       }
-    */
     ],
     scene: 'intro'
-  },
+  },*/
 	maps: [
     {
       name: 'forest1',
