@@ -913,6 +913,50 @@
                  "width":16,
                  "x":480,
                  "y":352
+                }, 
+                {
+                 "gid":2083,
+                 "height":16,
+                 "id":88,
+                 "name":"",
+                 "properties":
+                    {
+                     "defid":"gravestone",
+                     "signText":"Here lies someone"
+                    },
+                 "propertytypes":
+                    {
+                     "defid":"string",
+                     "signText":"string"
+                    },
+                 "rotation":0,
+                 "type":"Sign",
+                 "visible":true,
+                 "width":16,
+                 "x":672,
+                 "y":240
+                }, 
+                {
+                 "gid":2082,
+                 "height":16,
+                 "id":89,
+                 "name":"",
+                 "properties":
+                    {
+                     "defid":"gravestone",
+                     "signText":"Here lies Someone!"
+                    },
+                 "propertytypes":
+                    {
+                     "defid":"string",
+                     "signText":"string"
+                    },
+                 "rotation":0,
+                 "type":"Sign",
+                 "visible":true,
+                 "width":16,
+                 "x":688,
+                 "y":240
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1164,7 +1208,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":88,
+ "nextobjectid":90,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",
