@@ -21,7 +21,7 @@ const NPCs = [
 		type: 'iolo',
 		alignment: 'player',
 		weapon: 'crossbow',
-				dialog: [
+		dialog: [
 			{
 				key: "greeting",
 				variants: [
@@ -60,8 +60,47 @@ const NPCs = [
 			},
 			{
 				key: "join",
-				dialog: [
-					"Yes, please join me! The Milestone II awaits us!"
+				variants: [
+					{
+						condition: {
+							joined: false
+						},
+						dialog: [
+							{
+								type: "joinParty",
+								text: "Yes, please let me join you! The Milestone VIII awaits for us!"
+							}
+						]
+					},
+					{
+						condition: {
+							joined: true
+						},
+						dialog: "I am already in your party, give me bread."
+					}
+				]
+
+			},
+			{
+				key: "leave",
+				variants: [
+					{
+						condition: {
+							joined: true
+						},
+						dialog: [
+							{
+								type: "leaveParty",
+								text: "I don't want to leave! I need some bread!"
+							}
+						]
+					},
+					{
+						condition: {
+							joined: false
+						},
+						dialog: "Leave from where? I'm fine here."
+					}
 				]
 			},
 			{
@@ -73,8 +112,7 @@ const NPCs = [
 							value: false
 						},
 						dialog: [
-							"Let's go!",
-							{ type: "joinParty" },
+							{ type: "joinParty", text: "Let's go!" },
 							{ type: "setFlag", flagName: "firstIoloConversation" },
 							{ type: "endConversation" }
 						]
@@ -159,9 +197,47 @@ const NPCs = [
 			},
 			{
 				key: "join",
-				dialog: [
-					"Yes, please join me! Britannia needs you in this dark hour. [Iolo] will fill you with all the information you need about the latest happenings...",
-					"Lord [British] is missing, and the whole realm is being torn apart!"
+				variants: [
+					{
+						condition: {
+							joined: false
+						},
+						dialog: [
+							{
+								type: "joinParty",
+								text: "Yes, let's go! Britannia needs you in this dark hour. [Iolo] will fill you with all the information you need about the latest happenings..."
+							},
+							"Lord [British] is missing, and the whole realm is being torn apart!"
+						]
+					},
+					{
+						condition: {
+							joined: true
+						},
+						dialog: "I am already in your party, give me a kingdom."
+					}
+				]
+			},
+			{
+				key: "leave",
+				variants: [
+					{
+						condition: {
+							joined: true
+						},
+						dialog: [
+							{
+								type: "leaveParty",
+								text: "Ok, I'll wait here."
+							}
+						]
+					},
+					{
+						condition: {
+							joined: false
+						},
+						dialog: "Uh? I'm not in your party... Avatar..."
+					}
 				]
 			},
 			{
@@ -173,8 +249,7 @@ const NPCs = [
 							value: false
 						},
 						dialog: [
-							"We will find aid at Iolo's. It is but a short walk to the west!",
-							{ type: "joinParty" },
+							{ type: "joinParty", text: "We will find aid at Iolo's. It is but a short walk to the west!" },
 							{ type: "setFlag", flagName: "firstShaminoConversation" },
 							{ type: "endConversation" }
 						]

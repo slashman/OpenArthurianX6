@@ -119,12 +119,20 @@ module.exports = {
 			if (!v.condition) {
 				return true;
 			}
-			if (v.condition.value === false) {
-				// Undefined flags count as false!
-				return this.player.flags[v.condition.flag] === false || 
-					this.player.flags[v.condition.flag] === undefined;
+			if (v.condition.flag) {
+				if (v.condition.value === false) {
+					// Undefined flags count as false!
+					return this.player.flags[v.condition.flag] === false || 
+						this.player.flags[v.condition.flag] === undefined;
+				} else {
+					return this.player.flags[v.condition.flag] === true;
+				}
+			} else if (v.condition.joined !== undefined) {
+				const joinedCheck = v.condition.joined;
+				const joined = this.player.isMobOnParty(this.currentMob);
+				return joined == joinedCheck;
 			} else {
-				return this.player.flags[v.condition.flag] === true;
+				return false;
 			}
 		});
 	},
@@ -164,11 +172,14 @@ module.exports = {
 			} else if (msg.type === 'event') {
 				this.name.text = '';
 				msg = msg.text;
+			} else if (msg.type === 'leaveParty') {
+				msg = msg.text;
+				Bus.emit('removeFromParty', this.currentMob);
+			} else if (msg.type === 'joinParty') {
+				msg = msg.text;
+				Bus.emit('addToParty', this.currentMob);
 			} else {
 				switch (msg.type) {
-					case 'joinParty':
-						Bus.emit('addToParty', this.currentMob);
-						break;
 					case 'setFlag':
 						let value = true;
 						if (msg.value !== undefined) {

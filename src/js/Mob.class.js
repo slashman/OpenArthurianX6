@@ -788,7 +788,12 @@ Mob.prototype = {
 			return 'The '+ this.definition.name;
 		}
 	},
+	isMobOnParty: function(mob){
+		return this.party.indexOf(mob) != -1;
+	},
 	addMobToParty: function(mob){
+		if (this.isMobOnParty(mob))
+			return;
 		this.party.push(mob);
 		PartyStatus.addMob(mob);
 	},

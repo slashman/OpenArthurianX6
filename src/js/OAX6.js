@@ -57,6 +57,7 @@ const OAX6 = {
 		UI.setActiveMob(player);
 		UI.player = player; // TODO: Remove
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
+		Bus.listen('removeFromParty', npc => player.removeFromParty(npc));
 		startingState.party.forEach(function(partyMember) {
 			const npc = NPCFactory.buildNPC(game, partyMember.id, undefined, 0, 0, 0);
 			player.addMobToParty(npc);
@@ -77,6 +78,7 @@ const OAX6 = {
 		UI.setActiveMob(player);
 		UI.player = player; // TODO: Remove
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
+		Bus.listen('removeFromParty', npc => player.removeFromParty(npc));
 		/*LevelLoader.setLevelsData({
 			[player.level.mapId]: player.level
 		});*/
