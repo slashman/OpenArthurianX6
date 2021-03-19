@@ -1,0 +1,2 @@
+Bugs
+ Sprites get out of sync when entering and leaving combat quickly using C (check case of neutral enemies around)
