@@ -715,7 +715,7 @@ Mob.prototype = {
 			PlayerStateMachine.startCombat(true);
 		}
 		const weapon = this.getWeapon();
-		const armor = this.getArmor();
+		const armor = mob.getArmor();
 		const combinedDamage = this.damage.current + (weapon ? weapon.damage.current : 0);
 		const combinedDefense = mob.defense.current + (armor ? armor.defense.current : 0);
 		let damage = combinedDamage - combinedDefense;
