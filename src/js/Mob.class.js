@@ -111,7 +111,9 @@ Mob.prototype = {
 			// Surviving is the most important, so always look for enemies first
 			// Note that neutral enemies will by default have no target
 			const nearbyTarget = this.getNearbyTarget();
-			if (nearbyTarget) {
+			if (this.isPanicked && nearbyTarget) {
+				subIntent = 'flee';
+			} else if (nearbyTarget) {
 				subIntent = 'combat';
 			} else if (subIntent === 'seekPlayer' && !this.canTrack(player)) {
 				subIntent = 'waitCommand';
@@ -136,9 +138,37 @@ Mob.prototype = {
 			return this.moveTo(dx, dy);
 		} else if (subIntent === 'combat') {
 			return this.onCombatTurn().then(() => this.combatAction());
+		} else if (subIntent === 'flee') {
+			// Find the way out of danger
+			return this.fleeAction();
 		} else {
 			return Timer.delay(1000);
 		}
+	},
+	fleeAction: function () {
+		if (this.dead){
+			return Promise.resolve();
+		}
+		const nearbyEnemy = this.getNearbyTarget();
+		if (!nearbyEnemy){
+			if (Random.chance(50)){
+				return this.moveRandomly();
+			} else {
+				// Do nothing
+				this.reportAction("Stand by");
+				return Timer.delay(1000);
+			}
+		} else {
+			return this.bumpAwayFrom(nearbyEnemy);
+		}
+	},
+	moveRandomly: function () {
+		var dx = Random.num(-1,1);
+		var dy = Random.num(-1,1);
+		if (dx === 0 && dy === 0){
+			dx = 1;
+		}
+		return this.moveTo(dx, dy);
 	},
 	combatAction: function () {
 		if (this.dead){
@@ -147,12 +177,7 @@ Mob.prototype = {
 		const nearbyTarget = this.getNearbyTarget();
 		if (!nearbyTarget){
 			if (Random.chance(50)){
-				var dx = Random.num(-1,1);
-				var dy = Random.num(-1,1);
-				if (dx === 0 && dy === 0){
-					dx = 1;
-				}
-				return this.moveTo(dx, dy);
+				return this.moveRandomly();
 			} else {
 				// Do nothing
 				this.reportAction("Stand by");
@@ -171,10 +196,23 @@ Mob.prototype = {
 			}
 		} 
 	},
+	bumpAwayFrom: function (targetMob) {
+		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
+		let dx = -nextStep.dx;
+		let dy = -nextStep.dy;
+		if (this.level.canMoveFrom(this.x, this.y, this.z, dx, dy)) {
+			return this.bumpOnDirection(dx, dy);
+		} else {
+			return this.moveRandomly();
+		}
+	},
 	bumpTowards: function (targetMob) {
 		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
+		return this.bumpOnDirection(dx, dy);
+	},
+	bumpOnDirection: function (dx, dy) {
 		const mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
 		if (mob){
 			if (mob.alignment !== this.alignment){
@@ -712,7 +750,16 @@ Mob.prototype = {
 	attack: function(mob){
 		mob.hasBeenAttacked = true;
 		if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
+			//TODO: Should only happen if party member was attacked.
 			PlayerStateMachine.startCombat(true);
+		}
+		if (mob.alignment === Constants.Alignments.NEUTRAL) {
+			mob.isPanicked = true;
+			if (this.alignment == Constants.Alignments.ENEMY) {
+				mob.alignment = Constants.Alignments.PLAYER;
+			} else {
+				mob.alignment = Constants.Alignments.ENEMY;
+			}
 		}
 		const weapon = this.getWeapon();
 		const armor = mob.getArmor();
