@@ -270,15 +270,16 @@ Level.prototype = {
 		}
 		return !this.isSolid(x + dx, y + dy, z);
 	},
-	isSafeAround: function(x, y, alignment){
+	isSafeAround: function(x, y, alignment, panickedAreDangerous){
 		const dangerousMob = this.mobs.find((m) => {
-			return (m.hasBeenAttacked && m.alignment !== alignment) ||
-				(
-					m.alignment !== Constants.Alignments.NEUTRAL &&
-					m.alignment !== alignment &&
-					Geo.flatDist(x,y,m.x,m.y) < COMBAT_DISTANCE
-				);
-			});
+			const isDangerous = m.alignment !== Constants.Alignments.NEUTRAL &&
+				m.alignment !== alignment &&
+				Geo.flatDist(x,y,m.x,m.y) < COMBAT_DISTANCE;
+			if (isDangerous && !panickedAreDangerous && m.isPanicked) {
+				return false;
+			}
+			return isDangerous;
+		});
 		return !dangerousMob;
 	},
 	activateAll: function(){

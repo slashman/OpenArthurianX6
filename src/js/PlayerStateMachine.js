@@ -530,7 +530,15 @@ const PlayerStateMachine = {
             const keyCode = this._inkey();
             if (keyCode) {
                 if (keyCode === Phaser.KeyCode.C){
-                    return this.startCombat(true);
+                    if (this.state === PlayerStateMachine.WORLD) {
+                        return this.startCombat(true);
+                    } else {
+                        const endedCombat = this.tryToEndCombat(false);
+                        if (!endedCombat) {
+                            OAX6.UI.showMessage("Cannot leave combat mode");
+                        }
+                        return endedCombat;
+                    }
                 } else if (keyCode === Phaser.KeyCode.A){
                     return this.attackCommand(); //TODO: Instead of a direction, this should allow targetting based on range (Similar to R)
                 } else if (keyCode === Phaser.KeyCode.R) { // Ranged Attack
@@ -572,15 +580,23 @@ const PlayerStateMachine = {
                     break;
                 case PlayerStateMachine.COMBAT:
                     // End combat if no enemies nearby
-                    if (this.player.level.isSafeAround(this.player.x, this.player.y, this.player.alignment)){
-                        this.endCombat();
-                        OAX6.UI.showMessage("Combat is over!");
-                    } else {
+                    if (!this.tryToEndCombat(true)) {
                         this.player.level.actNext(); // TODO: Change for this.currentLevel
                     }
                     break;
             }
         });
+    },
+
+    tryToEndCombat: function (panickedAreDangerous) {
+        if (this.player.level.isSafeAround(this.player.x, this.player.y, this.player.alignment, panickedAreDangerous)){
+            this.endCombat();
+            OAX6.UI.showMessage("Combat is over!");
+            OAX6.UI.hideMarker();
+            return true;
+        } else {
+            return false;
+        }
     },
 
     updateInventoryAction() {
