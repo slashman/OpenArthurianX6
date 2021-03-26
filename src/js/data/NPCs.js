@@ -279,6 +279,85 @@ const NPCs = [
 		]
 	},
 	{
+		id: 'corvus',
+		name: 'Corvus',
+		description: 'A member of the Britannian Resistance.',
+		type: 'corvus',
+		alignment: 'player',
+		weapon: 'crossbow',
+		items: [
+			{ itemId: 'ironBolt', quantity: 50 },
+		],
+		intent: 'seekPlayer', // Include the schedule here?
+		triggers: [],
+		dialog: [
+			{
+				key: "greeting",
+				dialog: "Can I help you with anything?"
+			},
+			{
+				key: "name",
+				dialog: "I am Corvus, at least that's how you should call me."
+			},
+			{
+				key: "job",
+				dialog: "I seek revenge from the damn soldiers of Asteroth. They burnt my farm when I refused to pay their overpriced tribute."
+			},
+			{
+				key: "join",
+				dialog: "I am not ready yet to join your party."
+			},
+			{
+				key: "bye",
+				dialog: "Bye."
+			},
+			{
+				key: "unknown",
+				dialog: "Cannot help you with that, sorry"
+			}
+		]
+	},
+	{
+		id: 'calista',
+		name: 'Calista',
+		description: 'A member of the Britannian Resistance.',
+		type: 'calista',
+		alignment: 'player',
+		weapon: 'crossbow',
+		items: [
+			{ itemId: 'ironBolt', quantity: 50 },
+		],
+		intent: 'seekPlayer', // Include the schedule here?
+		triggers: [],
+		dialog: [
+			{
+				key: "greeting",
+				dialog: "Can I help you with anything?"
+			},
+			{
+				key: "name",
+				dialog: "I am Calista from Yew."
+			},
+			{
+				key: "yew",
+				dialog: "My fair city is now a stronghold for the oppressors."
+			},
+			{
+				key: "join",
+				dialog: "I am not ready yet to join your party."
+			},
+			{
+				key: "bye",
+				dialog: "Bye."
+			},
+			{
+				key: "unknown",
+				dialog: "Cannot help you with that."
+			}
+		]
+	},
+
+	{
 		id: 'dupre',
 		name: 'Dupre',
 		type: 'man2',
