@@ -288,7 +288,25 @@ const NPCs = [
 		items: [
 			{ itemId: 'ironBolt', quantity: 50 },
 		],
-		intent: 'seekPlayer', // Include the schedule here?
+		intent: 'followSchedule',
+		schedule: [
+			{ // Work in the fields
+				time: 7,
+				location: {x: 18, y: 32}
+			},
+			{ // Have lunch
+				time: 12,
+				location: {x: 34, y: 19}
+			},
+			{ // Work in the fields again
+				time: 14,
+				location: {x: 18, y: 32}
+			},
+			{ // Sleep at the barn
+				time: 20,
+				location: {x: 24, y: 18}
+			}
+		],
 		triggers: [],
 		dialog: [
 			{
@@ -327,7 +345,7 @@ const NPCs = [
 		items: [
 			{ itemId: 'ironBolt', quantity: 50 },
 		],
-		intent: 'seekPlayer', // Include the schedule here?
+		intent: 'wander', // Include the schedule here?
 		triggers: [],
 		dialog: [
 			{

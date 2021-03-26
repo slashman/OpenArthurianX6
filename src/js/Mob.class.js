@@ -33,6 +33,7 @@ function Mob(level, x, y, z){
 	this.flags = {};
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;
+	this.scheduleCheckTurns = 0;
 	this.sightRange = 15;
 	this._c = circular.register('Mob');
 }
@@ -92,8 +93,8 @@ Mob.prototype = {
 	},
 	__executeAI() {
 		const player = OAX6.UI.player;
-		// If mob is too far from player and hasn't been attacked, it mustn't act
-		if (!this.level.isInCombat(this)) {
+		// If mob is too far from player and hasn't been attacked, it mustn't act (except if it's following a schedule)
+		if (!this.level.isInCombat(this) && !this.intent == 'followSchedule') {
 			return Timer.delay(1000);	
 		}
 		let subIntent = this.intent; // While we have a general intent, it may change for this action
@@ -128,6 +129,8 @@ Mob.prototype = {
 			}
 		} else if (subIntent === 'seekPlayer') {
 			return this.bumpTowards(player);
+		} else if (subIntent === 'followSchedule') {
+			return this.followSchedule();
 		} else if (subIntent === 'wander') {
 			// TODO: Follow schedule
 			var dx = Random.num(-1,1);
@@ -205,6 +208,57 @@ Mob.prototype = {
 		} else {
 			return this.moveRandomly();
 		}
+	},
+	followSchedule: function () {
+		this.scheduleCheckTurns--;
+		if (this.scheduleCheckTurns > 0) {
+			if (!this.scheduleCurrentDestination) {
+				return this.moveRandomly();
+			} else {
+				return this.followDestination();
+			}
+		}
+		this.scheduleCheckTurns = 15;
+		const desiredLocation = this.getDesiredLocationBySchedule();
+		const dist = Geo.flatDist(desiredLocation.x, desiredLocation.y, this.x, this.y);
+		if (dist > 5) {
+			this.scheduleCurrentDestination = desiredLocation;
+			return this.followDestination();
+		} else {
+			// We are close enough
+			return this.moveRandomly();
+		}
+	},
+	followDestination: function () {
+		if (!this.scheduleCurrentDestination) {
+			return this.moveRandomly();
+		}
+		if (this.scheduleCurrentDestination.x == this.x &&
+			this.scheduleCurrentDestination.y == this.y) {
+			delete this.scheduleCurrentDestination;
+			return this.moveRandomly();
+		}
+		return this.bumpTowards(this.scheduleCurrentDestination);
+	},
+	getDesiredLocationBySchedule: function () {
+		if (!this.npcDefinition || !this.npcDefinition.schedule) {
+			return undefined;
+		}
+		this.npcDefinition.schedule.sort((a,b) => a.time - b.time); // TODO: Don't do this every time.
+		const timeOfDay = 4; // TODO: Fetch real time of day
+		// Get the prior scheduled unit based on timeOfDay, wrapping to the previous day if needed.
+		let nextActivity;
+		for (let i = 0; i < this.npcDefinition.schedule.length; i++) {
+			const activity = this.npcDefinition.schedule[i];
+			if (activity.time <= timeOfDay) {
+				nextActivity = activity;
+				break;
+			}
+		}
+		if (!nextActivity) {
+			nextActivity = this.npcDefinition.schedule[this.npcDefinition.schedule.length - 1];
+		}
+		return nextActivity.location;
 	},
 	bumpTowards: function (targetMob) {
 		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
@@ -354,7 +408,7 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
 			} 
-			if (this.isHostileMob() || this.isPartyMember() || this.intent === 'seekPlayer'){
+			if (this.isHostileMob() || this.isPartyMember() || this.intent === 'seekPlayer' || this.scheduleCurrentDestination){
 				// Reactivate immediately
 				return Timer.next();
 			} else {
