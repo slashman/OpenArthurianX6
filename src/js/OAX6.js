@@ -26,6 +26,7 @@ const Timer = require('./Timer');
 const Bus = require('./Bus');
 
 const scenarioInfo = require('./ScenarioInfo');
+const World = require('./model/World.class');
 
 const OAX6 = {
 	run: function(){
@@ -56,6 +57,14 @@ const OAX6 = {
 		const player = PlayerFactory.buildPlayer(game, undefined, 0, 0, 0);
 		UI.setActiveMob(player);
 		UI.player = player; // TODO: Remove
+		const world = new World();
+		player.world = world;
+		if (startingState.minuteOfDay !== undefined) {
+			world.setMinuteOfDay(startingState.minuteOfDay);
+		} else {
+			world.setMinuteOfDay(0);
+		}
+		
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
 		Bus.listen('removeFromParty', npc => player.removeFromParty(npc));
 		startingState.party.forEach(function(partyMember) {
@@ -68,9 +77,7 @@ const OAX6 = {
 		if (startingState.scene) {
 			UI.showScene(startingState.scene);
 		}
-		if (startingState.minuteOfDay !== undefined) {
-			SkyBox.setMinuteOfDay(startingState.minuteOfDay);
-		}
+		
 	},
 	loadGame: function(game) {
 		const player = Storage.loadGame(game);

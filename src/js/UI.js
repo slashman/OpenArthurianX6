@@ -498,7 +498,7 @@ const UI = {
   restoreComponentState() {
   	PartyStatus.addMob(this.player);
   	this.player.party.forEach(m => PartyStatus.addMob(m));
-	SkyBox.setMinuteOfDay(60);
+	this.player.world.timeOfDayPass();
   },
   showSign(sign) {
 	SignPanel.show(sign);

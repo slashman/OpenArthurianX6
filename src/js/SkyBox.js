@@ -1,5 +1,3 @@
-const PlayerStateMachine = require('./PlayerStateMachine');
-const Timer = require('./Timer');
 const SkyColor = require('./SkyColor');
 
 const skyboxRadius = 50;
@@ -26,7 +24,6 @@ const SkyBox = {
     this.moonSprite.anchor.x = 0.5;
     this.moonSprite.anchor.y = 0.5;
     this.moonSprite.visible = false;
-    this.currentMinuteOfDay = 8 * 60;
 
     this.mask = this.game.add.graphics(this.skyBack.x, this.skyBack.y, this.skyboxLayer);
     this.mask.beginFill(0xffffff);
@@ -36,26 +33,11 @@ const SkyBox = {
     this.moonSprite.mask = this.mask
     this.skyBack.mask = this.mask
   },
-  timeOfDayPass: function(){
-    if (PlayerStateMachine.state !== PlayerStateMachine.WORLD){
-      Timer.delay(100).then(() => this.timeOfDayPass());
-      return;
-    }
-    this.updateTimeOfDay();
-  },
-  updateTimeOfDay() {
-    this.currentMinuteOfDay += 5;
-    if (this.currentMinuteOfDay >= 60 * 24) {
-      this.currentMinuteOfDay = 0;
-    }
-    const currentHourOfDay = this.currentMinuteOfDay / 60; 
-    const currentMinuteOfHour = ((this.currentMinuteOfDay % 60) / 60) * 100;
-    if (currentMinuteOfHour === 100) {
-      currentMinuteOfHour = 0;
-    }
-    if (currentMinuteOfHour == 0) {
-      this.hourlyNotification();
-    }
+  
+  render () {
+    const currentMinuteOfDay = OAX6.UI.player.world.currentMinuteOfDay;
+    const currentHourOfDay = currentMinuteOfDay / 60; 
+    const currentMinuteOfHour = ((currentMinuteOfDay % 60) / 60) * 100;
     const currentHHMM = Math.floor(currentHourOfDay) * 100 + currentMinuteOfHour;
     this.skyBack.beginFill(SkyColor.getColor(currentHHMM));
     this.skyBack.drawCircle(0, 0, 2 * skyboxRadius);
@@ -70,17 +52,9 @@ const SkyBox = {
     this.moonSprite.x = Math.round(Math.cos(moonRads) * (skyboxRadius - skyboxMargin) + skyboxPosition.x);
     this.moonSprite.y = Math.round(Math.sin(moonRads) * (skyboxRadius - skyboxMargin) + skyboxPosition.y);
     this.moonSprite.visible = true;
-    Timer.delay(1000).then(()=>this.timeOfDayPass());
   },
 
-  setMinuteOfDay(minuteOfDay) {
-    this.currentMinuteOfDay = minuteOfDay;
-    this.updateTimeOfDay();
-  },
 
-  hourlyNotification () {
-    OAX6.UI.player.level.hourly();
-  }
 }
 
 module.exports = SkyBox;
