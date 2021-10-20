@@ -218,7 +218,7 @@ Mob.prototype = {
 				return this.followDestination();
 			}
 		}
-		this.scheduleCheckTurns = 15;
+		this.scheduleCheckTurns = 3;
 		const desiredLocation = this.getDesiredLocationBySchedule();
 		const dist = Geo.flatDist(desiredLocation.x, desiredLocation.y, this.x, this.y);
 		if (dist > 5) {
