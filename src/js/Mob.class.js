@@ -258,7 +258,9 @@ Mob.prototype = {
 		if (!nextActivity) {
 			nextActivity = this.npcDefinition.schedule[this.npcDefinition.schedule.length - 1];
 		}
-		return nextActivity.location;
+		const ret = Object.assign({}, nextActivity.location);
+		ret._c = circular.setSafe();
+		return ret;
 	},
 	bumpTowards: function (targetMob) {
 		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
