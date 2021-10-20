@@ -244,7 +244,7 @@ Mob.prototype = {
 		if (!this.npcDefinition || !this.npcDefinition.schedule) {
 			return undefined;
 		}
-		this.npcDefinition.schedule.sort((a,b) => a.time - b.time); // TODO: Don't do this every time.
+		this.npcDefinition.schedule.sort((a,b) => b.time - a.time); // TODO: Don't do this every time.
 		const timeOfDay = OAX6.UI.player.world.getHourOfDay();
 		// Get the prior scheduled unit based on timeOfDay, wrapping to the previous day if needed.
 		let nextActivity;
@@ -256,7 +256,7 @@ Mob.prototype = {
 			}
 		}
 		if (!nextActivity) {
-			nextActivity = this.npcDefinition.schedule[this.npcDefinition.schedule.length - 1];
+			nextActivity = this.npcDefinition.schedule[0];
 		}
 		const ret = Object.assign({}, nextActivity.location);
 		ret._c = circular.setSafe();
