@@ -245,7 +245,7 @@ Mob.prototype = {
 			return undefined;
 		}
 		this.npcDefinition.schedule.sort((a,b) => a.time - b.time); // TODO: Don't do this every time.
-		const timeOfDay = 4; // TODO: Fetch real time of day
+		const timeOfDay = OAX6.UI.player.world.getHourOfDay();
 		// Get the prior scheduled unit based on timeOfDay, wrapping to the previous day if needed.
 		let nextActivity;
 		for (let i = 0; i < this.npcDefinition.schedule.length; i++) {

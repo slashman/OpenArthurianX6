@@ -38,6 +38,10 @@ World.prototype = {
 
 	hourlyNotification () {
 		OAX6.UI.player.level.hourly();
+	},
+
+	getHourOfDay () {
+		return Math.floor(this.currentMinuteOfDay / 60);
 	}
 }
 
