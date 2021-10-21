@@ -167,7 +167,33 @@ Level.prototype = {
 		}
 		this.objectsMap[z][x][y] = object;
 	},
+	/**
+	 * Finds a "long" path to a far location, this is used by NPC schedules AI to walk to their destinations,
+	 * It ignores unlocked doors as blocking spaces, because the NPC can and will open them.
+	 * 
+	 * @param {*} to 
+	 * @param {*} from 
+	 * @param {*} z 
+	 * @param {*} includeMobsOfAlignment 
+	 */
+	findLongPath: function(to, from, z, includeMobsOfAlignment){
+		const gridClone = this._getGridWithMobsBlocked(to, z, includeMobsOfAlignment);
+		this.doors.forEach(door => {
+			if (door.z != z) {
+				return;
+			}
+			if (!door.isLocked()) {
+				gridClone.setWalkableAt(door.x, door.y, true);
+			}
+		});
+		return this.findPath(from, to, z, gridClone)
+	},
+
 	findPathThruMobs: function(to, from, z, includeMobsOfAlignment){
+		const gridClone = this._getGridWithMobsBlocked(to, z, includeMobsOfAlignment);
+		return this.findPath(from, to, z, gridClone)
+	},
+	_getGridWithMobsBlocked(to, z, includeMobsOfAlignment) {
 		const gridClone = this.pfGrids[z].clone();
 		
 		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
@@ -181,7 +207,7 @@ Level.prototype = {
 				});
 			}
 		});
-		return this.findPath(from, to, z, gridClone)
+		return gridClone;
 	},
 	findPath(from, to, z, grid, openEnded) {
 		if (!grid) {

@@ -238,7 +238,7 @@ Mob.prototype = {
 			delete this.scheduleCurrentDestination;
 			return this.moveRandomly();
 		}
-		return this.bumpTowards(this.scheduleCurrentDestination);
+		return this.walkTowardsDestination(this.scheduleCurrentDestination);
 	},
 	getDesiredLocationBySchedule: function () {
 		if (!this.npcDefinition || !this.npcDefinition.schedule) {
@@ -261,6 +261,15 @@ Mob.prototype = {
 		const ret = Object.assign({}, nextActivity.location);
 		ret._c = circular.setSafe();
 		return ret;
+	},
+	walkTowardsDestination: function (destination) {
+		const nextStep = this.level.findLongPath(destination, this, this.z, this.alignment);
+		if (!nextStep) {
+			return this.moveRandomly();
+		}
+		let dx = nextStep.dx;
+		let dy = nextStep.dy;
+		return this.bumpOnDirection(dx, dy);
 	},
 	bumpTowards: function (targetMob) {
 		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
