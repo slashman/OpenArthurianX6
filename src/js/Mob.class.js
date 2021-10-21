@@ -269,7 +269,19 @@ Mob.prototype = {
 		}
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
-		return this.bumpOnDirection(dx, dy);
+		const door = this.level.getDoorAt(this.x + dx, this.y + dy, this.z);
+		if (door && !door.open) {
+			if (door.isLocked()) {
+				return this.moveRandomly();
+			}
+			if (door.openDoor(this, false)) {
+				return this.bumpOnDirection(dx, dy);
+			} else {
+				return this.moveRandomly();
+			}
+		} else {
+			return this.bumpOnDirection(dx, dy);
+		}
 	},
 	bumpTowards: function (targetMob) {
 		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
