@@ -182,6 +182,9 @@ Level.prototype = {
 			if (door.z != z) {
 				return;
 			}
+			if (door.def.fixed) {
+				return;
+			}
 			if (!door.isLocked()) {
 				gridClone.setWalkableAt(door.x, door.y, true);
 			}
