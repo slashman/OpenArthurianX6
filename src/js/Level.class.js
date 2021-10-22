@@ -189,6 +189,8 @@ Level.prototype = {
 				gridClone.setWalkableAt(door.x, door.y, true);
 			}
 		});
+		// Prevent walking thru stairs
+		this.objects.filter(o => o.z === z && o.type == 'Stairs').forEach(stairs => gridClone.setWalkableAt(stairs.x, stairs.y, false));
 		return this.findPath(from, to, z, gridClone, true)
 	},
 
