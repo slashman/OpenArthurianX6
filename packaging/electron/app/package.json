@@ -1,6 +1,6 @@
 {
   "name": "oax6",
-  "version": "0.9",
+  "version": "0.10",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
