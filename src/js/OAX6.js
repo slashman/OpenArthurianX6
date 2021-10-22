@@ -60,9 +60,9 @@ const OAX6 = {
 		const world = new World();
 		player.world = world;
 		if (startingState.minuteOfDay !== undefined) {
-			world.setMinuteOfDay(startingState.minuteOfDay);
+			world.initMinuteOfDay(startingState.minuteOfDay);
 		} else {
-			world.setMinuteOfDay(0);
+			world.initMinuteOfDay(0);
 		}
 		
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));

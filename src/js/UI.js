@@ -115,13 +115,20 @@ const UI = {
 		this.UILayer.fixedToCamera = true;
 		this.floatingUILayer = this.game.add.group();
 		this.floatingUILayer.name = 'floatingUILayer';
+		this.fogLayer = this.game.add.group(this.UILayer);
+		this.fogLayer.name = 'fogLayer';
 		this.modeLabel = this.game.add.bitmapText(this.game.width - 48, 60, 'pixeled', 'Exploration', 12, this.UILayer);
 		this.tempCombatLabel = this.game.add.bitmapText(20, 280, 'pixeled', '', 12, this.UILayer);
 		this.stateLabel = this.game.add.bitmapText(this.game.width - 48, this.game.height - 60, 'pixeled', 'State', 12, this.UILayer);
 
 		this.fovMask = [];
 		this.fovBlocks = [];
-		
+
+		this.fogMask = this.game.add.image(0, 0, 'white', 0, this.fogLayer);
+		this.fogMask.width = this.game.width;
+		this.fogMask.height = this.game.height;
+		this.fogMask.alpha = 0;
+
 		for (let x = 0; x < Constants.FOV_RADIUS * 2 + 1; x++) {
 			this.fovMask[x] = [];
 			this.fovBlocks[x] = [];
@@ -500,6 +507,7 @@ const UI = {
   	PartyStatus.addMob(this.player);
   	this.player.party.forEach(m => PartyStatus.addMob(m));
 	this.player.world.timeOfDayPass();
+	this.player.world.setFogColor();
   },
   showSign(sign) {
 	SignPanel.show(sign);
@@ -585,6 +593,15 @@ const UI = {
 	// Called when drag was put into delay but then was aborted
 	cancelDrag() {
 		this.dragStatus = 'idle';
+	},
+	setFogColor(alpha, color) {
+		if (alpha == 0) {
+			this.fogMask.visible = false;
+		} else {
+			this.fogMask.visible = true;
+		}
+		this.fogMask.alpha = alpha;
+		this.fogMask.tint = color;
 	}
 }
 

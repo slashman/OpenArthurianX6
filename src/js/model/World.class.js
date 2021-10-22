@@ -26,14 +26,16 @@ World.prototype = {
 		}
 		if (currentMinuteOfHour == 0) {
 			this.hourlyNotification();
+			this.setFogColor();
 		}
 		SkyBox.render();
 		Timer.delay(1000).then(()=>this.timeOfDayPass());
 	},
 
-	setMinuteOfDay(minuteOfDay) {
+	initMinuteOfDay(minuteOfDay) {
 		this.currentMinuteOfDay = minuteOfDay;
 		this.timeOfDayPass();
+		this.setFogColor();
 	},
 
 	hourlyNotification () {
@@ -42,6 +44,23 @@ World.prototype = {
 
 	getHourOfDay () {
 		return Math.floor(this.currentMinuteOfDay / 60);
+	},
+
+	setFogColor () {
+		const hourOfTheDay = this.getHourOfDay();
+		if (hourOfTheDay < 5 || hourOfTheDay > 19) {
+			OAX6.UI.setFogColor(0.4, 0x00008b);
+		} else if (hourOfTheDay < 6 || hourOfTheDay > 18) {
+			OAX6.UI.setFogColor(0.2, 0x0000b9);
+		} else if (hourOfTheDay < 7) {
+			// Dawn
+			OAX6.UI.setFogColor(0.1, 0x0000b9);
+		} else if (hourOfTheDay > 17) {
+			// Sunset
+			OAX6.UI.setFogColor(0.1, 0x0000b9);
+		} else {
+			OAX6.UI.setFogColor(0, 0);
+		}
 	}
 }
 
