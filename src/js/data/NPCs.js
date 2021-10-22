@@ -291,20 +291,29 @@ const NPCs = [
 		intent: 'followSchedule',
 		schedule: [
 			{ // Work in the fields
+				id: 'workFields1',
 				time: 7,
 				location: {x: 18, y: 32}
 			},
 			{ // Have lunch
+				id: 'haveLunch',
 				time: 12,
 				location: {x: 34, y: 19}
 			},
 			{ // Work in the fields again
+				id: 'workFields2',
 				time: 14,
 				location: {x: 18, y: 32}
 			},
 			{ // Sleep at the barn
+				id: 'sleepAtTheBarn',
 				time: 20,
-				location: {x: 24, y: 18}
+				location: {x: 24, y: 18},
+				action: {
+					type: 'sleep',
+					hours: 7,
+					once: true
+				}
 			}
 		],
 		triggers: [],

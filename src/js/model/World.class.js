@@ -16,7 +16,7 @@ World.prototype = {
 			Timer.delay(100).then(() => this.timeOfDayPass());
 			return;
 		}
-		this.currentMinuteOfDay += 5;
+		this.currentMinuteOfDay += 5; // This should add up to 60 or else hourly notifications are not sent
 		if (this.currentMinuteOfDay >= 60 * 24) {
 		  this.currentMinuteOfDay = 0;
 		}

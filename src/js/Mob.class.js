@@ -215,33 +215,53 @@ Mob.prototype = {
 	followSchedule: function () {
 		this.scheduleCheckTurns--;
 		if (this.scheduleCheckTurns > 0) {
-			if (!this.scheduleCurrentDestination) {
+			if (!this.scheduleNextActivity) {
 				return this.moveRandomly();
 			} else {
-				return this.followDestination();
+				return this.gotoNextActivity();
 			}
 		}
 		this.scheduleCheckTurns = 3;
-		const desiredLocation = this.getDesiredLocationBySchedule();
-		const dist = Geo.flatDist(desiredLocation.x, desiredLocation.y, this.x, this.y);
+		const nextActivity = this.getDesiredLocationBySchedule();
+		// console.log(OAX6.UI.player.world.getHourOfDay() + ', time to '+ nextActivity.id);
+		const dist = Geo.flatDist(nextActivity.location.x, nextActivity.location.y, this.x, this.y);
+		if (nextActivity.id !== this.lastScheduledActivityId) {
+			delete this.lastScheduledActivityId;
+		}
+		this.scheduleNextActivity = nextActivity;
 		if (dist > 5) {
-			this.scheduleCurrentDestination = desiredLocation;
-			return this.followDestination();
+			return this.gotoNextActivity();
 		} else {
 			// We are close enough
+			return this.__arrivedAtActivity();
+		}
+	},
+	__arrivedAtActivity: function () {
+		const activity = this.scheduleNextActivity;
+		delete this.scheduleNextActivity;
+		if (activity.action) {
+			if (activity.action.once && activity.id === this.lastScheduledActivityId) {
+				// If we already did it, then we move randomly
+				return this.moveRandomly();		
+			}
+			this.lastScheduledActivityId = activity.id;
+			if (activity.action.type === 'sleep') {
+				this.gotoSleep(activity.action.hours)
+				return Promise.resolve();
+			}
+		} else {
 			return this.moveRandomly();
 		}
 	},
-	followDestination: function () {
-		if (!this.scheduleCurrentDestination) {
+	gotoNextActivity: function () {
+		if (!this.scheduleNextActivity) {
 			return this.moveRandomly();
 		}
-		if (this.scheduleCurrentDestination.x == this.x &&
-			this.scheduleCurrentDestination.y == this.y) {
-			delete this.scheduleCurrentDestination;
-			return this.moveRandomly();
+		if (this.scheduleNextActivity.location.x == this.x &&
+			this.scheduleNextActivity.location.y == this.y) {
+			return this.__arrivedAtActivity();
 		}
-		return this.walkTowardsDestination(this.scheduleCurrentDestination);
+		return this.walkTowardsActivity(this.scheduleNextActivity);
 	},
 	getDesiredLocationBySchedule: function () {
 		if (!this.npcDefinition || !this.npcDefinition.schedule) {
@@ -261,12 +281,12 @@ Mob.prototype = {
 		if (!nextActivity) {
 			nextActivity = this.npcDefinition.schedule[0];
 		}
-		const ret = Object.assign({}, nextActivity.location);
+		const ret = Object.assign({}, nextActivity);
 		ret._c = circular.setSafe();
 		return ret;
 	},
-	walkTowardsDestination: function (destination) {
-		const nextStep = this.level.findLongPath(destination, this, this.z, this.alignment);
+	walkTowardsActivity: function (activity) {
+		const nextStep = this.level.findLongPath(activity.location, this, this.z, this.alignment);
 		if (!nextStep) {
 			return this.moveRandomly();
 		}
@@ -434,7 +454,7 @@ Mob.prototype = {
 			if (PlayerStateMachine.state === PlayerStateMachine.COMBAT_SYNC){
 				PlayerStateMachine.checkCombatReady();
 			} 
-			if (this.isHostileMob() || this.isPartyMember() || this.intent === 'seekPlayer' || this.scheduleCurrentDestination){
+			if (this.isHostileMob() || this.isPartyMember() || this.intent === 'seekPlayer' || this.scheduleNextActivity){
 				// Reactivate immediately
 				return Timer.next();
 			} else {
