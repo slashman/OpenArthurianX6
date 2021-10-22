@@ -861,6 +861,9 @@ Mob.prototype = {
 				mob.alignment = Constants.Alignments.ENEMY;
 			}
 		}
+		if (mob.isAsleep) {
+			mob.wakeUp();
+		}
 		const weapon = this.getWeapon();
 		const armor = mob.getArmor();
 		const combinedDamage = this.damage.current + (weapon ? weapon.damage.current : 0);
