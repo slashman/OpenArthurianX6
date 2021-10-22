@@ -855,6 +855,8 @@ Mob.prototype = {
 		}
 		if (mob.alignment === Constants.Alignments.NEUTRAL) {
 			mob.isPanicked = true;
+		}
+		if (mob.alignment === Constants.Alignments.NEUTRAL || mob.alignment === this.alignment) {
 			if (this.alignment == Constants.Alignments.ENEMY) {
 				mob.alignment = Constants.Alignments.PLAYER;
 			} else {
