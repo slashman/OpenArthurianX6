@@ -69,6 +69,9 @@ Mob.prototype = {
 			this.reportAction("Stand by");
 			return Timer.delay(1000);
 		}
+		if (this.isAsleep) {
+			return Timer.delay(1000);
+		}
 		return this.__executeAI().then(() => this.__checkTriggers());
 	},
 	__checkTriggers() {
@@ -1035,6 +1038,20 @@ Mob.prototype = {
 			if (this.currentMobInventoryWindow) {
 				this.currentMobInventoryWindow.refresh();
 			}
+		}
+	},
+	gotoSleep(numberOfHours) {
+		this.isAsleep = true;
+		this.sprite.animations.play('sleep', 0);
+		this.hoursToWakeUp = numberOfHours;
+	},
+	wakeUp() {
+		this.isAsleep = false;
+	},
+	hourlyWakeupCheck () {
+		this.hoursToWakeUp--;
+		if (this.hoursToWakeUp < 0) {
+			this.wakeUp();
 		}
 	}
 };

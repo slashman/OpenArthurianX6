@@ -86,6 +86,7 @@ const MobFactory = {
 		sprite.animations.add('walk_n', appearance.u, 4);
 		sprite.animations.add('walk_e', appearance.r, 4);
 		sprite.animations.add('walk_w', appearance.l, 4);
+		sprite.animations.add('sleep', [appearance.asleep], 4);
 		sprite.inputEnabled = true;
 		sprite.events.onInputDown.add(() => {
 			OAX6.PlayerStateMachine.clickOnMob(mob, game.input.activePointer.leftButton.isDown, game.input.activePointer.rightButton.isDown);

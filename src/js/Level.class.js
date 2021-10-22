@@ -379,6 +379,8 @@ Level.prototype = {
 		OAX6.UI.player.party.forEach(function(partyMember) {
 			partyMember.hunger.increase(1);
 		});
+		// Check for NPCs that should wake up
+		this.mobs.filter(m => m.isAsleep).forEach(m => m.hourlyWakeupCheck());
 	}
 };
 
