@@ -225,7 +225,8 @@ Level.prototype = {
 		//TODO: Single finder object?
 		const finder = new PF.AStarFinder({
 		    allowDiagonal: true,
-    		dontCrossCorners: false
+    		dontCrossCorners: false,
+			diagonalMovement: PF.DiagonalMovement.Always
 		});
 		const path = finder.findPath(from.x, from.y, to.x, to.y, grid);
 		if (path.length == 0){
