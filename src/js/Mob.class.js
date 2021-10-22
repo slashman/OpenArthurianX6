@@ -229,7 +229,7 @@ Mob.prototype = {
 			delete this.lastScheduledActivityId;
 		}
 		this.scheduleNextActivity = nextActivity;
-		if (dist > 5) {
+		if (dist > (nextActivity.actionRadius || 3)) {
 			return this.gotoNextActivity();
 		} else {
 			// We are close enough
