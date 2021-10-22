@@ -8,7 +8,7 @@ module.exports = {
         this.container.addChild(this.game.add.image(0, 0, 'title'));
         this.pointer = this.container.addChild(this.game.add.image(36, 236, 'ui', 11));
         this.selectedOption = 0;
-        this.modeLabel = this.game.add.bitmapText(this.game.width - 200, this.game.height - 20, 'pixeled', 'Powered by OpenArthurianX6 v0.8', 12, this.container);
+        this.modeLabel = this.game.add.bitmapText(this.game.width - 200, this.game.height - 20, 'pixeled', 'Powered by OpenArthurianX6 v0.10', 12, this.container);
     },
     input(key) {
         if (key == Phaser.KeyCode.UP) {
