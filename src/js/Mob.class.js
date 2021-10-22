@@ -34,7 +34,7 @@ function Mob(level, x, y, z){
 	this.flags._c = circular.setSafe();
 	this.combatTurns = 0;
 	this.scheduleCheckTurns = 0;
-	this.sightRange = 15;
+	this.baseSightRange = 13;
 	this._c = circular.register('Mob');
 }
 
@@ -1078,6 +1078,18 @@ Mob.prototype = {
 		if (this.hoursToWakeUp < 0) {
 			this.wakeUp();
 		}
+	},
+	getSightRange () {
+		const hourOfTheDay = OAX6.UI.player.world.getHourOfDay();
+		let malus = 0;
+		if (hourOfTheDay < 5 || hourOfTheDay > 19) {
+			malus = 5;
+		} else if (hourOfTheDay < 6 || hourOfTheDay > 18) {
+			malus = 4;
+		} else if (hourOfTheDay < 7 || hourOfTheDay > 17) {
+			malus = 3;
+		} 
+		return this.baseSightRange - malus;
 	}
 };
 

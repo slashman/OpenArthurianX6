@@ -180,8 +180,10 @@ const UI = {
 				this.fovMask[x][y] = false;
 
 		var step = Math.PI * 2.0 / 1080;
+		const sightRange = this.activeMob.getSightRange();
+		var maxdist = sightRange < Constants.FOV_RADIUS ? sightRange : Constants.FOV_RADIUS;
 		for (var a = 0; a < Math.PI * 2; a += step)
-			this.shootRay(a);
+			this.shootRay(a, maxdist);
 
 
 		this.fovBlockLayer.x = (this.activeMob.x - Constants.FOV_RADIUS - 1) * TILE_WIDTH;
@@ -205,9 +207,8 @@ const UI = {
 		this.fovBlockLayer.updateTransform(); // We need to force this in order to prevent glitches. DONT MOVE THIS FROM HERE.
 		
 	},
-	shootRay: function (a) {
+	shootRay: function (a, maxdist) {
 		var step = 0.3333;
-		var maxdist = this.activeMob.sightRange < Constants.FOV_RADIUS ? this.activeMob.sightRange : Constants.FOV_RADIUS;
 		maxdist /= step;
 		var dx = Math.cos(a) * step;
 		var dy = -Math.sin(a) * step;

@@ -381,6 +381,7 @@ Level.prototype = {
 		});
 		// Check for NPCs that should wake up
 		this.mobs.filter(m => m.isAsleep).forEach(m => m.hourlyWakeupCheck());
+		OAX6.UI.updateFOV(); // Because the new hour may have less visibility
 	}
 };
 
