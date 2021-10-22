@@ -370,11 +370,16 @@ const PlayerStateMachine = {
                 }
                 const {activeMob} = OAX6.UI;
                 const mob = activeMob.level.getMobAt(x, y, activeMob.z);
-                if (mob && activeMob.canStartDialog && mob.npcDefinition && mob.npcDefinition.dialog) {
-                    // Conversations only work in WORLD state. We assume we come from that state.
-                    this.resetState();
-                    activeMob.talkWithMob(mob);
-                    return true;
+                if (mob && activeMob.canStartDialog) {
+                    if (mob.isAsleep) {
+                        OAX6.UI.showMessage(mob.getDescription() + " is asleep.");
+                        return false;
+                    } else if (mob.npcDefinition && mob.npcDefinition.dialog) {
+                        // Conversations only work in WORLD state. We assume we come from that state.
+                        this.resetState();
+                        activeMob.talkWithMob(mob);
+                        return true;
+                    }
                 }
                 return false;
             } else {
