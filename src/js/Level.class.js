@@ -189,7 +189,7 @@ Level.prototype = {
 				gridClone.setWalkableAt(door.x, door.y, true);
 			}
 		});
-		return this.findPath(from, to, z, gridClone)
+		return this.findPath(from, to, z, gridClone, true)
 	},
 
 	findPathThruMobs: function(to, from, z, includeMobsOfAlignment){
