@@ -51,7 +51,8 @@ We are still in development. Code is messy. Please contribute with
 # Running the game
 
 ## First time setup
-- `npm install`
+- Run `npm install` in the root directory
+- Run `npm install browserify -g`
 
 ## Scripts
 
