@@ -57,7 +57,7 @@ We are still in development. Code is messy. Please contribute with
 ## Optional: Serving the game via http-server
 Once the game is built, you can use `http-server` to run it in your browser.
 
-In order to do this you can install http-server globally via `npm install http-server -g`, then browser to the `build/` directory and run `http-server`.
+In order to do this you can install http-server globally via `npm install http-server -g`, then run `http-server` in the `build` directory.
 
 Alternatively, you can set up apache or any other HTTP server to serve that directory.
 
