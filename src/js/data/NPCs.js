@@ -451,11 +451,11 @@ const NPCs = [
 						value: "gotoIolo"
 					},
 					{
-						type: "openLevel",
+						type: "teleportToWorld", // TODO: Change this to remove enemies from the map.
 						value: "iolos"
 					},
 					{
-						type: "endCombat" // Careful to do this before openLevel!
+						type: "endCombat" // Careful to do this before openWorld!
 					},
 					{
 						type: "showMessage",

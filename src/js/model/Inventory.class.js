@@ -10,6 +10,7 @@ circular.registerClass('Inventory', Inventory);
 Inventory.prototype = {
     addItem: function(item) {
         item.container = this;
+        item.isOnFloor = false;
         if (item.def.stackLimit) {
             const existingItem = this.items.find(i => i.defid === item.defid);
             if (existingItem) {

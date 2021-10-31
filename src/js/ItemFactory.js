@@ -71,8 +71,8 @@ const ItemFactory = {
 				const activeMob = OAX6.UI.activeMob || OAX6.UI.player;
 				if (activeMob.canReach(item)) {
 					OAX6.PlayerStateMachine.switchState(OAX6.PlayerStateMachine.ITEM_TRANSFERRING);
-					activeMob.level.removeItem(item);
-					OAX6.UI.dragItem(item, activeMob.level);
+					activeMob.world.removeItem(item);
+					OAX6.UI.dragItem(item, activeMob.world);
 				} else {
 					OAX6.UI.cancelDrag();
 				}
@@ -92,14 +92,14 @@ const ItemFactory = {
 		sprite.loadTexture(appearance.tileset, appearance.i);
 	},
 	// TODO: Move this to ObjectFactory, the Door class has nothing to do with Item. Move the definitions too?
-	createDoor: function(id, level){
+	createDoor: function(id, chunk){
 		const def = this.itemsMap[id];
 		const door = new Door();
 		door.defid = id;
 		door.def = Object.assign({}, def);
 		door.open = false; // Closed by default
 		door.sprite = this.getDoorSprite(this.game, door);
-		door.level = level;
+		door.chunk = chunk;
 		return door;
 	},
 	getDoorSprite: function (game, door) {

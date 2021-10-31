@@ -20,9 +20,9 @@ circular.registerClass('Door', Door, {
 
 Door.prototype = {
   openDoor(mob, remote) {
-    const level = this.level;
+    const chunk = this.chunk;
     const linkedDir = this.def.linked;
-    const sisterDoor = level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
+    const sisterDoor = chunk.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
 
     if (!remote && (!this.inRange(mob) || !sisterDoor.inRange(mob))) {
       return false;
@@ -34,7 +34,7 @@ Door.prototype = {
     if (this.isLocked()) {
       return false;
     }
-    if (mob.level.getMobAt(this.x, this.y, this.z)) {
+    if (mob.world.getMobAt(this.x, this.y, this.z)) {
       OAX6.UI.showMessage("Blocked");
       return false;
     }
@@ -55,7 +55,7 @@ Door.prototype = {
 
   updateSolidAndOpaque(){
     if (!this.def.fixed) {
-      this.level.setSolidAndOpaque(this.x, this.y, this.z, !this.open, !this.open);
+      this.chunk.setSolidAndOpaque(this.x, this.y, this.z, !this.open, !this.open);
     }
   },
 
@@ -64,7 +64,7 @@ Door.prototype = {
       this.lock = null;
       
       const linkedDir = this.def.linked;
-      const sisterDoor = this.level.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
+      const sisterDoor = this.chunk.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
       if (sisterDoor != null) {
         sisterDoor.unlock(key);
       }

@@ -3,7 +3,9 @@ const scenarioInfo = require('./ScenarioInfo');
 const Loader = {
 	load: function(game){
 		scenarioInfo.maps.forEach(function(map){
-			game.load.tilemap(map.name, 'scenario/maps/'+map.filename, null, Phaser.Tilemap.TILED_JSON);
+			// TODO: Load on the fly! else the entire chunk model doesn't make sense.
+			const mapId = `chunk_${map.x}-${map.y}`;
+			game.load.tilemap(mapId, 'scenario/maps/'+map.filename, null, Phaser.Tilemap.TILED_JSON);
 		});
 		// TODO: Load the tileset based on the content packs related to the scenario
 		game.load.image('monsters', 'assets/monsters.png');

@@ -1,44 +1,40 @@
 module.exports = {
   config: {
     tileWidth: 16,
-    tileHeight: 16
+    tileHeight: 16,
+    chunkSize: 64,
+    chunksWidth: 3,
+    chunksHeight: 1,
   },
   startingState: {
     minuteOfDay: 1380,
     map: 'forest1',
     party: [],
-    scene: 'intro'
+    scene: 'intro',
+    position: {
+      x: 2 * 64 + 43,
+      y: 43
+    }
   },
-/* Iolo's starting test state 
-  startingState: {
-    minuteOfDay: 1380,
-    map: 'iolos',
-    party: [
-      {
-        id: 'shamino',
-        x: 13,
-        y: 16
-      }
-    ],
-    scene: 'intro'
-  },*/
 	maps: [
-    {
-      name: 'forest1',
-      filename: 'forest1.json',
-      start: {
-        x: 80,
-        y: 34
-      }
-    },
     {
       name: 'iolos',
       filename: 'iolos-hut.json',
-      start: {
-        x: 34,
-        y: 27
-      }
-    }
+      x: 0,
+      y: 0,
+    },
+    {
+      name: 'westForest',
+      filename: 'westForest.json',
+      x: 1,
+      y: 0,
+    },
+    {
+      name: 'eastForest',
+      filename: 'eastForest.json',
+      x: 2,
+      y: 0,
+    },
 	],
   scenes: {
     intro: [
