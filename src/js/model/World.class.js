@@ -153,66 +153,56 @@ World.prototype = {
 	 * @param {*} includeMobsOfAlignment 
 	 */
 	findLongPath: function(to, from, z, includeMobsOfAlignment){
-		const gridClone = this._getGridWithMobsBlocked(to, z, includeMobsOfAlignment);
-		this.doors.forEach(door => {
-			if (door.z != z) {
-				return;
-			}
-			if (door.def.fixed) {
-				return;
-			}
-			if (!door.isLocked()) {
-				gridClone.setWalkableAt(door.x, door.y, true);
+		const chunkTo = {
+			x: to.x % this.chunkSize,
+			y: to.y % this.chunkSize
+		};
+		const chunkFrom = {
+			x: from.x % this.chunkSize,
+			y: from.y % this.chunkSize
+		}
+
+		const chunkX = Math.floor(from.x / this.chunkSize);
+		const chunkY = Math.floor(from.y / this.chunkSize);
+
+		const blockedPositions = this._getPositionsBlockedByMobs(chunkX, chunkY, includeMobsOfAlignment);
+		blockedPositions.splice(blockedPositions.findIndex(p => p.x == from.x && p.y && from.y), 1);
+
+		const currentChunk = this._getChunk(chunkX, chunkY);
+		return currentChunk.findLongPath(chunkTo, chunkFrom, z, blockedPositions)
+	},
+
+	_getMobsInChunk(chunkX, chunkY) {
+		return this.mobs.filter(m => m.x > chunkX * this.chunkSize && 
+			m.x < ((chunkX+1) * this.chunkSize - 1) && 
+			m.y > chunkY * this.chunkSize && 
+			m.y < ((chunkY+1) * this.chunkSize - 1)
+		);
+	},
+
+	_getPositionsBlockedByMobs(chunkX, chunkY, includeMobsOfAlignment) {
+		const blockedPositions = [];
+		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
+		includeAlignments.forEach((alignment) => {
+			if (alignment){
+				const mobs = this._getMobsInChunk(chunkX, chunkY).filter(m => m.alignment === alignment);
+				mobs.forEach(m=> {
+					blockedPositions.push({
+						x: m.x % this.chunkSize,
+						y: m.y % this.chunkSize
+					});
+				});
 			}
 		});
-		// Prevent walking thru stairs
-		this.objects.filter(o => o.z === z && o.type == 'Stairs').forEach(stairs => gridClone.setWalkableAt(stairs.x, stairs.y, false));
-		return this.findPath(from, to, z, gridClone, true)
+		return blockedPositions;
 	},
 
 	findPathThruMobs: function(to, from, z, includeMobsOfAlignment){
 		const gridClone = this._getGridWithMobsBlocked(to, z, includeMobsOfAlignment);
 		return this.findPath(from, to, z, gridClone)
 	},
-	_getGridWithMobsBlocked(to, z, includeMobsOfAlignment) {
-		const gridClone = this.pfGrids[z].clone();
-		
-		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
-		includeAlignments.forEach((alignment) => {
-			if (alignment){
-				const mobs = this.getMobsOfAlignment(alignment);
-				mobs.forEach(m=> {
-					if (!(m.x === to.x && m.y === to.y)){
-						gridClone.setWalkableAt(m.x, m.y, false);
-					}
-				});
-			}
-		});
-		return gridClone;
-	},
-	findPath(from, to, z, grid, openEnded) {
-		if (!grid) {
-			grid = this.pfGrids[z].clone();
-		}
-		if (openEnded) {
-			grid.setWalkableAt(from.x, from.y, true);
-			grid.setWalkableAt(to.x, to.y, true);
-		}
-		//TODO: Single finder object?
-		const finder = new PF.AStarFinder({
-		    allowDiagonal: true,
-    		dontCrossCorners: false,
-			diagonalMovement: PF.DiagonalMovement.Always
-		});
-		const path = finder.findPath(from.x, from.y, to.x, to.y, grid);
-		if (path.length == 0){
-			return {dx:0, dy:0};
-		}
-		return {
-			dx: Math.sign(path[1][0]-from.x),
-			dy: Math.sign(path[1][1]-from.y)
-		};
-	},
+	
+	
 	sortForCombat: function(playerGoesFirst){
 		this.currentTurnCounter = 0;
 		this.mobs = this.mobs.sort((a,b)=>a.speed.current - b.speed.current);

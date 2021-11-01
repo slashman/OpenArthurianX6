@@ -146,7 +146,57 @@ Chunk.prototype = {
 		const solidMask = this.solidMasks[z];
 		const pfMask = this._transpose(solidMask).map(a=>a.map(c=>c===true?1:0));
 		this.pfGrids[z]= new PF.Grid(pfMask);
-	}
+	},
+
+	findLongPath: function(to, from, z, blockedPositions){
+		const gridClone = this._getGridWithPositionsBlocked(z, blockedPositions);
+		this.doors.forEach(door => {
+			if (door.z != z) {
+				return;
+			}
+			if (door.def.fixed) {
+				return;
+			}
+			if (!door.isLocked()) {
+				gridClone.setWalkableAt(door.x, door.y, true);
+			}
+		});
+		// Prevent walking thru stairs
+		this.objects.filter(o => o.z === z && o.type == 'Stairs').forEach(stairs => gridClone.setWalkableAt(stairs.x, stairs.y, false));
+		return this.findPath(from, to, z, gridClone, true)
+	},
+
+	findPath(from, to, z, grid, openEnded) {
+		if (!grid) {
+			grid = this.pfGrids[z].clone();
+		}
+		if (openEnded) {
+			grid.setWalkableAt(from.x, from.y, true);
+			grid.setWalkableAt(to.x, to.y, true);
+		}
+		//TODO: Single finder object?
+		const finder = new PF.AStarFinder({
+		    allowDiagonal: true,
+    		dontCrossCorners: false,
+			diagonalMovement: PF.DiagonalMovement.Always
+		});
+		const path = finder.findPath(from.x, from.y, to.x, to.y, grid);
+		if (path.length == 0){
+			return {dx:0, dy:0};
+		}
+		return {
+			dx: Math.sign(path[1][0]-from.x),
+			dy: Math.sign(path[1][1]-from.y)
+		};
+	},
+
+	_getGridWithPositionsBlocked(z, blockedPositions) {
+		const gridClone = this.pfGrids[z].clone();
+		blockedPositions.forEach(position => {
+			gridClone.setWalkableAt(position.x, position.y, false);
+		});
+		return gridClone;
+	},
 };
 
 module.exports = Chunk;
