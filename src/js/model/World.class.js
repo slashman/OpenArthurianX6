@@ -1,5 +1,7 @@
 const circular = require('circular-functions');
 const ChunkLoader = require('../ChunkLoader');
+const Constants = require('../Constants');
+const Geo = require('../Geo');
 const SkyBox = require('../SkyBox');
 const Timer = require('../Timer');
 
@@ -14,6 +16,7 @@ function World (config) {
 
 circular.registerClass('World', World);
 
+const COMBAT_DISTANCE = 10;
 
 World.prototype = {
 	timeOfDayPass: function(){
@@ -239,7 +242,7 @@ World.prototype = {
 		if (mob.hasBeenAttacked) {
 			return true;
 		}
-		const bbox = PlayerStateMachine.getPartyBoundingBox();
+		const bbox = OAX6.PlayerStateMachine.getPartyBoundingBox();
 		const width = bbox.x2 - bbox.x1;
 		const height = bbox.y2 - bbox.y1;
 		const x = bbox.x1 + width / 2;
