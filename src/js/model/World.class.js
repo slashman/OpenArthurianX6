@@ -4,6 +4,7 @@ const Constants = require('../Constants');
 const Geo = require('../Geo');
 const SkyBox = require('../SkyBox');
 const Timer = require('../Timer');
+const Line = require('../Line');
 
 function World (config) {
     this._c = circular.register('World');
