@@ -30,9 +30,10 @@ const ChunkLoader = {
 				throw new Error(`Map ${mapId} not loaded`);
 			}
 			console.log(`Loading chunk ${mapId}`);
-			const chunk = this.createChunk(mapData, world);
-			this.__chunks[mapId] = chunk;
-			return chunk;
+			const chunkData =  this.createChunk(mapData, world);
+			this.__chunks[mapId] = chunkData.chunk;
+			chunkData.mobs.forEach(m => m.activate());
+			return chunkData.chunk;
 		}
 	},
 
@@ -47,7 +48,7 @@ const ChunkLoader = {
 
 		chunk.setSolidMasks(tiledMap.masks.solidMasks);
 		chunk.setOpaqueMasks(tiledMap.masks.opaqueMasks);
-		mobsData.forEach((mobData) => this.loadMob(mobData, world));
+		const mobs = mobsData.map((mobData) => this.loadMob(mobData, world));
 		itemsData.forEach((itemData) => this.loadItem(itemData, chunk));
 		if (objectsData) {
 			objectsData.forEach((objectData) => {
@@ -58,7 +59,10 @@ const ChunkLoader = {
 				}
 			});
 		}
-		return chunk;
+		return {
+			chunk,
+			mobs
+		}
 	},
 	__getLayerPrefix(z) {
 		return z == 0 ? '' : (z + 1) + ' - ';
@@ -190,6 +194,7 @@ const ChunkLoader = {
 			mob = MobFactory.buildMob(this.game, mobData.mobId, world, mobData.x, mobData.y, mobData.z);
 		}
 		world.addMob(mob);
+		return mob;
 	},
 	loadItem: function(itemData, chunk) {
 		const item = ItemFactory.createItem(itemData);

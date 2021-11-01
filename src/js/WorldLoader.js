@@ -10,7 +10,6 @@ const WorldLoader = {
 			partyMember.relocate(startingPosition.x, startingPosition.y);
 			world.addMob(partyMember);
 		});
-		world.activateAll();
 
 		// Load the initial chunks
 		/*const chunkX = Math.floor(player.x / world.chunkSize);
