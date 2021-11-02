@@ -203,7 +203,7 @@ Mob.prototype = {
 		} 
 	},
 	bumpAwayFrom: function (targetMob) {
-		const nextStep = this.world.findPathThruMobs(targetMob, this, this.z, this.alignment);
+		const nextStep = this.world.findNearPath(this, targetMob, this.z, this.alignment, true);
 		let dx = -nextStep.dx;
 		let dy = -nextStep.dy;
 		if (this.world.canMoveFrom(this.x, this.y, this.z, dx, dy)) {
@@ -307,7 +307,7 @@ Mob.prototype = {
 		}
 	},
 	bumpTowards: function (targetMob) {
-		const nextStep = this.world.findPathThruMobs(targetMob, this, this.z, this.alignment);
+		const nextStep = this.world.findNearPath(this, targetMob, this.z, this.alignment, true);
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
 		return this.bumpOnDirection(dx, dy);
@@ -1018,7 +1018,7 @@ Mob.prototype = {
 	},
 	canReach(item) {
 		if (this.x != item.x || this.y != item.y || this.z != item.z) {
-			const path = this.world.findPath(this, item, this.z, undefined, true);
+			const path = this.world.findNearPath(this, item, this.z, undefined, true);
 			if (path.dx == 0 && path.dy == 0) {
 				OAX6.UI.showMessage("Unreachable.");
 				return false;
@@ -1030,7 +1030,7 @@ Mob.prototype = {
 		const worldItem = this.world.getItemAt(position.x, position.y, position.z);
 		if (this.x != position.x || this.y != position.y || this.z != position.z) {
 			const containerAtTarget = worldItem && worldItem.isContainer();
-			const path = this.world.findPath(this, position, this.z, undefined, containerAtTarget);
+			const path = this.world.findNearPath(this, position, this.z, undefined, containerAtTarget);
 			if (path.dx == 0 && path.dy == 0) {
 				OAX6.UI.showMessage("Unreachable - Cannot Drop");
 				return false;

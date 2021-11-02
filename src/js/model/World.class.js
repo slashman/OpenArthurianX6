@@ -1,4 +1,6 @@
 const circular = require('circular-functions');
+const PF = require('pathfinding');
+
 const ChunkLoader = require('../ChunkLoader');
 const Constants = require('../Constants');
 const Geo = require('../Geo');
@@ -198,12 +200,52 @@ World.prototype = {
 		return blockedPositions;
 	},
 
-	findPathThruMobs: function(to, from, z, includeMobsOfAlignment){
-		const gridClone = this._getGridWithMobsBlocked(to, z, includeMobsOfAlignment);
-		return this.findPath(from, to, z, gridClone)
+	/**
+	 * Gets next step towards something within a 5 tiles radius.
+	 */
+	findNearPath: function (from, to, z, removeAlignment, openEnded) {
+		const RANGE = 5;
+		const SPRED = RANGE * 2 + 1;
+		const toX = to.x - from.x + RANGE;
+		const toY = to.y - from.y + RANGE;
+		if (toX < 0 || toX >= SPRED || toY < 0 || toY >= SPRED) {
+			// Too far, we cannot help sorry.
+			return {dx:0, dy:0};
+		}
+		const grid = new PF.Grid(SPRED, SPRED);
+		for (let x = 0; x < SPRED; x++) {
+			for (let y = 0; y < SPRED; y++) {
+				const worldX = from.x - RANGE + x;
+				const worldY = from.y - RANGE + y;
+				const solid = this.isSolid(worldX, worldY, z);
+				grid.setWalkableAt(x, y, !solid);
+				if (!solid && removeAlignment) {
+					const mob = this.getMobAt(worldX, worldY, z);
+					if (mob && mob.alignment == removeAlignment)
+						grid.setWalkableAt(x, y, false);
+				}
+			}
+		}
+		if (openEnded) {
+			grid.setWalkableAt(RANGE, RANGE, true);
+			grid.setWalkableAt(toX, toY, true);
+		}
+		//TODO: Single finder object?
+		const finder = new PF.AStarFinder({
+			allowDiagonal: true,
+			dontCrossCorners: false,
+			diagonalMovement: PF.DiagonalMovement.Always
+		});
+		const path = finder.findPath(RANGE, RANGE, toX, toY, grid);
+		if (path.length == 0){
+			return {dx:0, dy:0};
+		}
+		return {
+			dx: Math.sign(path[1][0]-RANGE),
+			dy: Math.sign(path[1][1]-RANGE)
+		};
 	},
-	
-	
+
 	sortForCombat: function(playerGoesFirst){
 		this.currentTurnCounter = 0;
 		this.mobs = this.mobs.sort((a,b)=>a.speed.current - b.speed.current);
