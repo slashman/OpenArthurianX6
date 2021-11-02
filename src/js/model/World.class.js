@@ -95,8 +95,8 @@ World.prototype = {
 			// This world is no longer active, so stop processing the queue
 			return;
 		}
-		if (PlayerStateMachine.isPartyDead()) { return; }
-		if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT) {
+		if (OAX6.PlayerStateMachine.isPartyDead()) { return; }
+		if (OAX6.PlayerStateMachine.state !== OAX6.PlayerStateMachine.COMBAT) {
 			// There was a state transition and the world is no longer
 			// in charge of handling the mob actions
 			return;
