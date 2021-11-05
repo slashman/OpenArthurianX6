@@ -92,6 +92,9 @@ Mob.prototype = {
 		}
 	},
 	__getActiveTriggersByType(triggerType) {
+		if (!this.npcDefinition || !this.npcDefinition.triggers) {
+			return [];
+		}
 		return this.npcDefinition.triggers.filter(t => t.type === triggerType && !this.flags['trigger_' + t.id]);
 	},
 	__executeAI() {
