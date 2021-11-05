@@ -3,11 +3,11 @@ module.exports = {
     tileWidth: 16,
     tileHeight: 16,
     chunkSize: 64,
-    chunksWidth: 3,
+    chunksWidth: 4,
     chunksHeight: 1,
   },
   startingState: {
-    minuteOfDay: 1380,
+    minuteOfDay: 10 * 60,
     map: 'forest1',
     party: [],
     scene: 'intro',
