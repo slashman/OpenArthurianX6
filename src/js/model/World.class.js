@@ -198,22 +198,25 @@ World.prototype = {
 	},
 
 	/**
-	 * Gets next step towards something within a 5 tiles radius.
+	 * Gets next step towards something, sampling an area of the world around the initial position.
 	 */
 	findNearPath: function (from, to, z, removeAlignment, openEnded) {
-		const RANGE = 5;
-		const SPRED = RANGE * 2 + 1;
-		const toX = to.x - from.x + RANGE;
-		const toY = to.y - from.y + RANGE;
-		if (toX < 0 || toX >= SPRED || toY < 0 || toY >= SPRED) {
+		const xRange = Math.abs(from.x - to.x);
+		const yRange = Math.abs(from.y - to.y);
+		// TODO: Create a non-square area with some margins based on from and to, more optimal.
+		const range = yRange > xRange ? yRange + 2 : xRange + 2;
+		if (range > 15) {
 			// Too far, we cannot help sorry.
 			return {dx:0, dy:0};
 		}
-		const grid = new PF.Grid(SPRED, SPRED);
-		for (let x = 0; x < SPRED; x++) {
-			for (let y = 0; y < SPRED; y++) {
-				const worldX = from.x - RANGE + x;
-				const worldY = from.y - RANGE + y;
+		const spred = range * 2 + 1;
+		const toX = to.x - from.x + range;
+		const toY = to.y - from.y + range;
+		const grid = new PF.Grid(spred, spred);
+		for (let x = 0; x < spred; x++) {
+			for (let y = 0; y < spred; y++) {
+				const worldX = from.x - range + x;
+				const worldY = from.y - range + y;
 				const solid = this.isSolid(worldX, worldY, z);
 				grid.setWalkableAt(x, y, !solid);
 				if (!solid && removeAlignment) {
@@ -224,7 +227,7 @@ World.prototype = {
 			}
 		}
 		if (openEnded) {
-			grid.setWalkableAt(RANGE, RANGE, true);
+			grid.setWalkableAt(range, range, true);
 			grid.setWalkableAt(toX, toY, true);
 		}
 		//TODO: Single finder object?
@@ -233,13 +236,13 @@ World.prototype = {
 			dontCrossCorners: false,
 			diagonalMovement: PF.DiagonalMovement.Always
 		});
-		const path = finder.findPath(RANGE, RANGE, toX, toY, grid);
+		const path = finder.findPath(range, range, toX, toY, grid);
 		if (path.length == 0){
 			return {dx:0, dy:0};
 		}
 		return {
-			dx: Math.sign(path[1][0]-RANGE),
-			dy: Math.sign(path[1][1]-RANGE)
+			dx: Math.sign(path[1][0]-range),
+			dy: Math.sign(path[1][1]-range)
 		};
 	},
 
