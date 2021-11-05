@@ -8,20 +8,33 @@ const SkyBox = require('../SkyBox');
 const Timer = require('../Timer');
 const Line = require('../Line');
 
-function World (config) {
+function World () {
     this._c = circular.register('World');
 	this.currentMinuteOfDay = 0;
 	this.mobs = [];
-	this.chunkSize = config.chunkSize;
-	this.width = config.chunkSize * config.chunksWidth;
-	this.height =  config.chunkSize * config.chunksHeight;
+	this.chunksMap = {};
+	this.chunks = []; //TODO: Add some logic to deactivate chunks and take them into disk
 }
 
-circular.registerClass('World', World);
+circular.registerClass('World', World, {
+	transients: {
+		chunksMap: true,
+	},
+	reviver: function(world) {
+		world.chunks.forEach(c => {
+			world.chunksMap[c.mapId] = c;
+		});
+	}
+});
 
 const COMBAT_DISTANCE = 10;
 
 World.prototype = {
+	setConfig: function(config) {
+		this.chunkSize = config.chunkSize;
+		this.width = config.chunkSize * config.chunksWidth;
+		this.height = config.chunkSize * config.chunksHeight;
+	},
 	timeOfDayPass: function(){
 		if (OAX6.PlayerStateMachine.state !== OAX6.PlayerStateMachine.WORLD){
 			Timer.delay(100).then(() => this.timeOfDayPass());
@@ -398,7 +411,16 @@ World.prototype = {
 	},
 
 	_getChunk(x, y) {
-		return ChunkLoader.getChunk(x, y, this);
+		const mapId = `chunk_${x}-${y}`;
+		if (this.chunksMap[mapId]) {
+			return this.chunksMap[mapId];
+		} else {
+			const chunkData = ChunkLoader.getChunk(x, y, this);
+			this.chunksMap[mapId] = chunkData.chunk;
+			this.chunks.push(chunkData.chunk);
+			chunkData.mobs.forEach(m => m.activate());
+			return chunkData.chunk;
+		}
 	},
 
 	vanishNearbyMobs(position, alignment, range) {

@@ -58,7 +58,8 @@ const OAX6 = {
 		const player = PlayerFactory.buildPlayer(game, undefined, 0, 0, 0);
 		UI.setActiveMob(player);
 		UI.player = player; // TODO: Remove
-		const world = new World(scenarioInfo.config);
+		const world = new World();
+		world.setConfig(scenarioInfo.config);
 		player.world = world;
 		if (startingState.minuteOfDay !== undefined) {
 			world.initMinuteOfDay(startingState.minuteOfDay);

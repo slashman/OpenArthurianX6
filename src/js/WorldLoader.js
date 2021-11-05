@@ -10,16 +10,9 @@ const WorldLoader = {
 			partyMember.relocate(startingPosition.x, startingPosition.y);
 			world.addMob(partyMember);
 		});
-
-		// Load the initial chunks
-		/*const chunkX = Math.floor(player.x / world.chunkSize);
-		const chunkY = Math.floor(player.y / world.chunkSize);
-		ChunkLoader.openChunk(chunkX, chunkY, world);*/
 	},
 	restoreWorld (world) {
-		const chunkX = Math.floor(player.x / player.world.chunkSize);
-		const chunkY = Math.floor(player.y / player.world.chunkSize);
-		ChunkLoader.restoreChunk(chunkX, chunkY);
+		world.chunks.forEach(chunk => ChunkLoader.restoreChunk(chunk, world));
 		world.activateAll();
 	}
 }

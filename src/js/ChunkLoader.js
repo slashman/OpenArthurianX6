@@ -11,7 +11,6 @@ const MAX_TILE_LAYERS_PER_FLOOR = 10;
  */
 const ChunkLoader = {
 	init(game, maps) {
-		this.__chunks = {};
 		this.__maps = {};
 		maps.forEach(m => {
 			const mapId = `chunk_${m.x}-${m.y}`;
@@ -22,19 +21,12 @@ const ChunkLoader = {
 
 	getChunk(chunkX, chunkY, world) {
 		const mapId = `chunk_${chunkX}-${chunkY}`;
-		if (this.__chunks[mapId]) {
-			return this.__chunks[mapId]; // TODO: Verify this works
-		} else {
-			const mapData = this.__maps[mapId];
-			if (!mapData) {
-				throw new Error(`Map ${mapId} not loaded`);
-			}
-			console.log(`Loading chunk ${mapId}`);
-			const chunkData =  this.createChunk(mapData, world);
-			this.__chunks[mapId] = chunkData.chunk;
-			chunkData.mobs.forEach(m => m.activate());
-			return chunkData.chunk;
+		const mapData = this.__maps[mapId];
+		if (!mapData) {
+			throw new Error(`Map ${mapId} not loaded`);
 		}
+		console.log(`Loading chunk ${mapId}`);
+		return this.createChunk(mapData, world);
 	},
 
 	createChunk: function(mapData, world){
@@ -241,14 +233,14 @@ const ChunkLoader = {
 
 		chunk.addObject(object, inChunkX, inChunkY, objectData.z);
 	},
-	/**
-	 * Initializes the data for the different chunks from a savegame
-	 */
-	setChunksData: function (chunksData) {
-		this.__chunks = chunksData;
-	},
-	restoreChunk: function (chunk) {
-		const tiledMap = this.loadTiledMap(chunk.mapId, chunk); // TODO: Test
+	restoreChunk: function (chunk, world) {
+		const mapId = chunk.mapId;
+		const mapData = this.__maps[mapId];
+		if (!mapData) {
+			throw new Error(`Map ${mapId} not loaded`);
+		}
+		console.log(`Loading chunk ${mapId}`);
+		const tiledMap = this.loadTiledMap(mapId, mapData, world);
 		chunk.setSolidMasks(tiledMap.masks.solidMasks);
 		chunk.setOpaqueMasks(tiledMap.masks.opaqueMasks);
 		chunk.doors.forEach((door) => {
