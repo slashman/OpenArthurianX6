@@ -127,7 +127,7 @@ Chunk.prototype = {
 		this.items.forEach(item => OAX6.UI.addItemSprite(item, item.x, item.y, item.z)); // Using .x instead of .chunkX, since .addItemSprite works with world coord
 		this.doors.forEach(door => {
 			OAX6.UI.addItemSprite(door, door.x, door.y, door.z);
-			OAX6.UI.floorLayers[z].objectsLayer.add(door.sprite); // Override group
+			OAX6.UI.floorLayers[door.z].objectsLayer.add(door.sprite); // Override group
 		});
 	},
 	destroy() {
