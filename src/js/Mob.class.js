@@ -224,7 +224,7 @@ Mob.prototype = {
 		this.scheduleCheckTurns = 3;
 		const nextActivity = this.getDesiredLocationBySchedule();
 		// console.log(OAX6.UI.player.world.getHourOfDay() + ', time to '+ nextActivity.id);
-		const dist = Geo.flatDist(nextActivity.location.x, nextActivity.location.y, this.x, this.y);
+		const dist = Geo.flatDist(nextActivity.location.x, nextActivity.location.y, this.x % this.world.chunkSize, this.y % this.world.chunkSize);
 		if (nextActivity.id !== this.lastScheduledActivityId) {
 			delete this.lastScheduledActivityId;
 		}

@@ -22,7 +22,7 @@ Door.prototype = {
   openDoor(mob, remote) {
     const chunk = this.chunk;
     const linkedDir = this.def.linked;
-    const sisterDoor = chunk.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
+    const sisterDoor = chunk.getDoorAt(this.chunkX + linkedDir.x, this.chunkY + linkedDir.y, this.chunkZ);
 
     if (!remote && (!this.inRange(mob) || !sisterDoor.inRange(mob))) {
       return false;
@@ -55,7 +55,7 @@ Door.prototype = {
 
   updateSolidAndOpaque(){
     if (!this.def.fixed) {
-      this.chunk.setSolidAndOpaque(this.x, this.y, this.z, !this.open, !this.open);
+      this.chunk.setSolidAndOpaque(this.chunkX, this.chunkY, this.chunkZ, !this.open, !this.open);
     }
   },
 
@@ -64,7 +64,7 @@ Door.prototype = {
       this.lock = null;
       
       const linkedDir = this.def.linked;
-      const sisterDoor = this.chunk.getDoorAt(this.x + linkedDir.x, this.y + linkedDir.y, this.z);
+      const sisterDoor = this.chunk.getDoorAt(this.chunkX + linkedDir.x, this.chunkY + linkedDir.y, this.chunkZ);
       if (sisterDoor != null) {
         sisterDoor.unlock(key);
       }

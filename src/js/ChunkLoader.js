@@ -49,13 +49,13 @@ const ChunkLoader = {
 		chunk.setSolidMasks(tiledMap.masks.solidMasks);
 		chunk.setOpaqueMasks(tiledMap.masks.opaqueMasks);
 		const mobs = mobsData.map((mobData) => this.loadMob(mobData, world));
-		itemsData.forEach((itemData) => this.loadItem(itemData, chunk));
+		itemsData.forEach((itemData) => this.loadItem(itemData, chunk, mapData.x, mapData.y, world));
 		if (objectsData) {
 			objectsData.forEach((objectData) => {
 				if (objectData.type == 'Door') {
-					this.loadDoor(tiledMap.map, objectData, chunk);
+					this.loadDoor(tiledMap.map, objectData, chunk, mapData.x, mapData.y, world);
 				} else {
-					this.loadObject(tiledMap.map, objectData, chunk);
+					this.loadObject(tiledMap.map, objectData, chunk, mapData.x, mapData.y, world);
 				}
 			});
 		}
@@ -196,22 +196,50 @@ const ChunkLoader = {
 		world.addMob(mob);
 		return mob;
 	},
-	loadItem: function(itemData, chunk) {
+	loadItem: function(itemData, chunk, chunkX, chunkY, world) {
 		const item = ItemFactory.createItem(itemData);
+
+		const inChunkX = itemData.x;
+		const inChunkY = itemData.y;
+		const wx = chunkX * world.chunkSize + inChunkX;
+		const wy = chunkY * world.chunkSize + inChunkY;
+
+		item.x = wx;
+		item.y = wy;
+		item.z = itemData.z;
+		OAX6.UI.addItemSprite(item, item.x, item.y, item.z);
 		chunk.addItem(item, itemData.x, itemData.y, itemData.z);
 	},
-	loadDoor: function(map, doorData, chunk) {
+	loadDoor: function(map, doorData, chunk, chunkX, chunkY, world) {
 		const door = ItemFactory.createDoor(doorData.properties.doorTypeId, chunk);
 
 		door.lock = doorData.properties.lockItemId;
 		Object.assign(door, doorData.properties);
 
-		chunk.addDoor(door, doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z);
-		chunk.setSolidAndOpaque(doorData.x / map.tileWidth, doorData.y / map.tileHeight - 1, doorData.z, true, true);
+		const inChunkX = doorData.x / map.tileWidth;
+		const inChunkY = doorData.y / map.tileHeight - 1;
+		const wx = chunkX * world.chunkSize + inChunkX;
+		const wy = chunkY * world.chunkSize + inChunkY;
+
+		OAX6.UI.addItemSprite(door, wx, wy, doorData.z);
+		OAX6.UI.floorLayers[doorData.z].objectsLayer.add(door.sprite); // Override group
+
+		chunk.addDoor(door, inChunkX, inChunkY, doorData.z);
+		chunk.setSolidAndOpaque(inChunkX, inChunkY, doorData.z, true, true);
 	},
-	loadObject: function(map, objectData, chunk) {
+	loadObject: function(map, objectData, chunk, chunkX, chunkY, world) {
 		const object = ObjectFactory.createObject(objectData);
-		chunk.addObject(object, objectData.x / map.tileWidth, objectData.y / map.tileHeight - 1, objectData.z);
+		const inChunkX = objectData.x / map.tileWidth;
+		const inChunkY = objectData.y / map.tileHeight - 1;
+		const wx = chunkX * world.chunkSize + inChunkX;
+		const wy = chunkY * world.chunkSize + inChunkY;
+		object.x = wx;
+		object.y = wy;
+		object.z = objectData.z;
+
+		OAX6.UI.locateEntitySpriteInWord(object, object.isFloor ? 'floorLayer' : 'objectsLayer');
+
+		chunk.addObject(object, inChunkX, inChunkY, objectData.z);
 	},
 	/**
 	 * Initializes the data for the different chunks from a savegame

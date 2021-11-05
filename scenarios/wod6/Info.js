@@ -12,27 +12,33 @@ module.exports = {
     party: [],
     scene: 'intro',
     position: {
-      x: 2 * 64 + 43,
+      x: 3 * 64 + 43,
       y: 43
     }
   },
 	maps: [
     {
+      name: 'yewRoad',
+      filename: 'yewRoad.json',
+      x: 0,
+      y: 0,
+    },
+    {
       name: 'iolos',
       filename: 'iolos-hut.json',
-      x: 0,
+      x: 1,
       y: 0,
     },
     {
       name: 'westForest',
       filename: 'westForest.json',
-      x: 1,
+      x: 2,
       y: 0,
     },
     {
       name: 'eastForest',
       filename: 'eastForest.json',
-      x: 2,
+      x: 3,
       y: 0,
     },
 	],

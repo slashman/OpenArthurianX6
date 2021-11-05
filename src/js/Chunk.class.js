@@ -52,31 +52,29 @@ Chunk.prototype = {
 	},
 	
 	addItem: function(item, x, y, z) {
-		OAX6.UI.addItemSprite(item, x, y, z);
 		item.container = this;
 		item.isOnFloor = true;
-		item.x = x;
-		item.y = y;
-		item.z = z;
+		item.chunkX = x;
+		item.chunkY = y;
+		item.chunkZ = z;
 		if (item.def.solid) {
 			this.setSolidAndOpaque(x, y, z, true, false);
 		}
 		this.items.push(item);
 	},
 	returnItem (item) {
-		OAX6.UI.addItemSprite(item, item.x, item.y, item.z);
 		this.items.push(item);
 	},
 	addDoor: function(door, x, y, z) {
-		OAX6.UI.addItemSprite(door, x, y, z);
-		OAX6.UI.floorLayers[z].objectsLayer.add(door.sprite); // Override group
+		door.chunkX = x;
+		door.chunkY = y;
+		door.chunkZ = z;
 		this.doors.push(door);
 	},
 	addObject: function(object, x, y, z) {
-		object.x = x;
-		object.y = y;
-		object.z = z;
-		OAX6.UI.locateEntitySpriteInWord(object, object.isFloor ? 'floorLayer' : 'objectsLayer');
+		object.chunkX = x;
+		object.chunkY = y;
+		object.chunkZ = z;
 		this.objects.push(object);
 		if (!this.objectsMap[z]) {
 			this.objectsMap[z] = [];
@@ -88,14 +86,14 @@ Chunk.prototype = {
 	},
 	removeItem: function(item) {
 		if (item.def.solid) {
-			this.setSolidAndOpaque(item.x, item.y, item.z, false, false);
+			this.setSolidAndOpaque(item.chunkX, item.chunkY, item.chunkZ, false, false);
 		}
 		this.items.splice(this.items.indexOf(item), 1);
 		OAX6.UI.removeItemSprite(item);
 	},
 	getItemAt: function(x, y, z) {
 		for (var i=0,item; item=this.items[i]; i++) {
-			if (item.x == x && item.y == y && item.z == z) {
+			if (item.chunkX == x && item.chunkY == y && item.chunkZ == z) {
 				return item;
 			}
 		}
@@ -104,7 +102,7 @@ Chunk.prototype = {
 	},
 	getDoorAt: function(x, y, z) {
 		for (var i = 0, door; door = this.doors[i]; i++) {
-			if (door.x == x && door.y == y && door.z == z) {
+			if (door.chunkX == x && door.chunkY== y && door.chunkZ == z) {
 				return door;
 			}
 		}
@@ -126,7 +124,11 @@ Chunk.prototype = {
 	// Readies the chunk for the player to use it
 	activate() {
 		this.setSolidMasks(this.solidMasks); // Initializes the pfGrids
-		this.items.forEach(item => OAX6.UI.addItemSprite(item, item.x, item.y, item.z));
+		this.items.forEach(item => OAX6.UI.addItemSprite(item, item.x, item.y, item.z)); // Using .x instead of .chunkX, since .addItemSprite works with world coord
+		this.doors.forEach(door => {
+			OAX6.UI.addItemSprite(door, door.x, door.y, door.z);
+			OAX6.UI.floorLayers[z].objectsLayer.add(door.sprite); // Override group
+		});
 	},
 	destroy() {
 		this.destroyed = true;
@@ -158,15 +160,18 @@ Chunk.prototype = {
 				return;
 			}
 			if (!door.isLocked()) {
-				gridClone.setWalkableAt(door.x, door.y, true);
+				gridClone.setWalkableAt(door.chunkX, door.chunkY, true);
 			}
 		});
 		// Prevent walking thru stairs
-		this.objects.filter(o => o.z === z && o.type == 'Stairs').forEach(stairs => gridClone.setWalkableAt(stairs.x, stairs.y, false));
+		this.objects.filter(o => o.z === z && o.type == 'Stairs').forEach(stairs => gridClone.setWalkableAt(stairs.chunkX, stairs.chunkY, false));
 		return this.findPath(from, to, z, gridClone, true)
 	},
 
 	findPath(from, to, z, grid, openEnded) {
+		if (from.x === to.x && from.y === to.y) {
+			return {dx:0, dy:0};
+		}
 		if (!grid) {
 			grid = this.pfGrids[z].clone();
 		}

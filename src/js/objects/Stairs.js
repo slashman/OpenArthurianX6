@@ -12,7 +12,7 @@ class Stairs {
 		const targetZ = this.z + variation;
 		const targetX = this.x - variation;
 		const targetY = this.y - variation;
-		if (targetZ < 0 || targetZ >= mob.world.getChunk(targetX, targetY).depth) {
+		if (targetZ < 0 || targetZ >= mob.world.getCurrentChunk(targetX, targetY).depth) {
 			mob.reportAction("Can't use stairs, invalid destination");
 			return;
 		}

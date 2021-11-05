@@ -155,11 +155,7 @@ World.prototype = {
 	 * @param {*} z 
 	 * @param {*} includeMobsOfAlignment 
 	 */
-	findLongPath: function(to, from, z, includeMobsOfAlignment){
-		const chunkTo = {
-			x: to.x % this.chunkSize,
-			y: to.y % this.chunkSize
-		};
+	findLongPath: function(chunkTo, from, z, includeMobsOfAlignment){
 		const chunkFrom = {
 			x: from.x % this.chunkSize,
 			y: from.y % this.chunkSize
@@ -169,7 +165,7 @@ World.prototype = {
 		const chunkY = Math.floor(from.y / this.chunkSize);
 
 		const blockedPositions = this._getPositionsBlockedByMobs(chunkX, chunkY, includeMobsOfAlignment);
-		blockedPositions.splice(blockedPositions.findIndex(p => p.x == from.x && p.y && from.y), 1);
+		blockedPositions.splice(blockedPositions.findIndex(p => p.x == chunkFrom.x && p.y == chunkFrom.y), 1);
 
 		const currentChunk = this._getChunk(chunkX, chunkY);
 		return currentChunk.findLongPath(chunkTo, chunkFrom, z, blockedPositions)
@@ -186,9 +182,10 @@ World.prototype = {
 	_getPositionsBlockedByMobs(chunkX, chunkY, includeMobsOfAlignment) {
 		const blockedPositions = [];
 		const includeAlignments = [Constants.Alignments.NEUTRAL, includeMobsOfAlignment];
+		const chunkMobs = this._getMobsInChunk(chunkX, chunkY);
 		includeAlignments.forEach((alignment) => {
 			if (alignment){
-				const mobs = this._getMobsInChunk(chunkX, chunkY).filter(m => m.alignment === alignment);
+				const mobs = chunkMobs.filter(m => m.alignment === alignment);
 				mobs.forEach(m=> {
 					blockedPositions.push({
 						x: m.x % this.chunkSize,
@@ -345,7 +342,9 @@ World.prototype = {
 		return chunk[functionName](chunkInX, chunkInY, z);
 	},
 	removeItem: function(item) {
-		const chunk = item.container; // TODO: Can we confirm this is a chunk?
+		const chunkX = Math.floor(item.x / this.chunkSize);
+		const chunkY = Math.floor(item.y / this.chunkSize);
+		const chunk = this._getChunk(chunkX, chunkY);
 		return chunk.removeItem(item);
 	},
 	addItem: function(item, x, y, z) {
@@ -354,9 +353,16 @@ World.prototype = {
 		const chunk = this._getChunk(chunkX, chunkY);
 		const chunkInX = x % this.chunkSize;
 		const chunkInY = y % this.chunkSize;
+		item.x = x;
+		item.y = y;
+		item.z = z;
+		OAX6.UI.addItemSprite(item, x, y, z);
 		return chunk.addItem(item, chunkInX, chunkInY, z);
 	},
-
+	returnItem: function (item) {
+		OAX6.UI.addItemSprite(item, item.x, item.y, item.z);
+		this._getFromChunk(item.x, item.y, item.z, 'returnItem');
+	},
 	canMoveFrom: function(x, y, z, dx, dy) {
 		if (!this.isValidCoordinate(x + dx, y + dy)) {
 			return false;

@@ -12,7 +12,7 @@ class Lever {
 		this.open = !this.open;
     	this.switchSprite(); 
 
-		var door = mob.world.getChunk(mob.x, mob.y).getDoorById(this.opensDoorId);
+		var door = mob.world.getCurrentChunk(mob.x, mob.y).getDoorById(this.opensDoorId);
 		if (door) {
 			if (door.openDoor(mob, true)){
 				OAX6.UI.showMessage("You pull the lever. A door opens.");
