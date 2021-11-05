@@ -360,6 +360,9 @@ Mob.prototype = {
 					case 'cutscene':
 						promiseFunction = () => OAX6.UI.showScene(a.value);
 						break;
+					case 'vanishNearbyMobs':
+						promiseFunction = () => this.world.vanishNearbyMobs(this, this.alignment, 20);
+						break;
 					case 'teleportToWorld':
 						promiseFunction = Promise.resolve();
 						// TODO: Look at the repo history to implement this.
@@ -881,15 +884,21 @@ Mob.prototype = {
 		mob._damage(damage);
 		return Timer.delay(100);
 	},
+	// Make the mob disappear from the world (like death, but without a corpse or anything.)
+	vanish: function () {
+		this.dead = true;
+		this.sprite.destroy();
+		this.world.removeMob(this);
+	},
 	_damage: function(damage){
 		this.hp.reduce(damage);
 		if (this.hp.empty()){
 			this.reportOutcome(this.getDescription()+" dies.");
 			this.dead = true;
 			this.sprite.destroy();
+			this.world.removeMob(this);
 			if (this.definition.corpse){
 				const corpse = ItemFactory.createItem({ itemId: this.definition.corpse });
-				this.world.removeMob(this);
 				this.world.addItem(corpse, this.x, this.y, this.z);
 			}
 			if (this.isPartyMember()){

@@ -399,6 +399,11 @@ World.prototype = {
 
 	_getChunk(x, y) {
 		return ChunkLoader.getChunk(x, y, this);
+	},
+
+	vanishNearbyMobs(position, alignment, range) {
+		this.mobs.filter(m => m.alignment === alignment && Geo.flatDist(position.x, position.y, m.x, m.y) <= range)
+			.forEach(m => m.vanish());
 	}
 
 }
