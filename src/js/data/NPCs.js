@@ -336,7 +336,10 @@ const NPCs = [
 			},
 			{
 				key: "bye",
-				dialog: "Bye."
+				dialog: [
+					"Bye.",
+					{ type: "endConversation" }
+				]
 			},
 			{
 				key: "unknown",
@@ -402,7 +405,10 @@ const NPCs = [
 			},
 			{
 				key: "bye",
-				dialog: "Bye."
+				dialog: [
+					"Bye.",
+					{ type: "endConversation" }
+				]
 			},
 			{
 				key: "unknown",
