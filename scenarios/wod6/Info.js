@@ -8,7 +8,6 @@ module.exports = {
   },
   startingState: {
     minuteOfDay: 10 * 60,
-    map: 'forest1',
     party: [],
     scene: 'intro',
     position: {
