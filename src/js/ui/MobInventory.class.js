@@ -142,7 +142,7 @@ MobInventory.prototype.addItem = function(item, originalContainer, mousePointer)
 
     const replacementItem = this.mob.getItemAtSlot(slotId);
     if (replacementItem) {
-        if (originalContainer.isLevelContainer || replacementItem.isContainer()) {
+        if (originalContainer.isChunkContainer || replacementItem.isContainer()) {
             return originalContainer.returnItem(item);
         } else {
             // Swap

@@ -225,7 +225,7 @@ const UI = {
 			var testy = Math.round(yy);
 			try { 
 				this.fovMask[testx - this.activeMob.x + Constants.FOV_RADIUS + 1][testy - this.activeMob.y + Constants.FOV_RADIUS + 1] = true;
-				if (this.activeMob.level.isOpaque(testx, testy, this.activeMob.z))
+				if (this.activeMob.world.isOpaque(testx, testy, this.activeMob.z))
 					return;
 			} catch(err) {
 				// Catch OOB

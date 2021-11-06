@@ -192,7 +192,7 @@ module.exports = {
 						this.playerInput.visible = false;
 						break;
 					case 'setHostile':
-						this.player.level.activateHostile();
+						this.player.world.activateHostile();
 						break;
 				}
 				this.playerInput.visible = true;

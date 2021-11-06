@@ -18,8 +18,8 @@ const MobFactory = {
 		// TODO: Remove this when we are using objects instead of tiles for mobs.
 		return this.mobTypeData.find(t => t.tileIndex === tileIndex);
 	},
-	buildMob: function(game, typeId, level, x, y, z){
-		const mob = new Mob(level, x, y, z);
+	buildMob: function(game, typeId, world, x, y, z){
+		const mob = new Mob(world, x, y, z);
 		const definition = this.mobTypeMap[typeId];
 		if (!definition) {
 			throw new Error('Invalid definition: [' + typeId + ']')

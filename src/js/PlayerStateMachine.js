@@ -369,7 +369,7 @@ const PlayerStateMachine = {
                     return false;
                 }
                 const {activeMob} = OAX6.UI;
-                const mob = activeMob.level.getMobAt(x, y, activeMob.z);
+                const mob = activeMob.world.getMobAt(x, y, activeMob.z);
                 if (mob && activeMob.canStartDialog) {
                     if (mob.isAsleep) {
                         OAX6.UI.showMessage(mob.getDescription() + " is asleep.");
@@ -467,7 +467,7 @@ const PlayerStateMachine = {
             return null;
         }
         const {activeMob} = OAX6.UI;
-        const object = activeMob.level.getObjectAt(x, y, activeMob.z);
+        const object = activeMob.world.getObjectAt(x, y, activeMob.z);
         if (object) {
             if (object.hidden) {
                 object.hidden = false;
@@ -482,13 +482,13 @@ const PlayerStateMachine = {
             }
             return 'text';
         }
-        const mob = activeMob.level.getMobAt(x, y, activeMob.z);
+        const mob = activeMob.world.getMobAt(x, y, activeMob.z);
         if (mob){
             MobDescription.showMob(mob);
             this.examining = true;
             return 'basic';
         }
-        var item = activeMob.level.getItemAt(x, y, activeMob.z);
+        var item = activeMob.world.getItemAt(x, y, activeMob.z);
         if (item) {
             this.examining = true;
             if (item.def.isBook) {
@@ -586,7 +586,7 @@ const PlayerStateMachine = {
                 case PlayerStateMachine.COMBAT:
                     // End combat if no enemies nearby
                     if (!this.tryToEndCombat(true)) {
-                        this.player.level.actNext(); // TODO: Change for this.currentLevel
+                        this.player.world.actNext(); // TODO: Change for this.currentWorld
                     }
                     break;
             }
@@ -594,7 +594,7 @@ const PlayerStateMachine = {
     },
 
     tryToEndCombat: function (panickedAreDangerous) {
-        if (this.player.level.isSafeAround(this.player.x, this.player.y, this.player.alignment, panickedAreDangerous)){
+        if (this.player.world.isSafeAround(this.player.x, this.player.y, this.player.alignment, panickedAreDangerous)){
             this.endCombat();
             OAX6.UI.showMessage("Combat is over!");
             OAX6.UI.hideMarker();
@@ -686,7 +686,7 @@ const PlayerStateMachine = {
         if (this.state === PlayerStateMachine.COMBAT){
             return;
         }
-        if (!this.player.level.isMobActive()){ // TODO: Change for this.currentLevel
+        if (!this.player.world.isMobActive()){ // TODO: Change for this.currentWorld
             this._combatStarted();
         }
     },
@@ -695,8 +695,8 @@ const PlayerStateMachine = {
         // Eventually, the player's "act" function will be called,
         // And action will be enabled.
         this.switchState(PlayerStateMachine.COMBAT);
-        this.player.level.sortForCombat(this.playerGoesFirst);
-        this.player.level.actNext();
+        this.player.world.sortForCombat(this.playerGoesFirst);
+        this.player.world.actNext();
     },
 
     /*
@@ -710,7 +710,7 @@ const PlayerStateMachine = {
         }
         OAX6.UI.modeLabel.text = 'Exploration';
         this.switchState(PlayerStateMachine.WORLD);
-        this.player.level.activateAll();
+        this.player.world.activateAll();
         OAX6.UI.activeMob = this.player;
         this.enableAction();
     },
@@ -796,7 +796,7 @@ const PlayerStateMachine = {
                 break;
             case PlayerStateMachine.ITEM_TRANSFERRING:
                 this.selectedItem = item;
-                if (item.isContainer() && (item.container != activeMob.level || activeMob.canReach(item))) {
+                if (item.isContainer() && (!item.isOnFloor || activeMob.canReach(item))) {
                     OAX6.UI.showContainerForItem(item);
                 }
                 break;

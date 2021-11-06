@@ -17,10 +17,10 @@ const { Time } = require('phaser-ce');
  * Can be the player, an enemy, a party member, or a NPC.
  */
 
-function Mob(level, x, y, z){
+function Mob(world, x, y, z){
 	this.sprite = null;
 	this.definition = null;
-	this.level = level;
+	this.world = world;
 	this.x = x;
 	this.y = y;
 	this.z = z;
@@ -92,12 +92,15 @@ Mob.prototype = {
 		}
 	},
 	__getActiveTriggersByType(triggerType) {
+		if (!this.npcDefinition || !this.npcDefinition.triggers) {
+			return [];
+		}
 		return this.npcDefinition.triggers.filter(t => t.type === triggerType && !this.flags['trigger_' + t.id]);
 	},
 	__executeAI() {
 		const player = OAX6.UI.player;
 		// If mob is too far from player and hasn't been attacked, it mustn't act (except if it's following a schedule)
-		if (!this.level.isInCombat(this) && !this.intent == 'followSchedule') {
+		if (!this.world.isInCombat(this) && !this.intent == 'followSchedule') {
 			return Timer.delay(1000);	
 		}
 		let subIntent = this.intent; // While we have a general intent, it may change for this action
@@ -194,7 +197,7 @@ Mob.prototype = {
 			if (weapon && 
 				weapon.def.range && 
 				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= weapon.def.range &&
-				this.level.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y, this.z)
+				this.world.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y, this.z)
 				) {
 				return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
 			} else {
@@ -203,10 +206,10 @@ Mob.prototype = {
 		} 
 	},
 	bumpAwayFrom: function (targetMob) {
-		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
+		const nextStep = this.world.findNearPath(this, targetMob, this.z, this.alignment, true);
 		let dx = -nextStep.dx;
 		let dy = -nextStep.dy;
-		if (this.level.canMoveFrom(this.x, this.y, this.z, dx, dy)) {
+		if (this.world.canMoveFrom(this.x, this.y, this.z, dx, dy)) {
 			return this.bumpOnDirection(dx, dy);
 		} else {
 			return this.moveRandomly();
@@ -224,7 +227,7 @@ Mob.prototype = {
 		this.scheduleCheckTurns = 3;
 		const nextActivity = this.getDesiredLocationBySchedule();
 		// console.log(OAX6.UI.player.world.getHourOfDay() + ', time to '+ nextActivity.id);
-		const dist = Geo.flatDist(nextActivity.location.x, nextActivity.location.y, this.x, this.y);
+		const dist = Geo.flatDist(nextActivity.location.x, nextActivity.location.y, this.x % this.world.chunkSize, this.y % this.world.chunkSize);
 		if (nextActivity.id !== this.lastScheduledActivityId) {
 			delete this.lastScheduledActivityId;
 		}
@@ -286,13 +289,13 @@ Mob.prototype = {
 		return ret;
 	},
 	walkTowardsActivity: function (activity) {
-		const nextStep = this.level.findLongPath(activity.location, this, this.z, this.alignment);
+		const nextStep = this.world.findLongPath(activity.location, this, this.z, this.alignment);
 		if (!nextStep) {
 			return this.moveRandomly();
 		}
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
-		const door = this.level.getDoorAt(this.x + dx, this.y + dy, this.z);
+		const door = this.world.getDoorAt(this.x + dx, this.y + dy, this.z);
 		if (door && !door.open) {
 			if (door.isLocked()) {
 				return this.moveRandomly();
@@ -307,13 +310,13 @@ Mob.prototype = {
 		}
 	},
 	bumpTowards: function (targetMob) {
-		const nextStep = this.level.findPathThruMobs(targetMob, this, this.z, this.alignment);
+		const nextStep = this.world.findNearPath(this, targetMob, this.z, this.alignment, true);
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
 		return this.bumpOnDirection(dx, dy);
 	},
 	bumpOnDirection: function (dx, dy) {
-		const mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
+		const mob = this.world.getMobAt(this.x + dx, this.y + dy, this.z);
 		if (mob){
 			if (mob.alignment !== this.alignment){
 				return this.attackOnDirection(dx, dy);
@@ -360,14 +363,12 @@ Mob.prototype = {
 					case 'cutscene':
 						promiseFunction = () => OAX6.UI.showScene(a.value);
 						break;
-					case 'openLevel':
-						promiseFunction = () => new Promise(r => {
-							const oldLevel = OAX6.UI.player.level;
-							OAX6.LevelLoader.openLevel(a.value, OAX6.UI.player);
-							oldLevel.destroy();
-							OAX6.UI.updateFOV();
-							r();
-						});
+					case 'vanishNearbyMobs':
+						promiseFunction = () => this.world.vanishNearbyMobs(this, this.alignment, 20);
+						break;
+					case 'teleportToWorld':
+						promiseFunction = Promise.resolve();
+						// TODO: Look at the repo history to implement this.
 						break;
 					case 'endCombat':
 						promiseFunction = () => PlayerStateMachine.endCombat();
@@ -400,7 +401,7 @@ Mob.prototype = {
 			return false;
 		}
 		// Else trace a line and check no opaque tiles hit
-		return this.level.isLineClear(mob.x, mob.y, this.x, this.y, this.z);
+		return this.world.isLineClear(mob.x, mob.y, this.x, this.y, this.z);
 	},
 	isHostileMob: function(){
 		return this.alignment === Constants.Alignments.ENEMY;
@@ -418,7 +419,7 @@ Mob.prototype = {
 			return false;
 		}
 		const targetAlignment = this.isHostileMob() ? Constants.Alignments.PLAYER : Constants.Alignments.ENEMY;
-		const closerMob = this.level.getCloserMobTo(this.x, this.y, this.z, targetAlignment);
+		const closerMob = this.world.getCloserMobTo(this.x, this.y, this.z, targetAlignment);
 		if (closerMob && this.canTrack(closerMob)) {
 			return closerMob;
 		} else {
@@ -468,11 +469,11 @@ Mob.prototype = {
 		this.sprite.animations.play('walk_'+dir, 0);
 	},
 	moveTo: function(dx, dy){
-		if (!this.level.canMoveFrom(this.x, this.y, this.z, dx, dy)){
+		if (!this.world.canMoveFrom(this.x, this.y, this.z, dx, dy)){
 			this.reportAction("Move - Blocked");
 			return Timer.delay(500);
 		}
-		var mob = this.level.getMobAt(this.x + dx, this.y + dy, this.z);
+		var mob = this.world.getMobAt(this.x + dx, this.y + dy, this.z);
 		let blockedByMob = false;
 		const specialMovementRules = OAX6.UI.activeMob === this && PlayerStateMachine.state === PlayerStateMachine.WORLD;
 		if (mob){
@@ -488,7 +489,7 @@ Mob.prototype = {
 			this.reportAction("Move - Blocked");
 			return Timer.delay(specialMovementRules ? 50 : 500);
 		}
-		const object = this.level.getObjectAt(this.x + dx, this.y + dy, this.z);
+		const object = this.world.getObjectAt(this.x + dx, this.y + dy, this.z);
 		if (object && !object.hidden && object.type == 'Stairs') {
 			// Autouse if possible
 
@@ -508,7 +509,7 @@ Mob.prototype = {
 	},
 	
 	/*
-	 * Relocates the mob without a tween, for example when the level loads
+	 * Relocates the mob without a tween, for example when the world loads
 	 */
 	relocate (x, y) {
 		this.x = x;
@@ -534,12 +535,12 @@ Mob.prototype = {
 		return true;
 	},
 	getOnDirection: function(dx, dy) {
-		var item = this.level.getItemAt(this.x + dx, this.y + dy, this.z);
+		var item = this.world.getItemAt(this.x + dx, this.y + dy, this.z);
 		if (item) {
 			const pickedQuantity = item.quantity;
 			const added = this.addItem(item);
 			if (added) {
-				this.level.removeItem(item);
+				this.world.removeItem(item);
 				if (item.quantity === 1) {
 					this.reportAction("Got a " + item.def.name);  
 				} else {
@@ -560,10 +561,10 @@ Mob.prototype = {
 			dx = x - this.x;
 			dy = y - this.y;
 		}
-		var door = this.level.getDoorAt(x, y, this.z);
-		var object = this.level.getObjectAt(x, y, this.z);
-		var item = this.level.getItemAt(x, y, this.z);
-		var mob = this.level.getMobAt(x, y, this.z);
+		var door = this.world.getDoorAt(x, y, this.z);
+		var object = this.world.getObjectAt(x, y, this.z);
+		var item = this.world.getItemAt(x, y, this.z);
+		var mob = this.world.getMobAt(x, y, this.z);
 		if (mob) {
 			return this.useMobInPosition(x, y, mob);
 		} else if (door) {
@@ -627,7 +628,7 @@ Mob.prototype = {
 	findItemAroundById (id) {
 		for (let xx = -1; xx <= 1; xx++) {
 			for (let yy = -1; yy <= 1; yy++) {
-				const item = this.level.getItemAt(this.x + xx, this.y + yy, this.z);
+				const item = this.world.getItemAt(this.x + xx, this.y + yy, this.z);
 				if (!item) {
 					continue;
 				}
@@ -647,9 +648,9 @@ Mob.prototype = {
 			OAX6.UI.showMessage("Cannot be used");
 			return;
 		}
-		const mob = this.level.getMobAt(x, y, this.z);
+		const mob = this.world.getMobAt(x, y, this.z);
 		// TODO: If there is no mob there, and I used the item in the ground, the active mob should be the target of the action.
-		const door = this.level.getDoorAt(x, y, this.z);
+		const door = this.world.getDoorAt(x, y, this.z);
 		let used = false;
 		switch (itemEffect.type) {
 			case 'unlockDoor':
@@ -740,13 +741,13 @@ Mob.prototype = {
 			this.consumeAmmunition(ammoInfo);
 			// Here we must check in advance if this attack will trigger the combat mode!
 			// We cannot wait til the projectile animation is over!
-			var mob = this.level.getMobAt(x, y, this.z);
+			var mob = this.world.getMobAt(x, y, this.z);
 			if (mob && PlayerStateMachine.state === PlayerStateMachine.WORLD) {
 				PlayerStateMachine.startCombat(true);
 			}
 			return weapon.playProjectileAnimation(ammo, this.x, this.y, x, y).then(()=> {
 				if (ammo.def.throwable) {
-					this.level.addItem(ammo, x, y, this.z);
+					this.world.addItem(ammo, x, y, this.z);
 				}
 				return this._attackPosition(x, y);
 			});
@@ -829,7 +830,7 @@ Mob.prototype = {
 		return this._attackPosition(this.x + dx, this.y + dy);
 	},
 	_attackPosition: function(x, y){
-		var mob = this.level.getMobAt(x, y, this.z);
+		var mob = this.world.getMobAt(x, y, this.z);
 		if (mob){
 			// Attack!
 			OAX6.UI.showIcon(2, mob.x, mob.y);
@@ -838,7 +839,7 @@ Mob.prototype = {
 				OAX6.UI.hideIcon();
 				return this.attack(mob);
 			});
-		} else if (this.level.isSolid(x, y, this.z)) {
+		} else if (this.world.isSolid(x, y, this.z)) {
 			// TODO: Attack the map
 			this.reportAction("Attack - No one there!");
 			return Timer.delay(500);
@@ -886,16 +887,22 @@ Mob.prototype = {
 		mob._damage(damage);
 		return Timer.delay(100);
 	},
+	// Make the mob disappear from the world (like death, but without a corpse or anything.)
+	vanish: function () {
+		this.dead = true;
+		this.sprite.destroy();
+		this.world.removeMob(this);
+	},
 	_damage: function(damage){
 		this.hp.reduce(damage);
 		if (this.hp.empty()){
 			this.reportOutcome(this.getDescription()+" dies.");
 			this.dead = true;
 			this.sprite.destroy();
+			this.world.removeMob(this);
 			if (this.definition.corpse){
 				const corpse = ItemFactory.createItem({ itemId: this.definition.corpse });
-				this.level.removeMob(this);
-				this.level.addItem(corpse, this.x, this.y, this.z);
+				this.world.addItem(corpse, this.x, this.y, this.z);
 			}
 			if (this.isPartyMember()){
 				this.checkForGameOver();
@@ -982,6 +989,7 @@ Mob.prototype = {
 		this.bodySlots[slotId] = item;
 		if (item) {
 			item.container = this;
+			item.isOnFloor = false;
 			item.currentSlotId = slotId;
 			delete item.x;
 			delete item.y;
@@ -1022,7 +1030,7 @@ Mob.prototype = {
 	},
 	canReach(item) {
 		if (this.x != item.x || this.y != item.y || this.z != item.z) {
-			const path = this.level.findPath(this, item, this.z, undefined, true);
+			const path = this.world.findNearPath(this, item, this.z, undefined, true);
 			if (path.dx == 0 && path.dy == 0) {
 				OAX6.UI.showMessage("Unreachable.");
 				return false;
@@ -1031,16 +1039,16 @@ Mob.prototype = {
 		return true;
 	},
 	tryDrop(item, position) {
-		const worldItem = this.level.getItemAt(position.x, position.y, position.z);
+		const worldItem = this.world.getItemAt(position.x, position.y, position.z);
 		if (this.x != position.x || this.y != position.y || this.z != position.z) {
 			const containerAtTarget = worldItem && worldItem.isContainer();
-			const path = this.level.findPath(this, position, this.z, undefined, containerAtTarget);
+			const path = this.world.findNearPath(this, position, this.z, undefined, containerAtTarget);
 			if (path.dx == 0 && path.dy == 0) {
 				OAX6.UI.showMessage("Unreachable - Cannot Drop");
 				return false;
 			}
 		}
-		const mob = this.level.getMobAt(position.x, position.y, position.z);
+		const mob = this.world.getMobAt(position.x, position.y, position.z);
 		if (mob) {
 			return mob.addItem(item);
 		}
@@ -1054,7 +1062,7 @@ Mob.prototype = {
 				return false;
 			}
 		}
-		this.level.addItem(item, position.x, position.y, this.z);
+		this.world.addItem(item, position.x, position.y, this.z);
 		return true;
 	},
 	removeItem(item) {

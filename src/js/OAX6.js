@@ -4,7 +4,7 @@ window.Phaser = require('phaser-ce/build/custom/phaser-split');
 
 const UI = require('./UI');
 const SkyBox = require('./SkyBox');
-const LevelLoader = require('./LevelLoader');
+const ChunkLoader = require('./ChunkLoader');
 
 const NPCsData = require('./data/NPCs');
 const MobTypeData = require('./data/MobTypes');
@@ -27,6 +27,7 @@ const Bus = require('./Bus');
 
 const scenarioInfo = require('./ScenarioInfo');
 const World = require('./model/World.class');
+const WorldLoader = require('./WorldLoader');
 
 const OAX6 = {
 	run: function(){
@@ -42,7 +43,7 @@ const OAX6 = {
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);
 		ObjectFactory.setGame(game);
-		LevelLoader.init(game, scenarioInfo.maps);
+		ChunkLoader.init(game, scenarioInfo.maps);
 
 		this.playerStateMachine = PlayerStateMachine;
 
@@ -58,6 +59,7 @@ const OAX6 = {
 		UI.setActiveMob(player);
 		UI.player = player; // TODO: Remove
 		const world = new World();
+		world.setConfig(scenarioInfo.config);
 		player.world = world;
 		if (startingState.minuteOfDay !== undefined) {
 			world.initMinuteOfDay(startingState.minuteOfDay);
@@ -71,7 +73,7 @@ const OAX6 = {
 			const npc = NPCFactory.buildNPC(game, partyMember.id, undefined, 0, 0, 0);
 			player.addMobToParty(npc);
 		});
-		LevelLoader.openLevel(startingState.map, player);
+		WorldLoader.openWorld(startingState.position, player, world);
 		UI.updateFOV();
 
 		if (startingState.scene) {
@@ -86,10 +88,7 @@ const OAX6 = {
 		UI.player = player; // TODO: Remove
 		Bus.listen('addToParty', npc => player.addMobToParty(npc));
 		Bus.listen('removeFromParty', npc => player.removeFromParty(npc));
-		/*LevelLoader.setLevelsData({
-			[player.level.mapId]: player.level
-		});*/
-		LevelLoader.restoreLevel(player.level);
+		WorldLoader.restoreWorld(player.world);
 		UI.updateFOV();
 		UI.restoreComponentState();
 	}
@@ -99,7 +98,7 @@ window.OAX6 = {
 	runner: OAX6,
 	UI: UI,
 	Timer: Timer,
-	LevelLoader,
+	ChunkLoader,
 	NPCFactory,
 	MobFactory,
 	ItemFactory,

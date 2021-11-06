@@ -22,12 +22,12 @@ const NPCFactory = {
 	/**
 	 * Builds a Mob with extended NPC data
 	 */
-	buildNPC: function(game, id, level, x, y, z){
+	buildNPC: function(game, id, world, x, y, z){
 		const definition = this.npcMap[id];
 		if (!definition) {
 			throw new Error("Missing NPC definition [" + id + "]");
 		}
-		const npc = MobFactory.buildMob(game, definition.type, level, x, y, z);
+		const npc = MobFactory.buildMob(game, definition.type, world, x, y, z);
 		npc.npcDefid = id;
 		npc.npcDefinition = this.getDefinition(id);
 		// Note that we only assign things to the npc that can change, everything else remains in the NPC definition

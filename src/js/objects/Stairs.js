@@ -12,11 +12,11 @@ class Stairs {
 		const targetZ = this.z + variation;
 		const targetX = this.x - variation;
 		const targetY = this.y - variation;
-		if (targetZ < 0 || targetZ >= mob.level.depth) {
+		if (targetZ < 0 || targetZ >= mob.world.getCurrentChunk(targetX, targetY).depth) {
 			mob.reportAction("Can't use stairs, invalid destination");
 			return;
 		}
-		if (mob.level.isSolid(targetX, targetY, targetZ)) {
+		if (mob.world.isSolid(targetX, targetY, targetZ)) {
 			OAX6.UI.showMessage("Can't use stairs, solid destination");
 			return;
 		}
