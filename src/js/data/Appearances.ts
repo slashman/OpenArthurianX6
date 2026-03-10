@@ -1,6 +1,27 @@
 //TODO: Make this a data file instead of a JS module
 
-const Appearances = [
+type AppearanceItem = {
+	id: string;
+	i: number;
+	solid?: boolean;
+}
+
+type AppearanceMob = {
+	id: string;
+	u: number[];
+	d: number[];
+	l: number[];
+	r: number[];
+	asleep?: number;
+}
+
+export type AppearanceRecord = {
+	tileset: string;
+	items?: AppearanceItem[];
+	mobs?: AppearanceMob[];
+}
+
+const Appearances: AppearanceRecord[] = [
 	{
 		tileset: 'player',
 		mobs: [{
@@ -342,4 +363,4 @@ const Appearances = [
 	}
 ]
 
-module.exports = Appearances;
+export default Appearances;

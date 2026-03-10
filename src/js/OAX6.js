@@ -8,7 +8,7 @@ const ChunkLoader = require('./ChunkLoader');
 
 const NPCsData = require('./data/NPCs');
 const ItemsData = require('./data/Items');
-const AppearancesData = require('./data/Appearances');
+const AppearancesData = require('./data/Appearances').default;
 const ObjectTypes = require('./data/ObjectTypes');
 
 const NPCFactory = require('./NPCFactory');
