@@ -47,6 +47,8 @@ const Loader = {
 		// game.load.audio('notes-piano', ['assets/keys.mp3']);
 		game.load.audio('notes-lute', ['assets/lute.ogg']);
 		game.load.audio('notes-harpsichord', ['assets/harpsichord.ogg']);
+
+		game.load.json('mobTypes', 'scenario/mobTypes.json');
 	}
 }
 

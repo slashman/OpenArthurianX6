@@ -7,7 +7,6 @@ const SkyBox = require('./SkyBox');
 const ChunkLoader = require('./ChunkLoader');
 
 const NPCsData = require('./data/NPCs');
-const MobTypeData = require('./data/MobTypes').default;
 const ItemsData = require('./data/Items');
 const AppearancesData = require('./data/Appearances');
 const ObjectTypes = require('./data/ObjectTypes');
@@ -33,13 +32,13 @@ const OAX6 = {
 	run: function(){
 		console.log("Running OAX6");
 		NPCFactory.init(NPCsData);
-		MobFactory.init(MobTypeData);
 		AppearanceFactory.init(AppearancesData);
 		ItemFactory.init(ItemsData);
 		ObjectFactory.init(ObjectTypes);
 		UI.launch(this.startGame.bind(this));
 	},
 	startGame: function(game){
+		MobFactory.init(game.cache.getJSON('mobTypes'));
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);
 		ObjectFactory.setGame(game);
