@@ -1,4 +1,25 @@
-//TODO: Use this type in Loader.js once it's migrated to TS
+//TODO: Use these types in Loader.js once it's migrated to TS
+
+type AppearanceItem = {
+	id: string;
+	i: number;
+	solid?: boolean;
+}
+
+type AppearanceMob = {
+	id: string;
+	u: number[];
+	d: number[];
+	l: number[];
+	r: number[];
+	asleep?: number;
+}
+
+export type AppearanceRecord = {
+	tileset: string;
+	items?: AppearanceItem[];
+	mobs?: AppearanceMob[];
+}
 
 export type MobTypeRecord = {
 	id: string;

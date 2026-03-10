@@ -1,0 +1,182 @@
+[
+	{
+		"tileset": "player",
+		"mobs": [
+			{
+				"id": "player",
+				"u": [3, 4, 5, 4],
+				"d": [0, 1, 2, 1],
+				"l": [9, 10, 11, 10],
+				"r": [6, 7, 8, 7]
+			}
+		]
+	},
+	{
+		"tileset": "blank",
+		"items": [
+			{
+				"id": "blank",
+				"i": 0
+			}
+		]
+	},
+	{
+		"tileset": "items",
+		"items": [
+			{ "id": "spear", "i": 55 },
+			{ "id": "magicAxe", "i": 49 },
+			{ "id": "crossbow", "i": 54 },
+			{ "id": "maingauche", "i": 50 },
+			{ "id": "sword", "i": 48 },
+			{ "id": "mysticSword", "i": 63 },
+			{ "id": "boomerang", "i": 49 },
+			{ "id": "blueBook", "i": 141 },
+			{ "id": "ironBolt", "i": 71 },
+			{ "id": "chainMail", "i": 96 },
+			{ "id": "bluePotion", "i": 2 },
+			{ "id": "yellowPotion", "i": 3 },
+			{ "id": "lute", "i": 72 },
+			{ "id": "litTorch", "i": 225 },
+			{ "id": "offTorch", "i": 224 },
+			{ "id": "barrel", "i": 161 },
+			{ "id": "backpack", "i": 162 },
+			{ "id": "bag", "i": 163 },
+			{ "id": "carrot", "i": 39 },
+			{ "id": "milkBucket", "i": 10 },
+			{ "id": "emptyBucket", "i": 11 }
+		]
+	},
+	{
+		"tileset": "items",
+		"items": [
+			{ "id": "ironBolt_p", "i": 160 }
+		]
+	},
+	{
+		"tileset": "mobs",
+		"items": [
+			{ "id": "manCorpse", "i": 12 },
+			{ "id": "demonCorpse", "i": 28 },
+			{ "id": "bones", "i": 44 },
+			{ "id": "ratCorpse", "i": 60 },
+			{ "id": "cowCorpse", "i": 204 }
+		],
+		"mobs": [
+			{
+				"id": "man1",
+				"u": [3, 4, 5, 4],
+				"d": [0, 1, 2, 1],
+				"l": [9, 10, 11, 10],
+				"r": [6, 7, 8, 7],
+				"asleep": 12
+			},
+			{
+				"id": "man2",
+				"u": [227, 228, 229, 228],
+				"d": [224, 225, 226, 225],
+				"l": [233, 234, 235, 234],
+				"r": [230, 231, 232, 231],
+				"asleep": 236
+			},
+			{
+				"id": "iolo",
+				"u": [275, 276, 277, 276],
+				"d": [272, 273, 274, 273],
+				"l": [281, 282, 283, 282],
+				"r": [278, 279, 280, 279],
+				"asleep": 284
+			},
+			{
+				"id": "soldier",
+				"u": [243, 244, 245, 244],
+				"d": [240, 241, 242, 241],
+				"l": [249, 250, 251, 250],
+				"r": [246, 247, 248, 247],
+				"asleep": 252
+			},
+			{
+				"id": "asteroth",
+				"u": [259, 260, 261, 260],
+				"d": [256, 257, 258, 257],
+				"l": [265, 266, 267, 266],
+				"r": [262, 263, 264, 263],
+				"asleep": 268
+			},
+			{
+				"id": "demon",
+				"u": [19, 20, 21, 20],
+				"d": [16, 17, 18, 17],
+				"l": [25, 26, 27, 26],
+				"r": [22, 23, 24, 23],
+				"asleep": 28
+			},
+			{
+				"id": "skeleton",
+				"u": [35, 36, 37, 36],
+				"d": [32, 33, 34, 33],
+				"l": [41, 42, 43, 42],
+				"r": [38, 39, 40, 39],
+				"asleep": 44
+			},
+			{
+				"id": "rat",
+				"u": [51, 52, 53, 52],
+				"d": [48, 49, 50, 49],
+				"l": [57, 58, 59, 58],
+				"r": [54, 55, 56, 54],
+				"asleep": 60
+			},
+			{
+				"id": "cow",
+				"u": [195, 196, 197, 196],
+				"d": [192, 193, 194, 193],
+				"l": [201, 202, 203, 202],
+				"r": [198, 199, 200, 199],
+				"asleep": 204
+			}
+		]
+	},
+	{
+		"tileset": "items",
+		"items": [
+			{ "id": "fish", "i": 28 },
+			{ "id": "lobster", "i": 30 }
+		]
+	},
+	{
+		"tileset": "items",
+		"items": [
+			{ "id": "goldKey", "i": 154 }
+		]
+	},
+	{
+		"tileset": "terrain",
+		"items": [
+			{ "id": "doorOpenHL1", "solid": true, "i": 18 },
+			{ "id": "doorOpenHR1", "solid": false, "i": 19 },
+			{ "id": "doorHL1", "solid": true, "i": 51 },
+			{ "id": "doorHR1", "solid": true, "i": 52 },
+			{ "id": "doorOpenVL1", "solid": false, "i": 53 },
+			{ "id": "doorOpenVR1", "solid": true, "i": 20 },
+			{ "id": "doorVL1", "solid": true, "i": 54 },
+			{ "id": "doorVR1", "solid": true, "i": 21 },
+			{ "id": "stairsUp", "i": 213 },
+			{ "id": "stairsDown", "i": 71 },
+			{ "id": "vLever", "i": 117 },
+			{ "id": "wLever", "i": 150 },
+			{ "id": "vLeverOff", "i": 118 },
+			{ "id": "wLeverOff", "i": 151 },
+			{ "id": "harpsichord", "i": 442 },
+			{ "id": "rock", "i": 372 },
+			{ "id": "oakTree", "i": 267 }
+		]
+	},
+	{
+		"tileset": "portraits",
+		"items": [
+			{ "id": "portraitAvatar", "i": 0 },
+			{ "id": "portraitIolo", "i": 1 },
+			{ "id": "portraitShamino", "i": 2 }
+		]
+	}
+]

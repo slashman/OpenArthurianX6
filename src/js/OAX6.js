@@ -8,7 +8,6 @@ const ChunkLoader = require('./ChunkLoader');
 
 const NPCsData = require('./data/NPCs');
 const ItemsData = require('./data/Items');
-const AppearancesData = require('./data/Appearances').default;
 const ObjectTypes = require('./data/ObjectTypes');
 
 const NPCFactory = require('./NPCFactory');
@@ -32,12 +31,12 @@ const OAX6 = {
 	run: function(){
 		console.log("Running OAX6");
 		NPCFactory.init(NPCsData);
-		AppearanceFactory.init(AppearancesData);
 		ItemFactory.init(ItemsData);
 		ObjectFactory.init(ObjectTypes);
 		UI.launch(this.startGame.bind(this));
 	},
 	startGame: function(game){
+		AppearanceFactory.init(game.cache.getJSON('appearances'));
 		MobFactory.init(game.cache.getJSON('mobTypes'));
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);

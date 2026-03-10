@@ -49,6 +49,7 @@ const Loader = {
 		game.load.audio('notes-harpsichord', ['assets/harpsichord.ogg']);
 
 		game.load.json('mobTypes', 'scenario/mobTypes.json');
+		game.load.json('appearances', 'scenario/appearances.json');
 	}
 }
 
