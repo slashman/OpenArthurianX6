@@ -4,7 +4,8 @@
   "description": "A classic cRPG game engine",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp build"
   },
   "author": "",
   "license": "ISC",
@@ -24,10 +25,15 @@
     ]
   },
   "devDependencies": {
-    "browserify": "^11.0.0",
-    "browserify-shim": "^3.8.10",
-    "watchify": "^3.9.0",
-    "create-symlink": "^1.0.0",
-    "gulp": "^3.9.1"
+    "browserify": "^17.0.0",
+    "browserify-shim": "^3.8.14",
+    "gulp": "^4.0.2",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-typescript": "^6.0.0-alpha.1",
+    "tsify": "^5.0.4",
+    "typescript": "^5.4.5",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0",
+    "watchify": "^4.0.0"
   }
 }

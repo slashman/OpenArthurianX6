@@ -1,6 +1,6 @@
 const Bus = require('./Bus');
 const Timer = require('./Timer');
-const Geo = require('./Geo');
+const Geo = require('./Geo').default;
 const Random = require('./Random');
 const Storage = require('./Storage');
 const MobDescription = require('./MobDescription');

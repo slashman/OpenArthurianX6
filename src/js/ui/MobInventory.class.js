@@ -54,8 +54,8 @@ MobInventory.prototype = Object.create(Container.prototype);
 MobInventory.prototype._initSlots = function() {
     this.displayItems = {};
     this.slots.forEach(slot => {
-        x = slot.x;
-        y = slot.y;
+        const x = slot.x;
+        const y = slot.y;
         const slotSprite = this.game.add.sprite(x, y, 'ui', 7);
         slotSprite.anchor.set(0.5);
         const itemSprite = this.game.add.image(x,y,'ui');

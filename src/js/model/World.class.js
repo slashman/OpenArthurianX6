@@ -3,7 +3,7 @@ const PF = require('pathfinding');
 
 const ChunkLoader = require('../ChunkLoader');
 const Constants = require('../Constants');
-const Geo = require('../Geo');
+const Geo = require('../Geo').default;
 const SkyBox = require('../SkyBox');
 const Timer = require('../Timer');
 const Line = require('../Line');

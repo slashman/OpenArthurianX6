@@ -6,7 +6,7 @@ const Loader = require('./Loader');
 const Timer = require('./Timer');
 
 const PlayerStateMachine = require('./PlayerStateMachine');
-const Geo = require('./Geo');
+const Geo = require('./Geo').default;
 
 const TILE_WIDTH = 16;
 const TILE_HEIGHT = 16;
@@ -539,7 +539,8 @@ const UI = {
   	}
   },
   selectQuadrant(point) {
-  	let xvar = yvar = 0;
+  	let xvar = 0;
+    let yvar = 0;
   	if (point.x > this.game.width / 2 + TILE_WIDTH / 2) {
   		xvar = 1;
   	} else if (point.x < this.game.width / 2 - TILE_WIDTH / 2) {

@@ -1,4 +1,4 @@
-./scripts/build.sh
+npm run build
 
 # Assembly
 mkdir assembly
