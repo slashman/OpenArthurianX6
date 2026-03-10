@@ -1,6 +1,29 @@
 //TODO: Make this a data file instead of a JS module
 
-const MobTypes = [
+export type MobTypeRecord = {
+	id: string;
+	appearance: string;
+	name: string;
+	description?: string;
+	hp: number;
+	damage: number;
+	defense: number;
+	speed: number;
+	corpse: string;
+	weapon?: string;
+	portrait?: string;
+	alignment?: string;
+	intent?: string;
+	useEffect?: {
+		type: string;
+	};
+	items?: {
+		itemId: string;
+		quantity: number;
+	}[];
+}
+
+const MobTypes: MobTypeRecord[] = [
 	{
 		id: 'demon',
 		appearance: 'demon',
@@ -145,7 +168,7 @@ const MobTypes = [
 		]
 	},
 	{
-		id: 'asteroth',
+		id: 'asteroth', 
 		appearance: 'asteroth',
 		name: 'Asteroth',
 		description: 'Lord of Empath Abbey.',
@@ -163,4 +186,4 @@ const MobTypes = [
 	}
 ]
 
-module.exports = MobTypes;
+export default MobTypes;

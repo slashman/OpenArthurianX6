@@ -7,7 +7,7 @@ const SkyBox = require('./SkyBox');
 const ChunkLoader = require('./ChunkLoader');
 
 const NPCsData = require('./data/NPCs');
-const MobTypeData = require('./data/MobTypes');
+const MobTypeData = require('./data/MobTypes').default;
 const ItemsData = require('./data/Items');
 const AppearancesData = require('./data/Appearances');
 const ObjectTypes = require('./data/ObjectTypes');
