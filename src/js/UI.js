@@ -24,8 +24,6 @@ const Dialogs = require('./Dialogs');
 const MessageBox = require('./MessageBox');
 const MobDescription = require('./MobDescription');
 
-const scenarioInfo = require('./ScenarioInfo');
-
 const STRETCH = true;
 
 const GridContainer = require('./ui/GridContainer.class').GridContainer;
@@ -480,7 +478,7 @@ const UI = {
   },
 
   showScene(sceneId) {
-    const scene = scenarioInfo.scenes[sceneId];
+    const scene = OAX6.runner.scenarioInfo.scenes[sceneId];
     this.currentScene = scene;
     this.currentSceneIndex = -1;
     return new Promise(outstandingPromise => {

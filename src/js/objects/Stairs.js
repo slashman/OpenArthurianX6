@@ -1,13 +1,11 @@
 const circular = require('circular-functions');
 
-const scenarioInfo = require('../ScenarioInfo');
-
 class Stairs {
 	constructor() {
 		this._c = circular.register('Stairs');
 	}
 	use(mob, dx, dy) {
-		const { tileWidth, tileHeight } = scenarioInfo.config;
+		const { tileWidth, tileHeight } = OAX6.runner.scenarioInfo.config;
 		const variation = this.direction == 'up' ? 1 : -1;
 		const targetZ = this.z + variation;
 		const targetX = this.x - variation;

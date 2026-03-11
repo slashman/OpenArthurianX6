@@ -1,12 +1,18 @@
-const scenarioInfo = require('./ScenarioInfo');
-
 const Loader = {
 	load: function(game){
-		scenarioInfo.maps.forEach(function(map){
-			// TODO: Load on the fly! else the entire chunk model doesn't make sense.
-			const mapId = `chunk_${map.x}-${map.y}`;
-			game.load.tilemap(mapId, 'scenario/maps/'+map.filename, null, Phaser.Tilemap.TILED_JSON);
+		const scenarioListener = game.load.onFileComplete.add(function(progress, cacheKey, success) {
+			if (cacheKey === 'scenario' && success) {
+				scenarioListener.detach();
+				const scenarioInfo = game.cache.getJSON('scenario');
+				scenarioInfo.maps.forEach(function(map){
+					const mapId = `chunk_${map.x}-${map.y}`;
+					game.load.tilemap(mapId, 'scenario/maps/'+map.filename, null, Phaser.Tilemap.TILED_JSON);
+				});
+			}
 		});
+
+		game.load.json('scenario', 'scenario/scenario.json');
+
 		// TODO: Load the tileset based on the content packs related to the scenario
 		game.load.image('monsters', 'assets/monsters.png');
 		game.load.image('terrain', 'assets/terrain.png');

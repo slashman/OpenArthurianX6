@@ -1,7 +1,5 @@
 const circular = require('circular-functions');
 
-const scenarioInfo = require('../ScenarioInfo');
-
 class Lever {
 	constructor() {
 		this._c = circular.register('Lever');

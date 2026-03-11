@@ -19,7 +19,6 @@ const PlayerStateMachine = require('./PlayerStateMachine');
 const Timer = require('./Timer');
 const Bus = require('./Bus');
 
-const scenarioInfo = require('./ScenarioInfo');
 const World = require('./model/World.class');
 const WorldLoader = require('./WorldLoader');
 
@@ -29,6 +28,7 @@ const OAX6 = {
 		UI.launch(this.startGame.bind(this));
 	},
 	startGame: function(game){
+		this.scenarioInfo = game.cache.getJSON('scenario');
 		AppearanceFactory.init(game.cache.getJSON('appearances'));
 		ItemFactory.init(game.cache.getJSON('items'));
 		MobFactory.init(game.cache.getJSON('mobTypes'));
@@ -37,7 +37,7 @@ const OAX6 = {
 		PlayerStateMachine.init(game);
 		ItemFactory.setGame(game);
 		ObjectFactory.setGame(game);
-		ChunkLoader.init(game, scenarioInfo.maps);
+		ChunkLoader.init(game, this.scenarioInfo.maps);
 
 		this.playerStateMachine = PlayerStateMachine;
 
@@ -48,12 +48,12 @@ const OAX6 = {
 		};
 	},
 	newGame: function(game) {
-		const startingState = scenarioInfo.startingState;
+		const startingState = this.scenarioInfo.startingState;
 		const player = PlayerFactory.buildPlayer(game, undefined, 0, 0, 0);
 		UI.setActiveMob(player);
 		UI.player = player; // TODO: Remove
 		const world = new World();
-		world.setConfig(scenarioInfo.config);
+		world.setConfig(this.scenarioInfo.config);
 		player.world = world;
 		if (startingState.minuteOfDay !== undefined) {
 			world.initMinuteOfDay(startingState.minuteOfDay);
