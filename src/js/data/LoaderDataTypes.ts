@@ -90,3 +90,67 @@ export type ItemRecord = {
 	solid?: boolean;
 	containerType?: string;
 }
+
+export type DialogCondition = {
+	flag?: string;
+	value?: any;
+	joined?: boolean;
+}
+
+export type DialogRecord = {
+	key: string;
+	dialog?: string | string[] | any;
+	variants?: {
+		condition: DialogCondition;
+		dialog: string | string[] | any;
+	}[];
+	synonym?: string;
+}
+
+export type ActionRecord = {
+	type: string;
+	text?: string;
+	value?: any;
+	flagName?: string;
+	name?: string;
+}
+
+export type TriggerRecord = {
+	id: string;
+	type: string;
+	value: number;
+	actions: ActionRecord[];
+}
+
+export type ScheduleRecord = {
+	id: string;
+	time: number;
+	location: {
+		x: number;
+		y: number;
+	};
+	action?: {
+		type: string;
+		hours?: number;
+		once?: boolean;
+	};
+}
+
+export type NPCRecord = {
+	id: string;
+	name: string;
+	description?: string;
+	type: string;
+	alignment?: string;
+	armor?: string;
+	weapon?: string;
+	backpack?: string;
+	items?: {
+		itemId: string;
+		quantity: number;
+	}[];
+	intent?: string;
+	triggers?: TriggerRecord[];
+	schedule?: ScheduleRecord[];
+	dialog?: DialogRecord[];
+}

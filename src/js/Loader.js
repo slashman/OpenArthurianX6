@@ -51,6 +51,7 @@ const Loader = {
 		game.load.json('mobTypes', 'scenario/mobTypes.json');
 		game.load.json('appearances', 'scenario/appearances.json');
 		game.load.json('items', 'scenario/items.json');
+		game.load.json('npcs', 'scenario/npcs.json');
 	}
 }
 
