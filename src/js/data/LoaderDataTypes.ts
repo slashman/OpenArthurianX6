@@ -154,3 +154,11 @@ export type NPCRecord = {
 	schedule?: ScheduleRecord[];
 	dialog?: DialogRecord[];
 }
+
+export type ObjectTypeRecord = {
+	id: string;
+	closedAppearance?: string;
+	openAppearance?: string;
+	background?: string;
+	appearance?: string;
+}
