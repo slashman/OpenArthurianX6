@@ -43,3 +43,50 @@ export type MobTypeRecord = {
 		quantity: number;
 	}[];
 }
+
+export type ItemRecord = {
+	id: string;
+	appearance?: string;
+	name: string;
+	description?: string;
+	damage?: number;
+	defense?: number;
+	throwable?: boolean;
+	range?: number;
+	flyType?: string;
+	flyAppearance?: string;
+	usesProjectileType?: string;
+	stackLimit?: number;
+	capacity?: number;
+	closedAppearance?: string;
+	openAppearance?: string;
+	fixed?: boolean;
+	linked?: {
+		x: number;
+		y: number;
+	};
+	isBook?: boolean;
+	title?: string;
+	contents?: string;
+	effect?: {
+		type: string;
+		audioAssetKey?: string;
+		offset?: number;
+		timingType?: string;
+		fragments?: number[];
+		fragmentLength?: number;
+		keys?: number;
+		transformTo?: string;
+		hungerRecovery?: number;
+	};
+	spendable?: boolean;
+	useOnSelf?: boolean;
+	type?: string;
+	appearances?: {
+		lit: string;
+		off: string;
+	};
+	lightRadius?: number;
+	solid?: boolean;
+	containerType?: string;
+}
