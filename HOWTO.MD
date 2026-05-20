@@ -15,16 +15,16 @@ Setup
 =====
 After cloning the repository
 
-- Run npm install
-- Run ./build.sh
-- Run http-server on the build directory
-- Check http://localhost:8080
+- Run `npm install`
+- Run `npm run build`
+- Run `npx http-server build`
+- Check `http://localhost:8080`
 
 The default scenario should show up in the browser.
 
 Maps
 ====
-Tiled maps are saved on scenarios/wod6/maps. 
+Tiled maps are saved on `scenarios/wod6/maps`. 
 
 Make sure you are using uncompressed JSON format. 
 
@@ -39,7 +39,7 @@ The maps should have the following layers:
 
 Scenario Data
 =============
-Set your scenario data in scenarios/wod6/Info.js
+Set your scenario data in `scenarios/wod6/scenario.json`
 
 startingState
 
@@ -53,14 +53,14 @@ startingState
 maps
 
 - name: Identifies the map
-- filename: Filename in scenario/wod6/maps/
+- filename: Filename in `scenario/wod6/maps/`
 
 scenes
 Key is the scene key, each scene is a list of string which are shown in succession
     
 Appearances
 ===========
-Defined in src/js/data/Appearances.js
+Defined in `scenarios/wod6/appearances.json`
 
 - The numbers refer to indexes on the tileset
 - The mob appearances include 4 frames for each direction
@@ -68,11 +68,11 @@ Defined in src/js/data/Appearances.js
 Items
 =====
 
-Defined in src/js/data/Items.js Each item can have the following attributes:
+Defined in `scenarios/wod6/items.json` Each item can have the following attributes:
 
 - id: Identifies the item
 - name: Description of the item
-- appearance: Referencing an item appearance on Appearances.js
+- appearance: Referencing an item appearance on Appearances
 - flyAppearance: Used when the item is "flying" (for example when thrown)
 - throwable: Whether the item can be thrown
 - range: Max distance for throwing the item
@@ -82,7 +82,7 @@ Defined in src/js/data/Items.js Each item can have the following attributes:
 MobTypes
 ========
 
-Defined in src/js/data/MobTypes.js
+Defined in `scenarios/wod6/mobTypes.json`
 
 - id
 - name
@@ -91,13 +91,13 @@ Defined in src/js/data/MobTypes.js
 - damage
 - defense
 - speed: Determines the order in the queue for combat mode
-- corpse: References Items.js, item placed on the floor when the mob dies
+- corpse: References Items.json, item placed on the floor when the mob dies
 - intent: 'seekPlayer', 'waitCommand', 'wander', 'combat'
 
 NPCs - Basic Data
 =================
 
-Defined in src/js/data/NPCs.js
+Defined in `scenarios/wod6/npcs.json`
   
 - id
 - name
@@ -135,4 +135,4 @@ There is a special dialog fragment marked as "unknown" which is used when the ke
 
 == Assembling a build
 
-Once you have all data set, you can execute the build.sh script, then the game package will be available in the build directory (open the index.html file using a web server)
+Once you have all data set, you can execute `npm run build`, then the game package will be available in the `build` directory (open the `index.html` file using a web server)

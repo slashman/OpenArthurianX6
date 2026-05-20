@@ -52,28 +52,22 @@ We are still in development. Code is messy. Please contribute with
 
 ## First time setup
 - Run `npm install` in the root directory
-- Run `npm install browserify -g`
 
-## Optional: Serving the game via http-server
-Once the game is built, you can use `http-server` to run it in your browser.
+## Build the game
+- Run `npm run build`
 
-In order to do this you can install http-server globally via `npm install http-server -g`, then run `http-server` in the `build` directory.
+## Running in the browser
+Once the game is built, you can serve the `build` directory using any HTTP server.
 
-Alternatively, you can set up apache or any other HTTP server to serve that directory.
+For example, using `http-server`:
+- Run `npx http-server build`
+- Open `http://localhost:8080` in your browser.
 
-## Scripts
+## Running using Electron
+- Run `npm install` inside `packaging/electron/app`
+- Run `./scripts/electronRun.sh` from the root directory
 
-All scripts should be executed from the project root directory
-
-### Run in browser
-- Run `./scripts/build.sh`
-- Then serve the contents of `build` via http
-
-### Run using Electron
-- Make sure you have installed the modules for `packaging/electron/app` via `npm install`
-- Run `./scripts/electronRun.sh`
-
-### Pack using Electron
-- Run `./scripts/electronPack.sh`
-- Make sure you have installed the modules for `packaging/electron/packer` via `npm install`
+## Pack using Electron
+- Run `npm install` inside `packaging/electron/packer`
+- Run `./scripts/electronPack.sh` from the root directory
 - Use the package generated inside the `packaging/electron/packer` directory.
