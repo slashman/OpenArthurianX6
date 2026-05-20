@@ -1,0 +1,30 @@
+{
+  "assets": [
+    { "key": "dialogBack", "type": "image", "url": "assets/dialogBack.png" },
+    { "key": "title", "type": "image", "url": "assets/title.png" },
+    { "key": "bookBack", "type": "image", "url": "assets/tempBook.png" },
+    { "key": "messageBack", "type": "image", "url": "assets/messageBack.png" },
+    { "key": "inventory", "type": "image", "url": "assets/inventory.png" },
+    { "key": "uiVariants", "type": "image", "url": "assets/uiVariants_8x8.png" },
+    { "key": "mobDescription", "type": "image", "url": "assets/mobDescription.png" },
+    { "key": "blank", "type": "image", "url": "assets/blank.png" },
+    { "key": "white", "type": "image", "url": "assets/white.png" },
+    { "key": "player", "type": "spritesheet", "url": "assets/player.png", "width": 16, "height": 16 },
+    { "key": "mobs", "type": "spritesheet", "url": "assets/mobs.png", "width": 16, "height": 16 },
+    { "key": "items", "type": "spritesheet", "url": "assets/items.png", "width": 16, "height": 16 },
+    { "key": "terrain", "type": "spritesheet", "url": "assets/terrain.png", "width": 16, "height": 16 },
+    { "key": "celestialBodies", "type": "spritesheet", "url": "assets/celestialBodies.png", "width": 32, "height": 32 },
+    { "key": "skies", "type": "spritesheet", "url": "assets/skies.png", "width": 96, "height": 42 },
+    { "key": "ui", "type": "spritesheet", "url": "assets/ui.png", "width": 16, "height": 16 },
+    { "key": "portraits", "type": "spritesheet", "url": "assets/portraits.png", "width": 20, "height": 20 },
+    { "key": "pixeled", "type": "bitmapFont", "textureUrl": "assets/font.png", "atlasUrl": "assets/font.fnt" },
+    { "key": "containerMedium", "type": "image", "url": "assets/containerMedium.png" },
+    { "key": "mobContainer", "type": "image", "url": "assets/mobContainer.png" },
+    { "key": "backpackContainer", "type": "image", "url": "assets/backpack_test.png" },
+    { "key": "gravestone", "type": "image", "url": "assets/gravestone.png" },
+    { "key": "grayFont", "type": "bitmapFont", "textureUrl": "assets/grayFont.png", "atlasUrl": "assets/font.fnt" },
+    { "key": "dark", "type": "bitmapFont", "textureUrl": "assets/darkFont.png", "atlasUrl": "assets/font.fnt" },
+    { "key": "notes-lute", "type": "audio", "url": ["assets/lute.ogg"] },
+    { "key": "notes-harpsichord", "type": "audio", "url": ["assets/harpsichord.ogg"] }
+  ]
+}

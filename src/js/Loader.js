@@ -11,46 +11,31 @@ const Loader = {
 			}
 		});
 
+		const assetsListener = game.load.onFileComplete.add(function(progress, cacheKey, success) {
+			if (cacheKey === 'assets' && success) {
+				assetsListener.detach();
+				const assetsInfo = game.cache.getJSON('assets');
+				assetsInfo.assets.forEach(function(asset) {
+					switch (asset.type) {
+						case 'image':
+							game.load.image(asset.key, asset.url);
+							break;
+						case 'spritesheet':
+							game.load.spritesheet(asset.key, asset.url, asset.width, asset.height);
+							break;
+						case 'bitmapFont':
+							game.load.bitmapFont(asset.key, asset.textureUrl, asset.atlasUrl);
+							break;
+						case 'audio':
+							game.load.audio(asset.key, asset.url);
+							break;
+					}
+				});
+			}
+		});
+
 		game.load.json('scenario', 'scenario/scenario.json');
-
-		// TODO: Load the tileset based on the content packs related to the scenario
-		game.load.image('dialogBack', 'assets/dialogBack.png')
-		game.load.image('title', 'assets/title.png')
-		game.load.image('bookBack', 'assets/tempBook.png')
-		game.load.image('messageBack', 'assets/messageBack.png')
-		game.load.image('inventory', 'assets/inventory.png')
-		game.load.image('uiVariants', 'assets/uiVariants_8x8.png')
-		game.load.image('mobDescription', 'assets/mobDescription.png')
-		game.load.image('blank', 'assets/blank.png')
-		game.load.image('white', 'assets/white.png')
-
-		game.load.spritesheet('player', 'assets/player.png', 16, 16);
-		game.load.spritesheet('mobs', 'assets/mobs.png', 16, 16);
-		game.load.spritesheet('items', 'assets/items.png', 16, 16);
-		game.load.spritesheet('terrain', 'assets/terrain.png', 16, 16);
-
-		game.load.spritesheet('celestialBodies', 'assets/celestialBodies.png', 32, 32);
-		game.load.spritesheet('skies', 'assets/skies.png', 96, 42);
-
-		game.load.spritesheet('ui', 'assets/ui.png', 16, 16);
-
-		game.load.spritesheet('portraits', 'assets/portraits.png', 20, 20);
-
-		game.load.bitmapFont('pixeled', 'assets/font.png', 'assets/font.fnt');
-
-		game.load.image('containerMedium', 'assets/containerMedium.png');
-		game.load.image('mobContainer', 'assets/mobContainer.png');
-		game.load.image('backpackContainer', 'assets/backpack_test.png');
-
-		game.load.image('gravestone', 'assets/gravestone.png');
-		
-
-		game.load.bitmapFont('grayFont', 'assets/grayFont.png', 'assets/font.fnt');
-		game.load.bitmapFont('dark', 'assets/darkFont.png', 'assets/font.fnt');
-
-		// game.load.audio('notes-piano', ['assets/keys.mp3']);
-		game.load.audio('notes-lute', ['assets/lute.ogg']);
-		game.load.audio('notes-harpsichord', ['assets/harpsichord.ogg']);
+		game.load.json('assets', 'scenario/assets.json');
 
 		game.load.json('mobTypes', 'scenario/mobTypes.json');
 		game.load.json('appearances', 'scenario/appearances.json');
