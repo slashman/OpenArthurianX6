@@ -68,6 +68,7 @@ const OAX6 = {
 			player.addMobToParty(npc);
 		});
 		WorldLoader.openWorld(startingState.position, player, world);
+		player.activateParty();
 		UI.updateFOV();
 
 		if (startingState.scene) {
