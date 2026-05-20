@@ -7,6 +7,33 @@
     "chunksHeight": 1
   },
   "startingState": {
+    "_schema": {
+      "minuteOfDay": {
+        "type": "number",
+        "use": "Determines the time of the day when the game starts"
+      },
+      "party": {
+        "type": "array",
+        "_schema": {
+          "id": {
+            "type": "string",
+            "use": "NPC id of the party member"
+          }
+        }
+      },
+      "scene": {
+        "type": "string",
+        "use": "Cutscene id played when the game starts"
+      },
+      "position": {
+        "type": "object",
+        "_schema": {
+          "x": { "type": "number" },
+          "y": { "type": "number" }
+        },
+        "use": "World coordinate where the player starts"
+      }
+    },
     "minuteOfDay": 600,
     "party": [],
     "scene": "intro",
