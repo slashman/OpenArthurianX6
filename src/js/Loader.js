@@ -14,8 +14,6 @@ const Loader = {
 		game.load.json('scenario', 'scenario/scenario.json');
 
 		// TODO: Load the tileset based on the content packs related to the scenario
-		game.load.image('monsters', 'assets/monsters.png');
-		game.load.image('terrain', 'assets/terrain.png');
 		game.load.image('dialogBack', 'assets/dialogBack.png')
 		game.load.image('title', 'assets/title.png')
 		game.load.image('bookBack', 'assets/tempBook.png')
