@@ -1,6 +1,6 @@
 const circular = require('circular-functions');
 
-const Mob = require('./Mob.class');
+const Mob = require('./Mob.class').default;
 const AppearanceFactory = require('./AppearanceFactory');
 const ItemFactory = require('./ItemFactory');
 const Stat = require('./Stat.class');

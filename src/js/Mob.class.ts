@@ -1,65 +1,91 @@
 const circular = require('circular-functions');
 
-const Bus = require('./Bus');
-const Random = require('./Random');
-const Timer = require('./Timer');
-const PlayerStateMachine = require('./PlayerStateMachine');
-const ItemFactory = require('./ItemFactory');
-const Geo = require('./Geo').default;
-const MessageBox = require('./MessageBox');
-const PartyStatus = require('./ui/PartyStatus');
-const Constants = require('./Constants');
-const Inventory = require('./model/Inventory.class');
-const { Time } = require('phaser-ce');
+import Bus from "./Bus";
+import Random from './Random';
+import Timer from './Timer';
+import PlayerStateMachine from './PlayerStateMachine';
+import ItemFactory from './ItemFactory';
+import Geo from './Geo';
+import MessageBox from './MessageBox';
+import PartyStatus from './ui/PartyStatus';
+import Constants from './Constants';
 
 /**
  * Represents a being living inside a world
  * Can be the player, an enemy, a party member, or a NPC.
  */
 
-function Mob(world, x, y, z){
-	this.sprite = null;
-	this.definition = null;
-	this.world = world;
-	this.x = x;
-	this.y = y;
-	this.z = z;
-	this.isTalking = false;
-	this.canStartDialog = false; // Only player "mob" can start dialog
-	//TODO: FAR: Dialogs between NPCs
-	this.speed = null;
-	this.party = [];
-	this.bodySlots = null;
-	this.flags = {};
-	this.flags._c = circular.setSafe();
-	this.combatTurns = 0;
-	this.scheduleCheckTurns = 0;
-	this.baseSightRange = 13;
-	this._c = circular.register('Mob');
-}
+class Mob {
+	sprite: any; // Access granted to circular
+	defid: string = "";
+	definition: any; // Access granted to circular
+	npcDefid: string = "";
+	npcDefinition: any; // Access granted to circular
+	
+	private world: any; // World.ts
+	private x: number;
+	private y: number;
+	private z: number;
+	private isTalking: boolean;
+	private canStartDialog: boolean;
+	private speed: any; // Stat.ts
+	private party: Mob[];
+	private bodySlots: any; // Map<string, any> | undefined; // Item.ts (map)
+	private flags: any; // Map<string, boolean>;
+	private combatTurns: number;
+	private scheduleCheckTurns: number
+	private baseSightRange: any;
+	private _c: any;
+	private isAsleep: boolean = false;
+	private isPanicked: boolean = false;
+	private hasBeenAttacked: boolean = false;
+	private dead: boolean = false;
+	private intent: string | undefined;
+	private scheduleNextActivity: any;
+	private lastScheduledActivityId: string | undefined;
+	private hoursToWakeUp: number = 0;
+	private alignment: "player" | "enemy" | "neutral" = "neutral";
 
-circular.registerClass('Mob', Mob, {
-	transients: {
-		sprite: true,
-		definition: true,
-		npcDefinition: true
-	},
-	reviver(mob, data) {
-		mob.definition = OAX6.MobFactory.getDefinition(mob.defid);
-		if (mob.npcDefid) {
-			mob.npcDefinition = OAX6.NPCFactory.getDefinition(mob.npcDefid);
-		}
-		mob.sprite = OAX6.MobFactory.getSpriteForMob(data.phaserGame, mob);
+	private damage: any; // Stat
+	private defense: any; // Stat
+	private hp: any; // Stat
+	private name: string | undefined;
+
+	private executingAction: boolean = false;
+
+	// Activation logic
+	private deactivateNext: boolean = false;
+	private deactivatedDuringDialog: boolean = false;
+
+	private currentMobInventoryWindow: any;
+
+	constructor (world: any, x: number, y: number, z: number){
+		this.sprite = null;
+		this.definition = null;
+		this.world = world;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.isTalking = false;
+		this.canStartDialog = false; // Only player "mob" can start dialog
+		//TODO: FAR: Dialogs between NPCs
+		this.speed = null;
+		this.party = [];
+		this.bodySlots = null;
+		this.flags = {};
+		(this.flags as any)._c = circular.setSafe();
+		this.combatTurns = 0;
+		this.scheduleCheckTurns = 0;
+		this.baseSightRange = 13;
+		this._c = circular.register('Mob');
 	}
-});
 
-Mob.prototype = {
 	/**	
 	 * Mobs are prompted to act depending on
 	 * the current game mode, controlled by the 
 	 * mob scheduler
 	 */
-	act: function(){
+	private async act():Promise<void> {
 		if (this.isPartyMember() && PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 			PlayerStateMachine.actionEnabled = true;
 			OAX6.UI.activeMob = this;
@@ -73,10 +99,10 @@ Mob.prototype = {
 			return Timer.delay(1000);
 		}
 		return this.__executeAI().then(() => this.__checkTriggers());
-	},
-	__checkTriggers() {
+	}
+	private async __checkTriggers(): Promise<void> {
 		const player = OAX6.UI.player;
-		const promises = [];
+		const promises: Promise<void>[] = [];
 		if (this.npcDefinition && this.npcDefinition.triggers) {
 			const playerDistanceTriggers = this.__getActiveTriggersByType('playerDistance');
 			playerDistanceTriggers.forEach(t => {
@@ -86,21 +112,19 @@ Mob.prototype = {
 			});
 		}
 		if (promises.length) {
-			return Promise.all(promises);
-		} else {
-			return Promise.resolve();
+			await Promise.all(promises);
 		}
-	},
-	__getActiveTriggersByType(triggerType) {
+	}
+	private __getActiveTriggersByType(triggerType: string): any[] {
 		if (!this.npcDefinition || !this.npcDefinition.triggers) {
 			return [];
 		}
-		return this.npcDefinition.triggers.filter(t => t.type === triggerType && !this.flags['trigger_' + t.id]);
-	},
-	__executeAI() {
+		return this.npcDefinition.triggers.filter((t: any) => t.type === triggerType && !this.flags['trigger_' + t.id]);
+	}
+	private async __executeAI(): Promise<void> {
 		const player = OAX6.UI.player;
 		// If mob is too far from player and hasn't been attacked, it mustn't act (except if it's following a schedule)
-		if (!this.world.isInCombat(this) && !this.intent == 'followSchedule') {
+		if (!this.world.isInCombat(this) && this.intent !== 'followSchedule') {
 			return Timer.delay(1000);	
 		}
 		let subIntent = this.intent; // While we have a general intent, it may change for this action
@@ -153,8 +177,8 @@ Mob.prototype = {
 		} else {
 			return Timer.delay(1000);
 		}
-	},
-	fleeAction: function () {
+	}
+	private async fleeAction(): Promise<void> {
 		if (this.dead){
 			return Promise.resolve();
 		}
@@ -170,16 +194,16 @@ Mob.prototype = {
 		} else {
 			return this.bumpAwayFrom(nearbyEnemy);
 		}
-	},
-	moveRandomly: function () {
+	}
+	private async moveRandomly(): Promise<void> {
 		var dx = Random.num(-1,1);
 		var dy = Random.num(-1,1);
 		if (dx === 0 && dy === 0){
 			dx = 1;
 		}
 		return this.moveTo(dx, dy);
-	},
-	combatAction: function () {
+	}
+	private async combatAction(): Promise<void> {
 		if (this.dead){
 			return Promise.resolve();
 		}
@@ -199,13 +223,15 @@ Mob.prototype = {
 				Geo.flatDist(nearbyTarget.x, nearbyTarget.y, this.x, this.y) <= weapon.def.range &&
 				this.world.isLineClear(this.x, this.y, nearbyTarget.x, nearbyTarget.y, this.z)
 				) {
-				return this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
+				const attacked = await this.attackToPosition(nearbyTarget.x, nearbyTarget.y);
+				//TODO: Actually flow `attacked` upstream
+				return;
 			} else {
 				return this.bumpTowards(nearbyTarget);
 			}
 		} 
-	},
-	bumpAwayFrom: function (targetMob) {
+	}
+	private async bumpAwayFrom(targetMob: Mob): Promise<void> {
 		const nextStep = this.world.findNearPath(this, targetMob, this.z, this.alignment, true);
 		let dx = -nextStep.dx;
 		let dy = -nextStep.dy;
@@ -214,8 +240,8 @@ Mob.prototype = {
 		} else {
 			return this.moveRandomly();
 		}
-	},
-	followSchedule: function () {
+	}
+	private async followSchedule(): Promise<void> {
 		this.scheduleCheckTurns--;
 		if (this.scheduleCheckTurns > 0) {
 			if (!this.scheduleNextActivity) {
@@ -238,8 +264,8 @@ Mob.prototype = {
 			// We are close enough
 			return this.__arrivedAtActivity();
 		}
-	},
-	__arrivedAtActivity: function () {
+	}
+	private async __arrivedAtActivity(): Promise<void> {
 		const activity = this.scheduleNextActivity;
 		delete this.scheduleNextActivity;
 		if (activity.action) {
@@ -255,8 +281,8 @@ Mob.prototype = {
 		} else {
 			return this.moveRandomly();
 		}
-	},
-	gotoNextActivity: function () {
+	}
+	private async gotoNextActivity(): Promise<void> {
 		if (!this.scheduleNextActivity) {
 			return this.moveRandomly();
 		}
@@ -265,12 +291,12 @@ Mob.prototype = {
 			return this.__arrivedAtActivity();
 		}
 		return this.walkTowardsActivity(this.scheduleNextActivity);
-	},
-	getDesiredLocationBySchedule: function () {
+	}
+	private getDesiredLocationBySchedule(): any {
 		if (!this.npcDefinition || !this.npcDefinition.schedule) {
 			return undefined;
 		}
-		this.npcDefinition.schedule.sort((a,b) => b.time - a.time); // TODO: Don't do this every time.
+		this.npcDefinition.schedule.sort((a: any, b: any) => b.time - a.time); // TODO: Don't do this every time.
 		const timeOfDay = OAX6.UI.player.world.getHourOfDay();
 		// Get the prior scheduled unit based on timeOfDay, wrapping to the previous day if needed.
 		let nextActivity;
@@ -287,8 +313,8 @@ Mob.prototype = {
 		const ret = Object.assign({}, nextActivity);
 		ret._c = circular.setSafe();
 		return ret;
-	},
-	walkTowardsActivity: function (activity) {
+	}
+	private async walkTowardsActivity(activity: any): Promise<void> {
 		const nextStep = this.world.findLongPath(activity.location, this, this.z, this.alignment);
 		if (!nextStep) {
 			return this.moveRandomly();
@@ -308,14 +334,14 @@ Mob.prototype = {
 		} else {
 			return this.bumpOnDirection(dx, dy);
 		}
-	},
-	bumpTowards: function (targetMob) {
+	}
+	private async bumpTowards(targetMob: Mob): Promise<void> {
 		const nextStep = this.world.findNearPath(this, targetMob, this.z, this.alignment, true);
 		let dx = nextStep.dx;
 		let dy = nextStep.dy;
 		return this.bumpOnDirection(dx, dy);
-	},
-	bumpOnDirection: function (dx, dy) {
+	}
+	private async bumpOnDirection(dx: number, dy: number): Promise<void> {
 		const mob = this.world.getMobAt(this.x + dx, this.y + dy, this.z);
 		if (mob){
 			if (mob.alignment !== this.alignment){
@@ -326,8 +352,8 @@ Mob.prototype = {
 		} else {
 			return this.moveTo(dx, dy);
 		}
-	},
-	onCombatTurn: function() {
+	}
+	private async onCombatTurn(): Promise<void> {
 		return Promise.resolve().then(() => {
 			if (PlayerStateMachine.state !== PlayerStateMachine.COMBAT){
 				return;
@@ -346,49 +372,38 @@ Mob.prototype = {
 			});
 			return promise;
 		});
-	},
-	executeTriggerActions: function(trigger) {
-		return Promise.resolve().then(() => {
-			let p = Promise.resolve();
-			trigger.actions.forEach(a => {
-				let promiseFunction;
-				switch (a.type) {
-					case 'console':
-						// TODO: Chain this to the promise, must be a function returning a promise, not a promise.
-						promiseFunction = new Promise(r => {
-							console.log(a.value);
-							r();	
-						});
-						break;
-					case 'cutscene':
-						promiseFunction = () => OAX6.UI.showScene(a.value);
-						break;
-					case 'vanishNearbyMobs':
-						promiseFunction = () => this.world.vanishNearbyMobs(this, this.alignment, 20);
-						break;
-					case 'teleportToWorld':
-						promiseFunction = Promise.resolve();
-						// TODO: Look at the repo history to implement this.
-						break;
-					case 'endCombat':
-						promiseFunction = () => PlayerStateMachine.endCombat();
-						break;
-					case 'talk':
-						// TODO: Chain this to the promise
-						Bus.emit('startDialog', {mob: this, dialog: this.npcDefinition.dialog, player: OAX6.UI.player});
-						break;
-					case 'showMessage':
-						promiseFunction = () => OAX6.UI.showMessage(a.value);
-						break;
-				}
-				p = p.then(promiseFunction);
-				
-			});
+	}
+	private async executeTriggerActions(trigger: any) {
+		for (let i = 0; i < trigger.actions.length; i++) {
+			const a = trigger.actions[i];
+			switch (a.type) {
+				case 'console':		
+					console.log(a.value);
+					break;
+				case 'cutscene':
+					await OAX6.UI.showScene(a.value);
+					break;
+				case 'vanishNearbyMobs':
+					await this.world.vanishNearbyMobs(this, this.alignment, 20);
+					break;
+				case 'teleportToWorld':
+					// TODO: Look at the repo history to implement this.
+					break;
+				case 'endCombat':
+					await PlayerStateMachine.endCombat();
+					break;
+				case 'talk':
+					// TODO: Chain this to the promise
+					Bus.emit('startDialog', {mob: this, dialog: this.npcDefinition.dialog, player: OAX6.UI.player});
+					break;
+				case 'showMessage':
+					OAX6.UI.showMessage(a.value);
+					break;
+			}
 			this.flags['trigger_' + trigger.id] = true;
-			return p;
-		});
-	},
-	canTrack: function (mob) {
+		}
+	}
+	private canTrack (mob: Mob): boolean {
 		if (mob.z != this.z) {
 			return false;
 		}
@@ -402,14 +417,14 @@ Mob.prototype = {
 		}
 		// Else trace a line and check no opaque tiles hit
 		return this.world.isLineClear(mob.x, mob.y, this.x, this.y, this.z);
-	},
-	isHostileMob: function(){
+	}
+	private isHostileMob(): boolean{
 		return this.alignment === Constants.Alignments.ENEMY;
-	},
-	isPartyMember: function(){
+	}
+	private isPartyMember(): boolean{
 		return this == OAX6.UI.player || OAX6.UI.player.party.indexOf(this) !== -1;
-	},
-	getNearbyTarget: function(){
+	}
+	private getNearbyTarget(): Mob | false {
 		if (this.alignment === Constants.Alignments.NEUTRAL) {
 			// TODO: If was attacked, target the offender
 			// TODO: Wild animals may attack randomly
@@ -425,11 +440,11 @@ Mob.prototype = {
 		} else {
 			return false;
 		}
-	},
-	deactivate() {
+	}
+	private deactivate(): void {
 		this.deactivateNext = true;
-	},
-	activate: function() {
+	}
+	private activate() {
 		if (this.dead){
 			return;
 		}
@@ -463,12 +478,12 @@ Mob.prototype = {
 			}
 			//return Timer.delay(Random.num(500, 3000));
 		}).then(()=>{this.activate();});
-	},
-	lookAt: function(dx, dy) {
+	}
+	private lookAt(dx: number, dy: number): void {
 		var dir = OAX6.UI.selectDir(dx, dy);
 		this.sprite.animations.play('walk_'+dir, 0);
-	},
-	moveTo: function(dx, dy){
+	}
+	private async moveTo(dx: number, dy: number){
 		if (!this.world.canMoveFrom(this.x, this.y, this.z, dx, dy)){
 			this.reportAction("Move - Blocked");
 			return Timer.delay(500);
@@ -506,18 +521,18 @@ Mob.prototype = {
 		this.reportAction("Move");
 
 		return OAX6.UI.executeTween(this.sprite, {x: this.sprite.x + dx*16, y: this.sprite.y + dy*16}, OAX6.UI.WALK_DELAY);
-	},
+	}
 	
 	/*
 	 * Relocates the mob without a tween, for example when the world loads
 	 */
-	relocate (x, y) {
+	private relocate (x: number, y: number): void {
 		this.x = x;
 		this.y = y;
 		this.sprite.x = this.x * 16;
 		this.sprite.y = this.y * 16;
-	},
-	addItem: function(item) {
+	}
+	private addItem(item: any): boolean {
 		const backpack = this.getBackpack();
 		if (!this.getItemAtSlot("rightHand")) {
 			this.setItemAtSlot("rightHand", item);
@@ -533,8 +548,8 @@ Mob.prototype = {
 			this.currentMobInventoryWindow.refresh();
 		}
 		return true;
-	},
-	getOnDirection: function(dx, dy) {
+	}
+	private getOnDirection(dx: number, dy: number): void{
 		var item = this.world.getItemAt(this.x + dx, this.y + dy, this.z);
 		if (item) {
 			const pickedQuantity = item.quantity;
@@ -552,11 +567,11 @@ Mob.prototype = {
 		} else {
 			this.reportAction("Get - Nothing there!");
 		}
-	},
-	useOnDirection(dx, dy) {
+	}
+	private useOnDirection(dx: number, dy: number) {
 		return this.useInPosition(this.x + dx, this.y + dy, dx, dy);
-	},
-	useInPosition(x, y, dx, dy) {
+	}
+	private useInPosition(x: number, y: number, dx: number, dy: number) {
 		if (!dx) {
 			dx = x - this.x;
 			dy = y - this.y;
@@ -586,8 +601,8 @@ Mob.prototype = {
 		} else {
 			this.reportAction("Use - Nothing there!");
 		}
-	},
-	useMobInPosition(x, y, mob) {
+	}
+	private useMobInPosition(x: number, y: number, mob: Mob) {
 		const mobEffect = mob.definition.useEffect
 		if (!mobEffect) {
 			OAX6.UI.showMessage("Cannot be used");
@@ -598,8 +613,8 @@ Mob.prototype = {
 			this.tryMilk(mob);
 			break;
 		}
-	},
-	tryMilk (cow) {
+	}
+	private tryMilk(cow: Mob): void {
 		const bucket = this.findBucket();
 		if (!bucket) {
 			OAX6.UI.showMessage("You need an empty bucket to milk the cow.");
@@ -607,8 +622,8 @@ Mob.prototype = {
 		}
 		OAX6.UI.showMessage("You milk the cow.");
 		bucket.switchItemDefinition('milkBucket');
-	},
-	findBucket () {
+	}
+	private findBucket(): any {
 		const emptyBucketDefId = 'emptyBucket';
 		let bucket = this.findItemAroundById(emptyBucketDefId);
 		if (!bucket) {
@@ -624,8 +639,8 @@ Mob.prototype = {
 			}
 		}
 		return bucket;
-	},
-	findItemAroundById (id) {
+	}
+	private findItemAroundById(id: string): any {
 		for (let xx = -1; xx <= 1; xx++) {
 			for (let yy = -1; yy <= 1; yy++) {
 				const item = this.world.getItemAt(this.x + xx, this.y + yy, this.z);
@@ -638,11 +653,11 @@ Mob.prototype = {
 			}
 		}
 		return undefined;
-	},
-	useItemOnDirection(dx, dy, item) {
+	}
+	private useItemOnDirection(dx: number, dy: number, item: any): void{
 		return this.useItemInPosition(this.x + dx, this.y + dy, item);
-	},
-	useItemInPosition(x, y, item) {
+	}
+	private useItemInPosition(x: number, y: number, item: any): void {
 		const itemEffect = item.def.effect
 		if (!itemEffect) {
 			OAX6.UI.showMessage("Cannot be used");
@@ -714,8 +729,8 @@ Mob.prototype = {
 			item.refreshVisualContainer();
 		}
 		
-	},
-	attackToPosition: function(x, y){
+	}
+	private async attackToPosition(x: number, y: number): Promise<boolean>{
 		const weapon = this.getWeapon();
 		const range = weapon ? (weapon.def.range || 1) : 1;
 		const dist = Geo.flatDist(this.x, this.y, x, y);
@@ -757,11 +772,10 @@ Mob.prototype = {
 			return this.attackOnDirection(Math.sign(x-this.x), Math.sign(y-this.y));
 		} else {
 			this.reportAction("Attack - Out of range!");
-			return Promise.resolve();
+			return Promise.resolve(false);
 		}
-	},
-	
-	getAmmunitionFor: function(weapon) {
+	}
+	private getAmmunitionFor(weapon: any): any {
 		const ammoType = weapon.def.usesProjectileType;
 		if (ammoType) {
 			const backItem = this.getBackpack();
@@ -797,9 +811,9 @@ Mob.prototype = {
 				slotId: 'rightHand'
 			}
 		}
-	},
+	}
 
-	consumeAmmunition: function (ammoInfo) {
+	private consumeAmmunition (ammoInfo: any): void {
 		const { slotId, container, ammo } = ammoInfo;
 		if (slotId) {
 			this.reduceItemQuantityAtSlot(slotId);
@@ -808,28 +822,28 @@ Mob.prototype = {
 		} else {
 			throw new Error("Invalid consumeAmmunition operation."); // Shouldn't happen, ammo can only be on the backpack, or weapon for now
 		}
-	},
+	}
 
-	reduceItemQuantityAtSlot(slotId, variation) {
+	private reduceItemQuantityAtSlot(slotId: string, variation: number = 1): void {
 		variation = variation || 1;
 		const item = this.getItemAtSlot(slotId);
 		if (item.quantity) {
 			if (item.quantity > variation) {
 				item.quantity -= variation;
 			} else if (item.quantity < variation) {
-				throw new Error('Not enough quantity of item ' + item.name + ' to reduce by ' + quantity);
+				throw new Error('Not enough quantity of item ' + item.name + ' to reduce by ' + variation);
 			} else {
 				this.removeItemAtSlot(slotId);
 			}
 		} else {
 			this.removeItemAtSlot(slotId);
 		}
-	},
+	}
 
-	attackOnDirection: function(dx, dy){
+	private async attackOnDirection(dx: number, dy: number){
 		return this._attackPosition(this.x + dx, this.y + dy);
-	},
-	_attackPosition: function(x, y){
+	}
+	private async _attackPosition(x: number, y: number){
 		var mob = this.world.getMobAt(x, y, this.z);
 		if (mob){
 			// Attack!
@@ -847,8 +861,8 @@ Mob.prototype = {
 			this.reportAction("Attack - No one there!");
 			return Timer.delay(500);
 		}
-	},
-	attack: function(mob){
+	}
+	private async attack(mob: Mob){
 		mob.hasBeenAttacked = true;
 		if (PlayerStateMachine.state === PlayerStateMachine.WORLD){
 			//TODO: Should only happen if party member was attacked.
@@ -859,9 +873,9 @@ Mob.prototype = {
 		}
 		if (mob.alignment === Constants.Alignments.NEUTRAL || mob.alignment === this.alignment) {
 			if (this.alignment == Constants.Alignments.ENEMY) {
-				mob.alignment = Constants.Alignments.PLAYER;
+				mob.alignment = 'player';
 			} else {
-				mob.alignment = Constants.Alignments.ENEMY;
+				mob.alignment = 'enemy';
 			}
 		}
 		if (mob.isAsleep) {
@@ -886,14 +900,14 @@ Mob.prototype = {
 		this.reportOutcome(mob.getDescription()+" is "+ATTACK_DESCRIPTIONS[proportion]+"wounded.");
 		mob._damage(damage);
 		return Timer.delay(100);
-	},
+	}
 	// Make the mob disappear from the world (like death, but without a corpse or anything.)
-	vanish: function () {
+	private vanish(): void {
 		this.dead = true;
 		this.sprite.destroy();
 		this.world.removeMob(this);
-	},
-	_damage: function(damage){
+	}
+	private _damage(damage: number): void{
 		this.hp.reduce(damage);
 		if (this.hp.empty()){
 			this.reportOutcome(this.getDescription()+" dies.");
@@ -911,11 +925,11 @@ Mob.prototype = {
 				}
 			}
 		}
-	},
-	climb: function(dz){
+	}
+	private climb (dz: number): void{
 
-	},
-	reportAction: function(action){
+	}
+	private reportAction(action: string): void {
 		if (PlayerStateMachine.state === PlayerStateMachine.COMBAT){
 			OAX6.UI.showMessage(this.getBattleDescription()+": "+action);
 		} else if (OAX6.UI.activeMob == this){ 
@@ -923,11 +937,11 @@ Mob.prototype = {
 				OAX6.UI.showMessage(action);
 			}
 		}
-	},
-	reportOutcome: function(outcome){
+	}
+	private reportOutcome(outcome: any): void {
 		OAX6.UI.showMessage(outcome);
-	},
-	getBattleDescription: function(){
+	}
+	private getBattleDescription(): string{
 		let desc = null;
 		if (this.name){
 			desc = this.name;
@@ -939,53 +953,53 @@ Mob.prototype = {
 			desc += " armed with " + weapon.def.name;
 		}
 		return desc;
-	},
-	getDescription: function(){
+	}
+	private getDescription(): string {
 		if (this.name){
 			return this.name;
 		} else {
 			return 'The '+ this.definition.name;
 		}
-	},
-	isMobOnParty: function(mob){
+	}
+	private isMobOnParty(mob: Mob): boolean{
 		return this.party.indexOf(mob) != -1;
-	},
-	addMobToParty: function(mob){
+	}
+	private addMobToParty(mob: Mob): void {
 		if (this.isMobOnParty(mob))
 			return;
 		this.party.push(mob);
 		PartyStatus.addMob(mob);
-	},
-	removeFromParty: function(mob){
+	}
+	private removeFromParty(mob: Mob): void{
 		this.party.splice(this.party.indexOf(mob), 1);
 		PartyStatus.removeMob(mob);
-	},
-	checkForGameOver: function() {
+	}
+	private checkForGameOver(): void {
 		const player = OAX6.UI.player;
-		if (player.dead && !player.party.find(p => !p.dead)) {
+		if (player.dead && !player.party.find((p: Mob) => !p.dead)) {
 			MessageBox.showMessage("GAME OVER!");
 		}
-	},
-	activateParty() {
+	}
+	private activateParty(): void {
 		this.party.forEach(m => m.activate());	
-	},
-	deactivateParty() {
+	}
+	private deactivateParty(): void {
 		this.party.forEach(m => m.deactivate());	
-	},
-	talkWithMob(mob) {
+	}
+	private talkWithMob(mob: Mob): void {
 		Bus.emit('startDialog', {mob: mob, dialog: mob.npcDefinition.dialog, player: OAX6.UI.player});
 		const dx = Math.sign(mob.x - this.x);
 		const dy = Math.sign(mob.y - this.y);
 		this.lookAt(dx, dy);
 		mob.lookAt(-dx, -dy);
-	},
-	getContainerId() {
+	}
+	private getContainerId(): string {
 		return "mob" + this._c.uid;
-	},
-	getItemAtSlot(slotId) {
+	}
+	private getItemAtSlot(slotId: string): any {
 		return this.bodySlots[slotId];
-	},
-	setItemAtSlot(slotId, item) {
+	}
+	private setItemAtSlot(slotId: string, item: any) {
 		this.bodySlots[slotId] = item;
 		if (item) {
 			item.container = this;
@@ -996,39 +1010,39 @@ Mob.prototype = {
 			delete item.z;
 		}
 		// TODO: If there is an item already, put in backpack
-	},
-	removeItemAtSlot(slotId) {
+	}
+	private removeItemAtSlot(slotId: string): void {
 		const currentItem = this.bodySlots[slotId];
 		if (currentItem) {
 			currentItem.currentSlotId = false;
 		}
 		delete this.bodySlots[slotId];
-	},
-	getWeapon() {
+	}
+	private getWeapon(): any {
 		return this.getItemAtSlot('rightHand');
-	},
-	setWeapon(item) {
+	}
+	private setWeapon(item: any): void {
 		this.setItemAtSlot('rightHand', item);
-	},
-	removeWeapon() {
+	}
+	private removeWeapon(): void {
 		this.removeItemAtSlot('rightHand');
-	},
-	getArmor() {
+	}
+	private getArmor(): any {
 		return this.getItemAtSlot('torso');
-	},
-	setArmor(item) {
+	}
+	private setArmor(item: any): void {
 		this.setItemAtSlot('torso', item);
-	},
-	removeArmor(item) {
+	}
+	private removeArmor(): void {
 		this.removeItemAtSlot('torso');
-	},
-	getBackpack() {
+	}
+	private getBackpack(): any {
 		return this.getItemAtSlot('back');
-	},
-	setBackpack(item) {
+	}
+	private setBackpack(item: any): void {
 		this.setItemAtSlot('back', item);
-	},
-	canReach(item) {
+	}
+	private canReach(item: any): boolean {
 		if (this.x != item.x || this.y != item.y || this.z != item.z) {
 			const path = this.world.findNearPath(this, item, this.z, undefined, true);
 			if (path.dx == 0 && path.dy == 0) {
@@ -1037,8 +1051,8 @@ Mob.prototype = {
 			}
 		}
 		return true;
-	},
-	tryDrop(item, position) {
+	}
+	private tryDrop(item: any, position: any): boolean {
 		const worldItem = this.world.getItemAt(position.x, position.y, position.z);
 		if (this.x != position.x || this.y != position.y || this.z != position.z) {
 			const containerAtTarget = worldItem && worldItem.isContainer();
@@ -1064,30 +1078,30 @@ Mob.prototype = {
 		}
 		this.world.addItem(item, position.x, position.y, this.z);
 		return true;
-	},
-	removeItem(item) {
+	}
+	private removeItem(item: any): void {
 		if (item.currentSlotId) {
 			this.removeItemAtSlot(item.currentSlotId);
 			if (this.currentMobInventoryWindow) {
 				this.currentMobInventoryWindow.refresh();
 			}
 		}
-	},
-	gotoSleep(numberOfHours) {
+	}
+	private gotoSleep(numberOfHours: number): void {
 		this.isAsleep = true;
 		this.sprite.animations.play('sleep', 0);
 		this.hoursToWakeUp = numberOfHours;
-	},
-	wakeUp() {
+	}
+	private wakeUp(): void {
 		this.isAsleep = false;
-	},
-	hourlyWakeupCheck () {
+	}
+	private hourlyWakeupCheck (): void {
 		this.hoursToWakeUp--;
 		if (this.hoursToWakeUp < 0) {
 			this.wakeUp();
 		}
-	},
-	getSightRange () {
+	}
+	private getSightRange(): number {
 		const hourOfTheDay = OAX6.UI.player.world.getHourOfDay();
 		let malus = 0;
 		if (hourOfTheDay < 5 || hourOfTheDay > 19) {
@@ -1099,9 +1113,7 @@ Mob.prototype = {
 		} 
 		return this.baseSightRange - malus;
 	}
-};
-
-module.exports = Mob;
+}
 
 const ATTACK_DESCRIPTIONS = [
 	"barely ",
@@ -1110,3 +1122,20 @@ const ATTACK_DESCRIPTIONS = [
 	"critically ",
 	"critically "
 ];
+
+circular.registerClass('Mob', Mob, {
+	transients: {
+		sprite: true,
+		definition: true,
+		npcDefinition: true
+	},
+	reviver(mob: Mob, data: any) {
+		mob.definition = OAX6.MobFactory.getDefinition(mob.defid);
+		if (mob.npcDefid) {
+			mob.npcDefinition = OAX6.NPCFactory.getDefinition(mob.npcDefid);
+		}
+		mob.sprite = OAX6.MobFactory.getSpriteForMob(data.phaserGame, mob);
+	}
+});
+
+export default Mob;

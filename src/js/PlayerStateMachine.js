@@ -21,6 +21,9 @@ const PlayerStateMachine = {
     MUSIC       : 10,
     TITLE       : 11,
 
+    state: 0,
+    actionEnabled: false,
+
     init: function(game) {
         this.game = game;
         this.cursors = this.game.input.keyboard.createCursorKeys();
